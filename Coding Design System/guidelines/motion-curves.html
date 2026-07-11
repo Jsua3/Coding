@@ -1,0 +1,18 @@
+<!-- @dsCard group="Motion" viewport="700x180" name="Curvas de movimiento" subtitle="El vidrio tiene masa — desaceleraciones largas y resortes" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body { padding: 18px 20px; overflow: hidden; }
+.lane { position: relative; height: 34px; margin-bottom: 10px; border-radius: 99px; background: var(--glass-bg-subtle); border: 1px solid var(--glass-stroke); } .ball { position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 99px; background: linear-gradient(180deg, #7FA9E6, #4E86D6); box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 0 14px rgba(94,151,230,0.5); animation: run 2.6s infinite alternate; } code { position: absolute; right: 12px; top: 8px; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-tertiary); } @keyframes run { from { transform: translateX(0); } to { transform: translateX(280px); } }
+</style>
+</head>
+<body>
+<div class="lane"><div class="ball" style="animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);"></div><code>--ease-glass · 0.22, 1, 0.36, 1</code></div>
+<div class="lane"><div class="ball" style="animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); background: linear-gradient(180deg, #6BD4C4, #3FB5A3); box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 0 14px rgba(82,201,184,0.5);"></div><code>--ease-spring · 0.34, 1.56, 0.64, 1</code></div>
+<div class="lane"><div class="ball" style="animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); background: linear-gradient(180deg, #B0A8E8, #8378DB); box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 0 14px rgba(146,137,227,0.5);"></div><code>--ease-out · 0.16, 1, 0.3, 1</code></div>
+<div style="font-size: 11.5px; color: var(--text-tertiary); font-family: var(--font-mono);">fast 160ms — hovers · base 320ms — transiciones · slow 640ms — progreso</div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+/* Coding — corner radii (continuous, generous — glass pebbles) */
+:root {
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+  --radius-pill: 999px;
+}

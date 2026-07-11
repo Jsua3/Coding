@@ -1,0 +1,47 @@
+/* Coding — color system (Liquid Glass, dark aurora) */
+:root {
+  /* Base ink backgrounds (glass sits on these) */
+  --bg-deep: #05070F;
+  --bg-base: #0A0F1E;
+  --bg-raised: #111A30;
+
+  /* Aurora accents — light sources refracted through the glass */
+  --accent-blue: #5E97E6;
+  --accent-cyan: #52C9B8;
+  --accent-violet: #9289E3;
+  --accent-amber: #E6AF6B;
+
+  /* Subject hues (course categories) */
+  --subject-programacion: var(--accent-blue);
+  --subject-basesdatos: var(--accent-cyan);
+  --subject-algoritmos: var(--accent-violet);
+  --subject-web: var(--accent-amber);
+
+  /* Text on dark glass */
+  --text-primary: rgba(255, 255, 255, 0.96);
+  --text-secondary: rgba(226, 236, 255, 0.72);
+  --text-tertiary: rgba(226, 236, 255, 0.45);
+  --text-on-accent: #051022;
+
+  /* Semantic */
+  --success: #4CC793;
+  --warning: #E6B56B;
+  --danger: #E67984;
+  --info: var(--accent-blue);
+
+  /* Semantic aliases */
+  --surface-page: var(--bg-base);
+  --surface-card: var(--glass-bg);
+  --text-body: var(--text-secondary);
+  --text-heading: var(--text-primary);
+  --link: var(--accent-cyan);
+  --link-hover: #8CD6C9;
+  --focus-ring: rgba(94, 151, 230, 0.42);
+
+  /* Aurora background gradient (page backdrop) */
+  --aurora-page:
+    radial-gradient(52% 42% at 12% 8%, rgba(94, 151, 230, 0.12), transparent 70%),
+    radial-gradient(44% 38% at 88% 18%, rgba(146, 137, 227, 0.10), transparent 70%),
+    radial-gradient(50% 46% at 78% 92%, rgba(82, 201, 184, 0.08), transparent 70%),
+    linear-gradient(180deg, #0A0F1E 0%, #05070F 100%); /* @kind other */
+}

@@ -1,0 +1,48 @@
+/* Coding — canonical glass recipes + base element styles */
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--aurora-page);
+  background-attachment: fixed;
+  color: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+  font-size: var(--text-base);
+  letter-spacing: var(--tracking-body);
+  line-height: var(--leading-normal);
+}
+
+a { color: var(--link); text-decoration: none; transition: color var(--duration-fast) var(--ease-glass); }
+a:hover { color: var(--link-hover); }
+
+::selection { background: rgba(94, 151, 230, 0.35); color: var(--text-primary); }
+
+/* The Liquid Glass material */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--refraction-edge), var(--shadow-glass);
+  border-radius: var(--radius-lg);
+  position: relative;
+}
+/* El blur vive en su propia capa: el texto encima se pinta siempre nitido */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(var(--saturate-glass));
+  backdrop-filter: blur(var(--blur-md)) saturate(var(--saturate-glass));
+}
+.glass--subtle { background: var(--glass-bg-subtle); box-shadow: var(--refraction-edge), var(--shadow-rest); }
+.glass--strong { background: var(--glass-bg-strong); box-shadow: var(--refraction-edge), var(--shadow-float); }
+
+/* Specular sheen overlay — add to any .glass */
+.glass--specular::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--specular);
+  pointer-events: none;
+}

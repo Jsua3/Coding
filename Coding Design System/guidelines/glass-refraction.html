@@ -1,0 +1,23 @@
+<!-- @dsCard group="Glass" viewport="700x170" name="Refraccion y especular" subtitle="Borde luminoso superior + brillo que recorre la superficie" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body { padding: 18px 20px; overflow: hidden; }
+.blobs { position: absolute; inset: 0; pointer-events: none; } .blob { position: absolute; border-radius: 999px; filter: blur(28px); opacity: 0.75; }.p { position: relative; padding: 26px; border-radius: var(--radius-xl); background: var(--glass-bg); border: 1px solid var(--glass-stroke); box-shadow: var(--refraction-edge), var(--shadow-glass); overflow: hidden; } .p::before { content: ""; position: absolute; inset: 0; background: var(--specular); } .p::after { content: ""; position: absolute; inset: 0; z-index: -1; -webkit-backdrop-filter: blur(28px) saturate(135%); backdrop-filter: blur(28px) saturate(135%); } .note { position: relative; display: flex; gap: 28px; font-size: 12.5px; color: var(--text-secondary); } .note b { color: var(--text-primary); display: block; font-size: 13.5px; margin-bottom: 2px; } .edge { position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent); }
+</style>
+</head>
+<body>
+<div class="blobs"><div class="blob" style="width: 240px; height: 130px; left: 10%; top: 24px; background: var(--accent-blue);"></div><div class="blob" style="width: 200px; height: 120px; right: 8%; top: 10px; background: var(--accent-violet);"></div></div>
+<div class="p">
+<div class="edge"></div>
+<div class="note">
+<div><b>inset 0 1px blanco 45%</b>arista superior iluminada</div>
+<div><b>laterales 13%</b>refraccion en los bordes</div>
+<div><b>specular ::before</b>gradiente 24% → 0 al 60%</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+/* Coding — type system */
+:root {
+  --font-display: "Figtree", -apple-system, "SF Pro Display", system-ui, sans-serif;
+  --font-body: "Figtree", -apple-system, "SF Pro Text", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+
+  /* Scale */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 30px;
+  --text-3xl: 38px;
+  --text-4xl: 48px;
+  --text-hero: 64px;
+
+  /* Weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-heavy: 800;
+
+  /* Leading + tracking */
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --tracking-display: -0.03em;
+  --tracking-heading: -0.02em;
+  --tracking-body: -0.006em;
+  --tracking-caps: 0.08em;
+}

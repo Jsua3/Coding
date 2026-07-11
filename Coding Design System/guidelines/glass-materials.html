@@ -1,0 +1,20 @@
+<!-- @dsCard group="Glass" viewport="700x160" name="Material de vidrio" subtitle="Relleno translucido + blur + borde de refraccion + sombra" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body { padding: 18px 20px; overflow: hidden; }
+.blobs { position: absolute; inset: 0; pointer-events: none; } .blob { position: absolute; border-radius: 999px; filter: blur(28px); opacity: 0.75; }.g { position: relative; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; } .p { padding: 22px 18px; text-align: center; font-size: 13px; color: var(--text-primary); font-weight: 600; } .sub { display: block; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-tertiary); font-weight: 400; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="blobs"><div class="blob" style="width: 180px; height: 120px; left: 6%; top: 20px; background: var(--accent-blue);"></div><div class="blob" style="width: 160px; height: 110px; left: 42%; top: 30px; background: var(--accent-violet);"></div><div class="blob" style="width: 170px; height: 110px; right: 5%; top: 14px; background: var(--accent-cyan);"></div></div>
+<div class="g">
+<div class="p glass glass--subtle glass--specular">subtle<span class="sub">bg 7% · shadow-rest</span></div>
+<div class="p glass glass--specular">default<span class="sub">bg 11% · shadow-glass</span></div>
+<div class="p glass glass--strong glass--specular">strong<span class="sub">bg 17% · shadow-float</span></div>
+</div>
+</body>
+</html>

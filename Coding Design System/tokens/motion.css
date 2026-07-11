@@ -1,0 +1,9 @@
+/* Coding — motion. Fluid, springy, weighty — glass has mass. */
+:root {
+  --ease-glass: cubic-bezier(0.22, 1, 0.36, 1); /* @kind other */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* @kind other */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* @kind other */
+  --duration-fast: 160ms; /* @kind other */
+  --duration-base: 320ms; /* @kind other */
+  --duration-slow: 640ms; /* @kind other */
+}

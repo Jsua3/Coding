@@ -1,0 +1,20 @@
+<!-- @dsCard group="Glass" viewport="700x160" name="Niveles de blur" subtitle="14 / 28 / 48 px + saturacion 135%" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body { padding: 18px 20px; overflow: hidden; }
+.blobs { position: absolute; inset: 0; pointer-events: none; } .blob { position: absolute; border-radius: 999px; filter: blur(28px); opacity: 0.75; }.g { position: relative; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; } .p { position: relative; padding: 22px 18px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-primary); background: var(--glass-bg); border: 1px solid var(--glass-stroke); border-radius: var(--radius-lg); box-shadow: var(--refraction-edge); } .p::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; -webkit-backdrop-filter: var(--bf); backdrop-filter: var(--bf); } .sub { display: block; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-tertiary); font-weight: 400; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="blobs"><div class="blob" style="width: 200px; height: 120px; left: 4%; top: 16px; background: var(--accent-cyan);"></div><div class="blob" style="width: 190px; height: 120px; left: 40%; top: 26px; background: var(--accent-blue);"></div><div class="blob" style="width: 180px; height: 120px; right: 4%; top: 12px; background: var(--accent-violet);"></div></div>
+<div class="g">
+<div class="p" style="--bf: blur(var(--blur-sm)) saturate(var(--saturate-glass));">blur-sm<span class="sub">14px — controles</span></div>
+<div class="p" style="--bf: blur(var(--blur-md)) saturate(var(--saturate-glass));">blur-md<span class="sub">28px — paneles</span></div>
+<div class="p" style="--bf: blur(var(--blur-lg)) saturate(var(--saturate-glass));">blur-lg<span class="sub">48px — overlays</span></div>
+</div>
+</body>
+</html>

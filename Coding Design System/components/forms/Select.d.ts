@@ -1,0 +1,14 @@
+import * as React from "react";
+
+/** Glass dropdown select with floating blurred menu. */
+export interface SelectOption { value: string; label: string; }
+export interface SelectProps {
+  label?: string;
+  options: SelectOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+}
+export declare function Select(props: SelectProps): JSX.Element;

@@ -1,0 +1,19 @@
+<!-- @dsCard group="Glass" viewport="700x140" name="Vidrio tintado" subtitle="Acentos refractados en el material" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body { padding: 18px 20px; overflow: hidden; }
+.g { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; } .p { padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--glass-stroke); box-shadow: var(--refraction-edge), var(--shadow-rest); position: relative; font-size: 13px; font-weight: 600; } .p::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; -webkit-backdrop-filter: blur(28px); backdrop-filter: blur(28px); } code { display: block; font-family: var(--font-mono); font-size: 10.5px; font-weight: 400; margin-top: 3px; color: var(--text-tertiary); }
+</style>
+</head>
+<body>
+<div class="g">
+<div class="p" style="background: var(--glass-tint-blue); color: #A3C0E8;">Azul<code>--glass-tint-blue</code></div>
+<div class="p" style="background: var(--glass-tint-cyan); color: #9CDCD2;">Cian<code>--glass-tint-cyan</code></div>
+<div class="p" style="background: var(--glass-tint-violet); color: #C2BCE8;">Violeta<code>--glass-tint-violet</code></div>
+</div>
+</body>
+</html>

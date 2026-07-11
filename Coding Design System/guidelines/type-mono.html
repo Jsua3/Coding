@@ -1,0 +1,19 @@
+<!-- @dsCard group="Type" viewport="700x170" name="Mono — JetBrains Mono" subtitle="Codigo y datos tecnicos" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body { padding: 18px 20px; overflow: hidden; }
+.code { font-family: var(--font-mono); font-size: 13.5px; line-height: 1.7; background: rgba(3,6,16,0.55); border: 1px solid var(--glass-stroke); border-radius: var(--radius-sm); padding: 14px 18px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); } .k { color: var(--accent-violet); } .s { color: var(--accent-cyan); } .c { color: var(--text-tertiary); } .n { color: var(--accent-amber); }
+</style>
+</head>
+<body>
+<div class="code">
+<div><span class="c">-- Estudiantes con promedio superior a 4.0</span></div>
+<div><span class="k">SELECT</span> nombre, promedio <span class="k">FROM</span> estudiantes</div>
+<div><span class="k">WHERE</span> promedio &gt; <span class="n">4.0</span> <span class="k">ORDER BY</span> promedio <span class="k">DESC</span>;</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!-- @dsCard group="Colors" viewport="700x130" name="Colores por materia" subtitle="Cada area academica tiene su tono fijo" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body { padding: 18px 20px; overflow: hidden; }
+.g { display: flex; gap: 12px; flex-wrap: wrap; } .chip { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: var(--radius-pill); background: var(--glass-bg); border: 1px solid var(--glass-stroke); box-shadow: var(--refraction-edge); position: relative; font-size: 14px; font-weight: 600; color: var(--text-primary); } .chip::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); } .dot { width: 12px; height: 12px; border-radius: 99px; box-shadow: 0 0 10px currentColor; }
+</style>
+</head>
+<body>
+<div class="g">
+<span class="chip"><span class="dot" style="background: var(--subject-programacion); color: var(--subject-programacion);"></span>Programacion I · II</span>
+<span class="chip"><span class="dot" style="background: var(--subject-basesdatos); color: var(--subject-basesdatos);"></span>Bases de datos I · II</span>
+<span class="chip"><span class="dot" style="background: var(--subject-algoritmos); color: var(--subject-algoritmos);"></span>Algoritmos</span>
+<span class="chip"><span class="dot" style="background: var(--subject-web); color: var(--subject-web);"></span>Desarrollo web</span>
+</div>
+</body>
+</html>
