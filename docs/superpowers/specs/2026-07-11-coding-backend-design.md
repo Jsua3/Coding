@@ -119,7 +119,7 @@ Los conteos de lecciones y horas que muestra la UI se derivan del contenido real
 
 Cada lección: 2–4 bloques de contenido (párrafo con `<code>` inline, bloque de código coloreado, nota) + 1 pregunta de quiz con 4 opciones y explicaciones. El quiz de SELECT/WHERE del `data.js` se conserva en la lección `l5`. Los fragmentos de código van en su sintaxis original (SQL, Java, JS); textos en español con tuteo, siguiendo los CONTENT FUNDAMENTALS del design system.
 
-El seed corre automáticamente si las tablas están vacías; `npm run seed -- --reset` fuerza recarga de contenido sin borrar usuarios ni progreso (los cursos/lecciones se reinsertan por id estable).
+El seed corre automáticamente si las tablas están vacías; `npm run seed` refresca el contenido sin borrar usuarios ni progreso (upsert por id estable).
 
 ## 7. Frontend (adaptación del UI kit)
 
