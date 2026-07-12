@@ -34,6 +34,9 @@ router.post("/register", async (req, res, next) => {
     const user = { id: result.insertId, ...clean };
     res.status(201).json({ token: signToken(user, false), user: publicUser(user) });
   } catch (e) {
+    if (e && e.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({ error: "Este correo ya está registrado" });
+    }
     next(e);
   }
 });
