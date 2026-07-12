@@ -239,7 +239,7 @@ export default {
           mins: 20,
           content: [
             { type: "p", html: "El <code>diseño responsive</code> adapta la presentación de una página al tamaño de pantalla del dispositivo que la muestra. Una <code>media query</code> aplica un bloque de reglas CSS solo cuando se cumple una condición, como un ancho máximo de viewport." },
-            { type: "p", html: "La etiqueta <code>&lt;meta name='viewport'&gt;</code> en el <code>&lt;head&gt;</code> es indispensable: sin ella, los navegadores móviles renderizan la página como si fuera de escritorio y luego la reducen, ignorando tus media queries." },
+            { type: "p", html: "La etiqueta <code>&lt;<span style=\"${K}\">meta</span> name=<span style=\"${S}\">\"viewport\"</span> content=<span style=\"${S}\">\"width=device-width, initial-scale=1\"</span>&gt;</code> en el <code>&lt;<span style=\"${K}\">head</span>&gt;</code> es indispensable: sin ella, los navegadores móviles renderizan la página como si fuera de escritorio y luego la reducen, ignorando tus media queries." },
             { type: "code", lines: [
               `<span style="${K}">.columna</span> {`,
               `  <span style="${S}">width</span>: <span style="${N}">50%</span>;`,
