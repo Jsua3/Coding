@@ -3,7 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import { initDb } from "./db.js";
-import authRouter from "./auth.js";
+import authRouter, { requireAuth } from "./auth.js";
+import coursesRouter from "./routes/courses.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,6 +15,7 @@ export function createApp() {
   app.get("/api/health", (req, res) => res.json({ ok: true }));
   // (las rutas de la API se montan aquí en tareas posteriores)
   app.use("/api/auth", authRouter);
+  app.use("/api/courses", requireAuth, coursesRouter);
 
   app.use("/api", (req, res) => res.status(404).json({ error: "Recurso no encontrado" }));
   app.use("/ds", express.static(path.join(__dirname, "..", "..", "Coding Design System")));
