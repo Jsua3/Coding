@@ -2,6 +2,7 @@ import "dotenv/config";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
+import { initDb } from "./db.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,6 +27,17 @@ export function createApp() {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  if (!process.env.JWT_SECRET) {
+    console.error("Falta JWT_SECRET en app/.env (copia .env.example)");
+    process.exit(1);
+  }
+  try {
+    await initDb();
+  } catch (e) {
+    console.error("No se pudo conectar a MySQL. Revisa DB_HOST, DB_PORT, DB_USER y DB_PASSWORD en app/.env");
+    console.error(e.message);
+    process.exit(1);
+  }
   const port = process.env.PORT || 3000;
   createApp().listen(port, () => console.log(`Coding en http://localhost:${port}`));
 }
