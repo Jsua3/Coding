@@ -1,0 +1,48 @@
+import "dotenv/config";
+import { initDb, query, closeDb } from "./db.js";
+import bd1 from "./seed-data/bd1.js";
+import bd2 from "./seed-data/bd2.js";
+
+export const COURSES = [bd1, bd2];
+
+export async function runSeed() {
+  for (const c of COURSES) {
+    await query(
+      `INSERT INTO courses (id, subject, subject_tone, title, description, order_index, prereq_course_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE subject = VALUES(subject), subject_tone = VALUES(subject_tone),
+         title = VALUES(title), description = VALUES(description),
+         order_index = VALUES(order_index), prereq_course_id = VALUES(prereq_course_id)`,
+      [c.id, c.subject, c.tone, c.title, c.description, c.order, c.prereq]
+    );
+    for (const [unitIndex, u] of c.units.entries()) {
+      await query(
+        `INSERT INTO units (id, course_id, name, order_index) VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE name = VALUES(name), order_index = VALUES(order_index)`,
+        [u.id, c.id, u.name, unitIndex]
+      );
+      for (const [lessonIndex, l] of u.lessons.entries()) {
+        await query(
+          `INSERT INTO lessons (id, unit_id, title, mins, order_index, content) VALUES (?, ?, ?, ?, ?, ?)
+           ON DUPLICATE KEY UPDATE title = VALUES(title), mins = VALUES(mins),
+             order_index = VALUES(order_index), content = VALUES(content)`,
+          [l.id, u.id, l.title, l.mins, lessonIndex, JSON.stringify(l.content)]
+        );
+        await query(
+          `INSERT INTO quiz_questions (lesson_id, question, options, correct_index, explain_ok, explain_bad)
+           VALUES (?, ?, ?, ?, ?, ?)
+           ON DUPLICATE KEY UPDATE question = VALUES(question), options = VALUES(options),
+             correct_index = VALUES(correct_index), explain_ok = VALUES(explain_ok), explain_bad = VALUES(explain_bad)`,
+          [l.id, l.quiz.question, JSON.stringify(l.quiz.options), l.quiz.correct, l.quiz.ok, l.quiz.bad]
+        );
+      }
+    }
+  }
+}
+
+if (process.argv[1] && process.argv[1].replaceAll("\\", "/").endsWith("server/seed.js")) {
+  await initDb({ seed: false });
+  await runSeed();
+  console.log("Seed aplicado");
+  await closeDb();
+}

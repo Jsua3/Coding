@@ -1,0 +1,298 @@
+const K = 'color: var(--accent-violet)';
+const S = 'color: var(--accent-cyan)';
+const N = 'color: var(--accent-amber)';
+const C = 'color: var(--text-tertiary)';
+
+export default {
+  id: "bd1",
+  subject: "Bases de datos I",
+  tone: "cyan",
+  title: "Modelo relacional",
+  description: "Domina tablas, claves, consultas SQL y normalización — la base de todo sistema de información.",
+  order: 1,
+  prereq: null,
+  units: [
+    {
+      id: "bd1-u1",
+      name: "Unidad 1 · Introducción a las bases de datos",
+      lessons: [
+        {
+          id: "l1",
+          title: "Qué es un SGBD",
+          mins: 12,
+          content: [
+            { type: "p", html: "Un <code>SGBD</code> (Sistema de Gestión de Bases de Datos) es el software que almacena, organiza y protege los datos de una aplicación. Tú le hablas en <code>SQL</code> y él se encarga de guardar la información en disco, controlar el acceso concurrente y garantizar que nada se corrompa." },
+            { type: "p", html: "Ejemplos que usarás en la carrera: <code>MySQL</code>, <code>PostgreSQL</code>, <code>Oracle</code> y <code>SQL Server</code>. Todos comparten el mismo lenguaje base: SQL." },
+            { type: "note", text: "Piensa en el SGBD como el bibliotecario: tú pides el libro (consulta), él sabe en qué estante está y te lo trae íntegro." },
+          ],
+          quiz: {
+            question: "¿Cuál de estas responsabilidades corresponde a un SGBD?",
+            options: [
+              "Renderizar la interfaz gráfica de la aplicación",
+              "Compilar el código fuente a binario",
+              "Almacenar los datos y controlar el acceso concurrente",
+              "Enviar correos a los usuarios",
+            ],
+            correct: 2,
+            ok: "El SGBD gestiona el almacenamiento, la integridad y la concurrencia de los datos; la interfaz y la lógica de la app viven en otra capa.",
+            bad: "Recuerda: el SGBD vive en la capa de datos. Interfaz, compilación y correos son responsabilidades de otras capas del sistema.",
+          },
+        },
+        {
+          id: "l2",
+          title: "Tablas, filas y columnas",
+          mins: 15,
+          content: [
+            { type: "p", html: "En el modelo relacional los datos viven en <code>tablas</code>. Cada <code>fila</code> es un registro (un estudiante concreto) y cada <code>columna</code> es un atributo (su nombre, su promedio). Toda columna tiene un tipo de dato fijo." },
+            { type: "code", lines: [
+              `<span style="${C}">-- Una tabla se define con sus columnas y tipos</span>`,
+              `<span style="${K}">CREATE TABLE</span> estudiantes (`,
+              `  id <span style="${S}">INT</span>,`,
+              `  nombre <span style="${S}">VARCHAR</span>(<span style="${N}">80</span>),`,
+              `  promedio <span style="${S}">DECIMAL</span>(<span style="${N}">3</span>,<span style="${N}">2</span>)`,
+              `);`,
+            ]},
+            { type: "note", text: "Regla mental: tabla = sustantivo del dominio (estudiantes, cursos); columna = dato atómico de ese sustantivo." },
+          ],
+          quiz: {
+            question: "En la tabla estudiantes(id, nombre, promedio), ¿qué representa una fila?",
+            options: [
+              "Un atributo de los estudiantes",
+              "Un estudiante concreto con sus valores",
+              "El tipo de dato de la tabla",
+              "El nombre de la base de datos",
+            ],
+            correct: 1,
+            ok: "Exacto: cada fila es un registro completo — un estudiante con su id, su nombre y su promedio.",
+            bad: "Las columnas son los atributos; la fila es el registro completo de un estudiante concreto.",
+          },
+        },
+        {
+          id: "l3",
+          title: "Claves primarias y foráneas",
+          mins: 18,
+          content: [
+            { type: "p", html: "Una <code>clave primaria</code> (<code>PRIMARY KEY</code>) identifica de forma única cada fila de una tabla: no admite valores repetidos ni valores nulos. Una <code>clave foránea</code> (<code>FOREIGN KEY</code>) es una columna que referencia la clave primaria de otra tabla, y así conecta ambas." },
+            { type: "code", lines: [
+              `<span style="${C}">-- La FK matriculas.estudiante_id apunta a estudiantes.id</span>`,
+              `<span style="${K}">CREATE TABLE</span> estudiantes (`,
+              `  id <span style="${S}">INT</span> <span style="${K}">PRIMARY KEY</span>,`,
+              `  nombre <span style="${S}">VARCHAR</span>(<span style="${N}">80</span>)`,
+              `);`,
+              `<span style="${K}">CREATE TABLE</span> matriculas (`,
+              `  id <span style="${S}">INT</span> <span style="${K}">PRIMARY KEY</span>,`,
+              `  estudiante_id <span style="${S}">INT</span>,`,
+              `  <span style="${K}">FOREIGN KEY</span> (estudiante_id) <span style="${K}">REFERENCES</span> estudiantes(id)`,
+              `);`,
+            ]},
+            { type: "note", text: "Si intentas insertar una matrícula con un estudiante_id que no existe en estudiantes, el SGBD rechaza la operación: así se protege la integridad referencial." },
+          ],
+          quiz: {
+            question: "¿Qué garantiza una FOREIGN KEY entre matriculas.estudiante_id y estudiantes.id?",
+            options: [
+              "Que estudiante_id nunca se repita en matriculas",
+              "Que el valor de estudiante_id exista como id en estudiantes",
+              "Que la tabla estudiantes se ordene por id",
+              "Que las dos tablas tengan el mismo número de filas",
+            ],
+            correct: 1,
+            ok: "La clave foránea impone integridad referencial: cada estudiante_id de matriculas debe existir como id en estudiantes.",
+            bad: "La FK no exige unicidad, orden ni igual cantidad de filas; solo obliga a que el valor referenciado exista en la tabla referenciada.",
+          },
+        },
+      ],
+    },
+    {
+      id: "bd1-u2",
+      name: "Unidad 2 · El modelo relacional",
+      lessons: [
+        {
+          id: "l4",
+          title: "Relaciones 1:1, 1:N y N:M",
+          mins: 20,
+          content: [
+            { type: "p", html: "Una relación <code>1:1</code> vincula como máximo una fila de una tabla con una fila de otra (por ejemplo, un estudiante y su expediente único). Una relación <code>1:N</code> vincula una fila de una tabla con muchas filas de otra: un profesor dicta muchos cursos, pero cada curso tiene un solo profesor." },
+            { type: "p", html: "Una relación <code>N:M</code> vincula muchas filas de una tabla con muchas de otra — un estudiante se matricula en varios cursos y un curso tiene varios estudiantes. Como una fila solo puede tener una clave foránea hacia otra fila, una relación N:M se implementa con una <code>tabla intermedia</code> que guarda un par de claves foráneas, una hacia cada tabla original." },
+            { type: "note", text: "Regla práctica: si al describir la relación usas «cada uno tiene varios» en ambos sentidos, necesitas una tabla intermedia." },
+          ],
+          quiz: {
+            question: "Un estudiante se matricula en varios cursos y un curso tiene varios estudiantes. ¿Cómo se modela esta relación en el modelo relacional?",
+            options: [
+              "Con una FOREIGN KEY directa en la tabla estudiantes",
+              "Con una FOREIGN KEY directa en la tabla cursos",
+              "Con una tabla intermedia que referencia ambas claves primarias",
+              "Duplicando cada estudiante una vez por curso en la misma tabla",
+            ],
+            correct: 2,
+            ok: "Una relación N:M necesita una tabla intermedia (por ejemplo, matriculas) con una FK hacia estudiantes y otra hacia cursos.",
+            bad: "Una FK directa en una sola tabla solo modela relaciones 1:N; para N:M hace falta una tabla de unión.",
+          },
+        },
+        {
+          id: "l5",
+          title: "Consultas SELECT y WHERE",
+          mins: 22,
+          content: [
+            { type: "p", html: "<code>SELECT</code> recupera columnas de una tabla; <code>WHERE</code> filtra las filas que cumplen una condición. Puedes ordenar el resultado con <code>ORDER BY</code>." },
+            { type: "code", lines: [
+              `<span style="${C}">-- Estudiantes con promedio superior a 4.0</span>`,
+              `<span style="${K}">SELECT</span> nombre, promedio <span style="${K}">FROM</span> estudiantes`,
+              `<span style="${K}">WHERE</span> promedio &gt; <span style="${N}">4.0</span>`,
+              `<span style="${K}">ORDER BY</span> promedio <span style="${K}">DESC</span>;`,
+            ]},
+            { type: "note", text: "La condición del WHERE se evalúa fila por fila antes de proyectar las columnas del SELECT." },
+          ],
+          quiz: {
+            question: "Tienes la tabla estudiantes(nombre, promedio). ¿Qué consulta devuelve los estudiantes con promedio mayor a 4.0, ordenados de mayor a menor?",
+            options: [
+              "SELECT nombre FROM estudiantes ORDER BY promedio;",
+              "SELECT nombre, promedio FROM estudiantes WHERE promedio > 4.0 ORDER BY promedio DESC;",
+              "SELECT * WHERE promedio > 4.0 FROM estudiantes;",
+              "FILTER estudiantes BY promedio > 4.0;",
+            ],
+            correct: 1,
+            ok: "WHERE filtra y ORDER BY … DESC ordena de mayor a menor.",
+            bad: "Recuerda: la cláusula WHERE va después de FROM y necesitas DESC para ordenar de mayor a menor.",
+          },
+        },
+        {
+          id: "l6",
+          title: "JOIN entre tablas",
+          mins: 25,
+          content: [
+            { type: "p", html: "Un <code>JOIN</code> combina filas de dos o más tablas cuando cumplen una condición de igualdad, normalmente entre una clave primaria y su clave foránea. El <code>INNER JOIN</code> devuelve solo las filas que tienen coincidencia en ambas tablas." },
+            { type: "code", lines: [
+              `<span style="${C}">-- Nombre del estudiante junto al curso en que está matriculado</span>`,
+              `<span style="${K}">SELECT</span> e.nombre, c.titulo`,
+              `<span style="${K}">FROM</span> estudiantes e`,
+              `<span style="${K}">INNER JOIN</span> matriculas m <span style="${K}">ON</span> m.estudiante_id = e.id`,
+              `<span style="${K}">INNER JOIN</span> cursos c <span style="${K}">ON</span> c.id = m.curso_id;`,
+            ]},
+            { type: "note", text: "Si un estudiante no tiene ninguna matrícula, INNER JOIN lo excluye del resultado; para incluirlo igual necesitarías un LEFT JOIN." },
+          ],
+          quiz: {
+            question: "En SELECT e.nombre, c.titulo FROM estudiantes e INNER JOIN matriculas m ON m.estudiante_id = e.id INNER JOIN cursos c ON c.id = m.curso_id;, ¿qué estudiantes aparecen en el resultado?",
+            options: [
+              "Solo los estudiantes que tienen al menos una matrícula",
+              "Todos los estudiantes, tengan o no matrícula",
+              "Solo los estudiantes cuyo id es menor que el de algún curso",
+              "Ninguno, porque faltan las columnas de matriculas",
+            ],
+            correct: 0,
+            ok: "INNER JOIN solo conserva las filas con coincidencia en ambas tablas: sin matrícula, sin fila en el resultado.",
+            bad: "INNER JOIN sí devuelve filas y no compara por tamaño de id; conserva solo a quienes encuentran pareja en ambas tablas, así que sin matrícula quedan fuera.",
+          },
+        },
+        {
+          id: "l7",
+          title: "Normalización: 1FN a 3FN",
+          mins: 28,
+          content: [
+            { type: "p", html: "La <code>normalización</code> es el proceso de reorganizar tablas para eliminar redundancia y evitar anomalías al insertar, actualizar o borrar datos. Se aplica en formas sucesivas, cada una más estricta que la anterior. La <code>Primera Forma Normal (1FN)</code> exige que cada columna guarde un único valor atómico — nada de listas separadas por comas en una celda — y que no haya grupos de columnas repetidas." },
+            { type: "p", html: "La <code>Segunda Forma Normal (2FN)</code> exige estar en 1FN y que todo atributo no clave dependa de la clave primaria completa (relevante cuando la clave es compuesta). La <code>Tercera Forma Normal (3FN)</code> exige estar en 2FN y eliminar dependencias transitivas: ningún atributo no clave puede depender de otro atributo no clave, solo de la clave primaria." },
+            { type: "note", text: "Ejemplo de violación de 3FN: si en cursos guardas profesor_id y también facultad_del_profesor, esta última depende de profesor_id, no de la clave del curso — pertenece a otra tabla." },
+          ],
+          quiz: {
+            question: "La tabla cursos(id, titulo, profesor_id, facultad_del_profesor) guarda la facultad del profesor, que depende de profesor_id y no de la clave del curso. ¿Qué forma normal se viola?",
+            options: [
+              "1FN, porque hay una columna con múltiples valores",
+              "2FN, porque la clave primaria es compuesta",
+              "Ninguna, la tabla ya está normalizada",
+              "3FN, porque existe una dependencia transitiva",
+            ],
+            correct: 3,
+            ok: "Es una dependencia transitiva: facultad_del_profesor depende de profesor_id, no de id (la clave del curso), así que se viola 3FN.",
+            bad: "El problema no es atomicidad (1FN) ni una clave compuesta (2FN); la tabla sí tiene un defecto de diseño: una dependencia transitiva.",
+          },
+        },
+      ],
+    },
+    {
+      id: "bd1-u3",
+      name: "Unidad 3 · Agregación y agrupación",
+      lessons: [
+        {
+          id: "bd1-l8",
+          title: "Funciones de agregación",
+          mins: 20,
+          content: [
+            { type: "p", html: "Las <code>funciones de agregación</code> (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>) resumen muchas filas en un solo valor. <code>COUNT</code> cuenta filas, <code>SUM</code> suma una columna numérica, <code>AVG</code> calcula el promedio, y <code>MIN</code>/<code>MAX</code> devuelven el valor menor y mayor." },
+            { type: "code", lines: [
+              `<span style="${C}">-- Promedio general y número de estudiantes evaluados</span>`,
+              `<span style="${K}">SELECT</span> <span style="${K}">COUNT</span>(*) <span style="${K}">AS</span> total, <span style="${K}">AVG</span>(promedio) <span style="${K}">AS</span> promedio_general`,
+              `<span style="${K}">FROM</span> estudiantes;`,
+            ]},
+            { type: "note", text: "COUNT(*) cuenta todas las filas, incluidas las que tienen columnas en NULL; COUNT(columna) ignora los NULL de esa columna." },
+          ],
+          quiz: {
+            question: "Tienes estudiantes(id, nombre, promedio). ¿Qué consulta calcula cuántos estudiantes hay y su promedio general en una sola fila?",
+            options: [
+              "SELECT nombre, promedio FROM estudiantes;",
+              "SELECT COUNT(*) AS total, AVG(promedio) AS promedio_general FROM estudiantes;",
+              "SELECT MAX(promedio) FROM estudiantes GROUP BY nombre;",
+              "SELECT SUM(nombre) FROM estudiantes;",
+            ],
+            correct: 1,
+            ok: "COUNT(*) cuenta las filas y AVG(promedio) calcula el promedio; combinadas sin GROUP BY devuelven un único resultado resumen.",
+            bad: "Sumar una columna de texto (SUM(nombre)) no tiene sentido, y agrupar por nombre no da un resumen general de toda la tabla.",
+          },
+        },
+        {
+          id: "bd1-l9",
+          title: "GROUP BY y HAVING",
+          mins: 24,
+          content: [
+            { type: "p", html: "<code>GROUP BY</code> agrupa las filas que comparten el valor de una o más columnas, para aplicarles una función de agregación por grupo. <code>HAVING</code> filtra esos grupos ya formados, a diferencia de <code>WHERE</code>, que filtra filas individuales antes de agrupar." },
+            { type: "code", lines: [
+              `<span style="${C}">-- Cursos con más de 20 estudiantes matriculados</span>`,
+              `<span style="${K}">SELECT</span> curso_id, <span style="${K}">COUNT</span>(*) <span style="${K}">AS</span> total`,
+              `<span style="${K}">FROM</span> matriculas`,
+              `<span style="${K}">GROUP BY</span> curso_id`,
+              `<span style="${K}">HAVING</span> <span style="${K}">COUNT</span>(*) &gt; <span style="${N}">20</span>;`,
+            ]},
+            { type: "note", text: "No puedes escribir WHERE COUNT(*) > 20 porque WHERE se evalúa antes de que existan los grupos; para filtrar por el resultado de una agregación necesitas HAVING." },
+          ],
+          quiz: {
+            question: "¿Por qué SELECT curso_id, COUNT(*) FROM matriculas GROUP BY curso_id HAVING COUNT(*) > 20; usa HAVING en lugar de WHERE?",
+            options: [
+              "Porque HAVING es obligatorio en toda consulta con GROUP BY",
+              "Porque WHERE no admite la función COUNT en ninguna parte de la consulta",
+              "Porque HAVING ordena los grupos alfabéticamente",
+              "Porque la condición filtra sobre el resultado agregado (COUNT), que solo existe después de agrupar",
+            ],
+            correct: 3,
+            ok: "HAVING se evalúa después del GROUP BY, cuando ya existen los agregados por grupo; por eso es el único lugar donde puedes filtrar por COUNT(*) > 20.",
+            bad: "HAVING no es obligatorio ni ordena resultados, y COUNT sí puede usarse en el SELECT sin HAVING; la clave es que HAVING filtra grupos ya agregados.",
+          },
+        },
+        {
+          id: "bd1-l10",
+          title: "Subconsultas",
+          mins: 26,
+          content: [
+            { type: "p", html: "Una <code>subconsulta</code> es una consulta <code>SELECT</code> anidada dentro de otra consulta. Puede aparecer en el <code>WHERE</code> para filtrar por un resultado calculado, en el <code>FROM</code> como una tabla temporal, o en el <code>SELECT</code> para calcular una columna derivada." },
+            { type: "code", lines: [
+              `<span style="${C}">-- Estudiantes con promedio superior al promedio general</span>`,
+              `<span style="${K}">SELECT</span> nombre, promedio`,
+              `<span style="${K}">FROM</span> estudiantes`,
+              `<span style="${K}">WHERE</span> promedio &gt; (<span style="${K}">SELECT</span> <span style="${K}">AVG</span>(promedio) <span style="${K}">FROM</span> estudiantes);`,
+            ]},
+            { type: "note", text: "La subconsulta entre paréntesis se ejecuta primero y devuelve un único valor (el promedio general); luego la consulta externa compara cada fila contra ese valor." },
+          ],
+          quiz: {
+            question: "En SELECT nombre, promedio FROM estudiantes WHERE promedio > (SELECT AVG(promedio) FROM estudiantes);, ¿qué devuelve la subconsulta entre paréntesis?",
+            options: [
+              "Un único valor: el promedio general de todos los estudiantes",
+              "Una lista con el nombre de cada estudiante",
+              "La misma tabla estudiantes completa",
+              "Un error, porque WHERE no admite subconsultas",
+            ],
+            correct: 0,
+            ok: "SELECT AVG(promedio) FROM estudiantes devuelve un solo número, el promedio general, que la consulta externa usa para comparar cada fila.",
+            bad: "La subconsulta no lista nombres ni repite la tabla completa; WHERE sí admite subconsultas, siempre que su resultado sea compatible con la comparación.",
+          },
+        },
+      ],
+    },
+  ],
+};
