@@ -1,0 +1,62 @@
+// Barra de navegacion flotante + iconos compartidos del kit
+const KIT = window.CodingDesignSystem_2ecb3a;
+
+function KIcon({ d, size = 15 }) {
+  return <svg width={size} height={size} viewBox="0 0 16 16" fill="none"><path d={d} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
+const ICONS = {
+  search: "M11.5 11.5L14 14M12 7A5 5 0 112 7a5 5 0 0110 0z",
+  flame: "M8 1.5c1 2.5 4 3.5 4 7a4 4 0 01-8 0c0-1.5.6-2.6 1.4-3.6C6 6.2 7.5 4.5 8 1.5z",
+  back: "M10 3L5 8l5 5",
+  play: "M5 3.5v9l7.5-4.5L5 3.5z",
+  check: "M3 8.5L6.5 12L13 4.5",
+  lock: "M4.5 7V5a3.5 3.5 0 017 0v2M3.5 7h9v6.5h-9V7z",
+  book: "M2.5 3.5h4.2c.7 0 1.3.6 1.3 1.3V13c0-.7-.6-1.3-1.3-1.3H2.5V3.5zM13.5 3.5H9.3c-.7 0-1.3.6-1.3 1.3V13c0-.7.6-1.3 1.3-1.3h4.2V3.5z",
+};
+
+function NavBar({ onHome, tab, setTab, user }) {
+  const { Tabs, IconButton, Badge } = KIT;
+  return (
+    <div style={{ position: "sticky", top: 20, zIndex: 40, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, padding: "10px 12px 10px 24px", borderRadius: "var(--radius-pill)", background: "rgba(16, 23, 44, 0.6)", border: "1px solid var(--glass-stroke)", boxShadow: "var(--refraction-edge), var(--shadow-glass)" }}>
+      <span aria-hidden style={{ position: "absolute", inset: 0, zIndex: -1, borderRadius: "inherit", WebkitBackdropFilter: "blur(var(--blur-lg)) saturate(var(--saturate-glass))", backdropFilter: "blur(var(--blur-lg)) saturate(var(--saturate-glass))" }}></span>
+      <div onClick={onHome} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+        <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: "var(--weight-heavy)", letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>Coding</span>
+        <span style={{ width: 4, height: 18, borderRadius: 3, background: "var(--accent-cyan)", boxShadow: "0 0 10px var(--accent-cyan)" }}></span>
+      </div>
+      <Tabs size="sm" value={tab} onChange={setTab} style={{ width: 380 }} items={[
+        { id: "inicio", label: "Inicio" },
+        { id: "materias", label: "Materias" },
+        { id: "progreso", label: "Progreso" },
+      ]} />
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <IconButton label="Buscar" size="sm" variant="ghost"><KIcon d={ICONS.search} /></IconButton>
+        <Badge tone="amber" dot>{user.streak} dias</Badge>
+        <div style={{ width: 36, height: 36, borderRadius: 99, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg, #6FA0E0, #4E86D6)", border: "1px solid rgba(255,255,255,0.4)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 14px rgba(94,151,230,0.35)", fontSize: 13, fontWeight: 700, color: "var(--text-on-accent)" }}>{user.initials}</div>
+      </div>
+    </div>
+  );
+}
+
+function PageFrame({ children }) {
+  return <div style={{ maxWidth: 1160, margin: "0 auto", padding: "20px 32px 64px" }}>{children}</div>;
+}
+
+function LoadingPanel() {
+  return (
+    <div style={{ padding: 48, textAlign: "center", color: "var(--text-tertiary)", fontSize: "var(--text-md)" }}>
+      Cargando…
+    </div>
+  );
+}
+
+function ErrorPanel({ message, onRetry }) {
+  const { GlassPanel, Button } = KIT;
+  return (
+    <GlassPanel padding="var(--space-6)" style={{ textAlign: "center" }}>
+      <p style={{ margin: "0 0 14px", fontSize: "var(--text-base)", color: "var(--text-secondary)" }}>{message}</p>
+      <Button variant="secondary" onClick={onRetry}>Reintentar</Button>
+    </GlassPanel>
+  );
+}
+
+Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel });
