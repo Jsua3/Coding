@@ -51,4 +51,19 @@ test("el seed es idempotente (upsert por id)", async () => {
   assert.ok(rows[0].n >= 2);
 });
 
+test("seed completo: 6 cursos, 64 lecciones, 64 quizzes", async () => {
+  await setupTestDb();
+  const courses = await query("SELECT id FROM courses");
+  assert.equal(courses.length, 6);
+  const lessons = await query("SELECT COUNT(*) AS n FROM lessons");
+  assert.equal(lessons[0].n, 64);
+  const quizzes = await query("SELECT COUNT(*) AS n FROM quiz_questions");
+  assert.equal(quizzes[0].n, 64);
+  const perCourse = await query(
+    `SELECT u.course_id, COUNT(l.id) AS n FROM lessons l JOIN units u ON u.id = l.unit_id GROUP BY u.course_id`
+  );
+  const counts = Object.fromEntries(perCourse.map((r) => [r.course_id, r.n]));
+  assert.deepEqual(counts, { bd1: 10, bd2: 9, prog1: 12, prog2: 9, algo: 12, web: 12 });
+});
+
 after(closeDb);

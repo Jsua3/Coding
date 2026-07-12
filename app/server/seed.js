@@ -2,8 +2,12 @@ import "dotenv/config";
 import { initDb, query, closeDb } from "./db.js";
 import bd1 from "./seed-data/bd1.js";
 import bd2 from "./seed-data/bd2.js";
+import prog1 from "./seed-data/prog1.js";
+import prog2 from "./seed-data/prog2.js";
+import algo from "./seed-data/algo.js";
+import web from "./seed-data/web.js";
 
-export const COURSES = [bd1, bd2];
+export const COURSES = [bd1, bd2, prog1, prog2, algo, web];
 
 export async function runSeed() {
   for (const c of COURSES) {
