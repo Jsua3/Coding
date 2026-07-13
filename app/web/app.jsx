@@ -55,7 +55,9 @@ function App() {
 
   return (
     <React.Fragment>
-      {screen}
+      <div key={route.screen + ":" + (route.lessonId || route.courseId || "")} className="anim-screen-in">
+        {screen}
+      </div>
       {toast ? (
         <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 90 }}>
           <Toast tone={toast.tone} title={toast.title} description={toast.description} onClose={() => setToast(null)} />

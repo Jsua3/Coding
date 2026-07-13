@@ -12,7 +12,20 @@ const ICONS = {
   check: "M3 8.5L6.5 12L13 4.5",
   lock: "M4.5 7V5a3.5 3.5 0 017 0v2M3.5 7h9v6.5h-9V7z",
   book: "M2.5 3.5h4.2c.7 0 1.3.6 1.3 1.3V13c0-.7-.6-1.3-1.3-1.3H2.5V3.5zM13.5 3.5H9.3c-.7 0-1.3.6-1.3 1.3V13c0-.7.6-1.3 1.3-1.3h4.2V3.5z",
+  sound: "M2.5 6v4h2.5L8.5 13V3L5 6H2.5zM10.5 5.5a3.5 3.5 0 010 5M12 3.5a6 6 0 010 9",
+  soundOff: "M2.5 6v4h2.5L8.5 13V3L5 6H2.5zM10.5 6.5l3 3M13.5 6.5l-3 3",
 };
+
+function SoundToggle() {
+  const { IconButton } = KIT;
+  const [on, setOn] = React.useState(window.FX ? FX.sound.enabled : true);
+  const toggle = () => { FX.sound.enabled = !on; setOn(!on); if (!on) FX.sound.play("correct"); };
+  return (
+    <IconButton label={on ? "Silenciar" : "Activar sonido"} size="sm" variant="ghost" onClick={toggle}>
+      <KIcon d={on ? ICONS.sound : ICONS.soundOff} />
+    </IconButton>
+  );
+}
 
 function NavBar({ onHome, tab, setTab, user }) {
   const { Tabs, IconButton, Badge } = KIT;
@@ -29,8 +42,9 @@ function NavBar({ onHome, tab, setTab, user }) {
         { id: "progreso", label: "Progreso" },
       ]} />
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <SoundToggle />
         <IconButton label="Buscar" size="sm" variant="ghost"><KIcon d={ICONS.search} /></IconButton>
-        <Badge tone="amber" dot>{user.streak} dias</Badge>
+        <Badge tone="amber" dot>{user.streak} {user.streak === 1 ? "día" : "días"}</Badge>
         <div style={{ width: 36, height: 36, borderRadius: 99, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg, #6FA0E0, #4E86D6)", border: "1px solid rgba(255,255,255,0.4)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 14px rgba(94,151,230,0.35)", fontSize: 13, fontWeight: 700, color: "var(--text-on-accent)" }}>{user.initials}</div>
       </div>
     </div>
@@ -59,4 +73,4 @@ function ErrorPanel({ message, onRetry }) {
   );
 }
 
-Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel });
+Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle });
