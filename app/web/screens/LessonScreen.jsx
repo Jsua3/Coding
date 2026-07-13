@@ -51,7 +51,7 @@ function FeedbackBand({ result, onContinue, onRetry }) {
 }
 
 function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTab, showToast, refreshMe }) {
-  const { GlassPanel, Badge, Button, IconButton, Progress } = KITX;
+  const { GlassPanel, Badge, Button, IconButton } = KITX;
   const [lesson, setLesson] = React.useState(null);
   const [error, setError] = React.useState(null);
   const [step, setStep] = React.useState(0); // 0 = teoría; 1..N = ejercicios
@@ -62,6 +62,9 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
   const [orbMood, setOrbMood] = React.useState("idle");
   const [panelAnim, setPanelAnim] = React.useState("");
   const orbTimer = React.useRef(null);
+  const panelTimer = React.useRef(null);
+
+  React.useEffect(() => () => { clearTimeout(orbTimer.current); clearTimeout(panelTimer.current); }, []);
 
   const orbReact = (mood, ms) => {
     setOrbMood(mood);
@@ -110,7 +113,8 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
         FX.sound.play("wrong");
         setPanelAnim("anim-shake");
       }
-      setTimeout(() => setPanelAnim(""), 400);
+      clearTimeout(panelTimer.current);
+      panelTimer.current = setTimeout(() => setPanelAnim(""), 400);
       if (r.xpAwarded > 0) refreshMe();
     } catch (e) {
       setError(e.message);
@@ -162,7 +166,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
       ) : (
         <div style={{ display: "flex", gap: 18, alignItems: "flex-start", maxWidth: 820, margin: "0 auto" }}>
           <Orb size={56} mood={orbMood} style={{ marginTop: 8 }} />
-          <GlassPanel tint="blue" padding="var(--space-6)" radius="var(--radius-xl)" style={{ flex: 1 }} className={panelAnim}>
+          <GlassPanel tint="blue" padding="var(--space-6)" radius="var(--radius-xl)" style={{ flex: 1 }}>
             <div className={panelAnim}>
               <div style={{ fontSize: "var(--text-xs)", fontWeight: 600, letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--text-tertiary)", marginBottom: 10 }}>
                 Ejercicio {step} de {exercises.length}
