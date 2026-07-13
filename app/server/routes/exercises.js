@@ -67,10 +67,10 @@ router.post("/:id/answer", async (req, res, next) => {
             [req.userId, ex.lesson_id]
           );
           const perfect = fails.length === 0;
-          const todayDone = await query(
-            "SELECT lesson_id FROM lesson_completions WHERE user_id = ? AND DATE(completed_at) = CURDATE() LIMIT 1",
-            [req.userId]
-          );
+          const prevDays = (
+            await query("SELECT completed_at FROM lesson_completions WHERE user_id = ?", [req.userId])
+          ).map((r) => toDayString(r.completed_at));
+          const hadToday = prevDays.includes(toDayString(new Date()));
           const conn = await getPool().getConnection();
           try {
             await conn.beginTransaction();
@@ -92,7 +92,7 @@ router.post("/:id/answer", async (req, res, next) => {
           if (lessonCompleted) {
             const rows = await query("SELECT completed_at FROM lesson_completions WHERE user_id = ?", [req.userId]);
             const days = rows.map((r) => toDayString(r.completed_at));
-            streak = { value: currentStreak(days, toDayString(new Date())), extended: todayDone.length === 0 };
+            streak = { value: currentStreak(days, toDayString(new Date())), extended: !hadToday };
           }
         }
       }
