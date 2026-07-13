@@ -43,7 +43,7 @@ function CourseCard({ course, onOpen }) {
   );
 }
 
-function DashboardScreen({ me, onOpenCourse, onOpenLesson, tab, setTab }) {
+function DashboardScreen({ me, onOpenCourse, onOpenLesson, onOpenReview, tab, setTab }) {
   const { Button } = KITD;
   const [courses, setCourses] = React.useState(null);
   const [error, setError] = React.useState(null);
@@ -81,6 +81,16 @@ function DashboardScreen({ me, onOpenCourse, onOpenLesson, tab, setTab }) {
         <StatPanel label="XP total" value={stats.xp.toLocaleString("es")} sub={"+" + stats.xpWeek + " esta semana"} tone="blue" />
         <StatPanel label="Materias activas" value={String(stats.activeCourses)} sub={stats.completedCourses + " completadas · " + stats.lockedCourses + " bloqueadas"} tone="cyan" />
       </div>
+      {me.stats.reviewCount > 0 ? (
+        <KITD.GlassPanel tint="none" padding="var(--space-5)" style={{ marginBottom: 28, display: "flex", alignItems: "center", gap: 18, border: "1px solid rgba(230,175,107,0.35)" }}>
+          <Orb size={44} mood="idle" />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--text-primary)" }}>Repaso pendiente</div>
+            <div style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)" }}>{me.stats.reviewCount} {me.stats.reviewCount === 1 ? "ejercicio" : "ejercicios"} por repasar · +5 XP cada uno</div>
+          </div>
+          <KITD.Button variant="secondary" onClick={onOpenReview}>Repasar ahora</KITD.Button>
+        </KITD.GlassPanel>
+      ) : null}
       <h2 style={{ margin: "0 4px 16px", fontFamily: "var(--font-display)", fontSize: "var(--text-xl)", fontWeight: 700, letterSpacing: "var(--tracking-heading)", color: "var(--text-primary)" }}>Tus materias</h2>
       {error ? (
         <ErrorPanel message={error} onRetry={load} />

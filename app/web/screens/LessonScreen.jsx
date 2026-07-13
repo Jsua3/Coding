@@ -250,4 +250,4 @@ function CelebrationScreen({ data, onNext, onBack, me, tab, setTab }) {
     </PageFrame>
   );
 }
-Object.assign(window, { LessonScreen, CelebrationScreen });
+Object.assign(window, { LessonScreen, CelebrationScreen, FeedbackBand });

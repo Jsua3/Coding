@@ -34,6 +34,7 @@ function App() {
     dashboard: () => { setRoute({ screen: "dashboard" }); loadMe(); },
     course: (courseId) => setRoute({ screen: "course", courseId }),
     lesson: (courseId, lessonId) => setRoute({ screen: "lesson", courseId, lessonId }),
+    review: () => setRoute({ screen: "review" }),
   };
 
   let screen;
@@ -48,9 +49,12 @@ function App() {
     screen = <LessonScreen me={me} courseId={route.courseId} lessonId={route.lessonId} tab={tab} setTab={setTab}
       onBack={() => go.course(route.courseId)} onOpenLesson={(lessonId) => go.lesson(route.courseId, lessonId)}
       showToast={showToast} refreshMe={loadMe} />;
+  } else if (route.screen === "review") {
+    screen = <ReviewScreen me={me} tab={tab} setTab={setTab} onBack={go.dashboard} refreshMe={loadMe} />;
   } else {
     screen = <DashboardScreen me={me} tab={tab} setTab={setTab}
-      onOpenCourse={(id) => go.course(id)} onOpenLesson={(courseId, lessonId) => go.lesson(courseId, lessonId)} />;
+      onOpenCourse={(id) => go.course(id)} onOpenLesson={(courseId, lessonId) => go.lesson(courseId, lessonId)}
+      onOpenReview={go.review} />;
   }
 
   return (
