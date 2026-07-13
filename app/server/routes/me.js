@@ -3,6 +3,7 @@ import { query } from "../db.js";
 import { initials } from "../auth.js";
 import { currentStreak, bestStreak, weeklyXp, toDayString } from "../services/gamification.js";
 import { coursesForUser, findContinue } from "../services/progress.js";
+import { reviewCount } from "../services/review.js";
 
 const router = Router();
 
@@ -27,6 +28,7 @@ router.get("/", async (req, res, next) => {
         activeCourses: courses.filter((c) => c.status === "EN CURSO").length,
         completedCourses: courses.filter((c) => c.status === "COMPLETADO").length,
         lockedCourses: courses.filter((c) => c.status === "BLOQUEADO").length,
+        reviewCount: await reviewCount(req.userId),
       },
       continue: await findContinue(req.userId),
     });

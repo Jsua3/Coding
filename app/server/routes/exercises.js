@@ -3,6 +3,7 @@ import { query, getPool } from "../db.js";
 import { courseDetail } from "../services/progress.js";
 import { validateResponse } from "../services/exercises.js";
 import { currentStreak, toDayString } from "../services/gamification.js";
+import { isPendingReview } from "../services/review.js";
 
 const router = Router();
 
@@ -36,9 +37,15 @@ router.post("/:id/answer", async (req, res, next) => {
     );
     if (!valid) return res.status(400).json({ error: "Tu respuesta no tiene el formato esperado" });
 
+    const context = req.body && req.body.context === "review" ? "review" : "lesson";
+    let reviewCleared = false;
+    if (context === "review" && correct) {
+      reviewCleared = await isPendingReview(req.userId, ex.id);
+    }
+
     await query(
-      "INSERT INTO answer_attempts (user_id, exercise_id, context, correct) VALUES (?, ?, 'lesson', ?)",
-      [req.userId, ex.id, correct ? 1 : 0]
+      "INSERT INTO answer_attempts (user_id, exercise_id, context, correct) VALUES (?, ?, ?, ?)",
+      [req.userId, ex.id, context, correct ? 1 : 0]
     );
 
     let lessonCompleted = false;
@@ -46,7 +53,12 @@ router.post("/:id/answer", async (req, res, next) => {
     let perfectBonus = 0;
     let streak = null;
 
-    if (correct) {
+    if (reviewCleared) {
+      await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, ?, 5)", [req.userId, ex.lesson_id]);
+      xpAwarded = 5;
+    }
+
+    if (context === "lesson" && correct) {
       const done = await query(
         "SELECT lesson_id FROM lesson_completions WHERE user_id = ? AND lesson_id = ?",
         [req.userId, ex.lesson_id]
@@ -112,7 +124,7 @@ router.post("/:id/answer", async (req, res, next) => {
       streak,
       courseProgress: detail.progress,
       nextLessonId: nextLesson,
-      reviewCleared: false,
+      reviewCleared,
     });
   } catch (e) {
     next(e);
