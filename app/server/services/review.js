@@ -9,8 +9,8 @@ const PENDING_HAVING = `HAVING last_wrong IS NOT NULL AND (last_review_ok IS NUL
 export async function isPendingReview(userId, exerciseId) {
   const rows = await query(
     `SELECT
-       MAX(CASE WHEN correct = 0 THEN created_at END) AS last_wrong,
-       MAX(CASE WHEN correct = 1 AND context = 'review' THEN created_at END) AS last_review_ok
+       MAX(CASE WHEN correct = 0 THEN id END) AS last_wrong,
+       MAX(CASE WHEN correct = 1 AND context = 'review' THEN id END) AS last_review_ok
      FROM answer_attempts
      WHERE user_id = ? AND exercise_id = ?`,
     [userId, exerciseId]
@@ -22,8 +22,8 @@ export async function isPendingReview(userId, exerciseId) {
 export async function pendingReview(userId, limit = 10) {
   const rows = await query(
     `SELECT e.id, e.type, e.prompt, e.payload, l.title AS lesson_title, c.subject AS course_subject,
-            MAX(CASE WHEN a.correct = 0 THEN a.created_at END) AS last_wrong,
-            MAX(CASE WHEN a.correct = 1 AND a.context = 'review' THEN a.created_at END) AS last_review_ok
+            MAX(CASE WHEN a.correct = 0 THEN a.id END) AS last_wrong,
+            MAX(CASE WHEN a.correct = 1 AND a.context = 'review' THEN a.id END) AS last_review_ok
      FROM answer_attempts a
      JOIN exercises e ON e.id = a.exercise_id
      JOIN lessons l ON l.id = e.lesson_id
@@ -50,8 +50,8 @@ export async function reviewCount(userId) {
   const rows = await query(
     `SELECT COUNT(*) AS n FROM (
        SELECT a.exercise_id,
-              MAX(CASE WHEN a.correct = 0 THEN a.created_at END) AS last_wrong,
-              MAX(CASE WHEN a.correct = 1 AND a.context = 'review' THEN a.created_at END) AS last_review_ok
+              MAX(CASE WHEN a.correct = 0 THEN a.id END) AS last_wrong,
+              MAX(CASE WHEN a.correct = 1 AND a.context = 'review' THEN a.id END) AS last_review_ok
        FROM answer_attempts a
        WHERE a.user_id = ?
        GROUP BY a.exercise_id
