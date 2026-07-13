@@ -2,10 +2,6 @@ import test, { after } from "node:test";
 import assert from "node:assert/strict";
 import { setupTestDb, query, closeDb } from "./helpers.js";
 
-function parseMaybe(v) {
-  return typeof v === "string" ? JSON.parse(v) : v;
-}
-
 test("seed inserta bd1 y bd2 con estructura válida", async () => {
   await setupTestDb();
   const bd1 = await query("SELECT * FROM courses WHERE id = 'bd1'");

@@ -35,8 +35,6 @@ CREATE TABLE IF NOT EXISTS lessons (
   CONSTRAINT fk_lessons_unit FOREIGN KEY (unit_id) REFERENCES units(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS quiz_questions;
-
 CREATE TABLE IF NOT EXISTS lesson_completions (
   user_id INT NOT NULL,
   lesson_id VARCHAR(30) NOT NULL,
@@ -79,3 +77,5 @@ CREATE TABLE IF NOT EXISTS answer_attempts (
   CONSTRAINT fk_aa_user FOREIGN KEY (user_id) REFERENCES users(id),
   CONSTRAINT fk_aa_exercise FOREIGN KEY (exercise_id) REFERENCES exercises(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS quiz_questions;
