@@ -79,7 +79,7 @@ export default {
           mins: 20,
           content: [
             { type: "p", html: "<code>ACID</code> es el acrónimo de las cuatro propiedades que garantiza una transacción: Atomicidad, Consistencia, Aislamiento y Durabilidad. La <code>Atomicidad</code> asegura que la transacción se aplica completa o no se aplica; la <code>Consistencia</code> asegura que la base de datos pasa de un estado válido a otro estado válido, respetando las reglas definidas (claves, restricciones)." },
-            { type: "p", html: "El <code>Aislamiento</code> garantiza que transacciones concurrentes no interfieran entre sí, como si se ejecutaran una tras otra. La <code>Durabilidad</code> garantiza que, una vez hecho COMMIT, los cambios sobreviven incluso ante una caída del servidor justo después." },
+            { type: "p", html: "El <code>Aislamiento</code> garantiza que transacciones concurrentes no interfieran entre sí, como si se ejecutaran una tras otra. La <code>Durabilidad</code> garantiza que, una vez hecho <code>COMMIT</code>, los cambios sobreviven incluso ante una caída del servidor justo después." },
             { type: "note", text: "Piensa en ACID como el contrato de confianza entre tu aplicación y el SGBD: sin él, no podrías confiar en que un pago se procesó una sola vez y de forma correcta." },
           ],
           quiz: {
