@@ -53,9 +53,9 @@ export default {
             prompt: "Ordena las líneas para construir la estructura básica de un documento HTML, desde el doctype hasta el body.",
             payload: {
               lines: [
-                { id: "c", html: `  &lt;<span style="${K}">head</span>&gt;&lt;<span style="${K}">title</span>&gt;Mi página&lt;/<span style="${K}">title</span>&gt;&lt;/<span style="${K}">head</span>&gt;` },
-                { id: "a", html: `&lt;!DOCTYPE <span style="${K}">html</span>&gt;` },
                 { id: "d", html: `  &lt;<span style="${K}">body</span>&gt;&lt;<span style="${K}">h1</span>&gt;¡Hola!&lt;/<span style="${K}">h1</span>&gt;&lt;/<span style="${K}">body</span>&gt;` },
+                { id: "a", html: `&lt;!DOCTYPE <span style="${K}">html</span>&gt;` },
+                { id: "c", html: `  &lt;<span style="${K}">head</span>&gt;&lt;<span style="${K}">title</span>&gt;Mi página&lt;/<span style="${K}">title</span>&gt;&lt;/<span style="${K}">head</span>&gt;` },
                 { id: "b", html: `&lt;<span style="${K}">html</span> lang=<span style="${S}">"es"</span>&gt;` },
               ],
             },
@@ -577,10 +577,10 @@ export default {
             prompt: "Ordena la cadena de promesas: hacer la petición, convertir la respuesta a JSON, usar los datos y manejar errores.",
             payload: {
               lines: [
-                { id: "c", html: `.then((datos) =&gt; console.log(datos))` },
-                { id: "a", html: `fetch(<span style="${S}">"https://api.ejemplo.com/usuarios"</span>)` },
-                { id: "d", html: `.catch((error) =&gt; console.log(<span style="${S}">"Error al obtener usuarios"</span>))` },
                 { id: "b", html: `.then((res) =&gt; res.json())` },
+                { id: "c", html: `.then((datos) =&gt; console.log(datos))` },
+                { id: "d", html: `.catch((error) =&gt; console.log(<span style="${S}">"Error al obtener usuarios"</span>))` },
+                { id: "a", html: `fetch(<span style="${S}">"https://api.ejemplo.com/usuarios"</span>)` },
               ],
             },
             answer: { order: ["a", "b", "c", "d"] },

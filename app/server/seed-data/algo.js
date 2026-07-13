@@ -103,10 +103,10 @@ export default {
             prompt: "Ordena las líneas para construir el pseudocódigo que encuentra el mayor de dos números a y b.",
             payload: {
               lines: [
-                { id: "c", html: `  <span style="${K}">SI</span> a &gt; b <span style="${K}">ENTONCES</span> <span style="${K}">ESCRIBIR</span> a <span style="${K}">SINO</span> <span style="${K}">ESCRIBIR</span> b <span style="${K}">FIN SI</span>` },
-                { id: "a", html: `<span style="${K}">INICIO</span>` },
-                { id: "d", html: `<span style="${K}">FIN</span>` },
                 { id: "b", html: `  <span style="${K}">LEER</span> a, b` },
+                { id: "d", html: `<span style="${K}">FIN</span>` },
+                { id: "a", html: `<span style="${K}">INICIO</span>` },
+                { id: "c", html: `  <span style="${K}">SI</span> a &gt; b <span style="${K}">ENTONCES</span> <span style="${K}">ESCRIBIR</span> a <span style="${K}">SINO</span> <span style="${K}">ESCRIBIR</span> b <span style="${K}">FIN SI</span>` },
               ],
             },
             answer: { order: ["a", "b", "c", "d"] },
@@ -145,10 +145,10 @@ export default {
             prompt: "Traza este bucle: int contador = 0; for (int i = 1; i <= 4; i++) { contador = contador + i; } Ordena los valores que toma contador, desde el inicial hasta el último.",
             payload: {
               lines: [
-                { id: "c", html: `<span style="${C}">// contador = 3 (tras i = 2)</span>` },
-                { id: "a", html: `<span style="${C}">// contador = 0 (valor inicial, antes del bucle)</span>` },
                 { id: "e", html: `<span style="${C}">// contador = 10 (tras i = 4)</span>` },
                 { id: "b", html: `<span style="${C}">// contador = 1 (tras i = 1)</span>` },
+                { id: "c", html: `<span style="${C}">// contador = 3 (tras i = 2)</span>` },
+                { id: "a", html: `<span style="${C}">// contador = 0 (valor inicial, antes del bucle)</span>` },
                 { id: "d", html: `<span style="${C}">// contador = 6 (tras i = 3)</span>` },
               ],
             },
@@ -348,10 +348,10 @@ export default {
             prompt: "Ordena la llamada inicial y los movimientos que imprime hanoi(2, \"A\", \"C\", \"B\") al resolver Torres de Hanói con 2 discos.",
             payload: {
               lines: [
-                { id: "c", html: `<span style="${S}">System</span>.out.println(<span style="${S}">"Mover disco 2 de A a C"</span>);` },
                 { id: "a", html: `hanoi(<span style="${N}">2</span>, <span style="${S}">"A"</span>, <span style="${S}">"C"</span>, <span style="${S}">"B"</span>);` },
                 { id: "d", html: `<span style="${S}">System</span>.out.println(<span style="${S}">"Mover disco 1 de B a C"</span>);` },
                 { id: "b", html: `<span style="${S}">System</span>.out.println(<span style="${S}">"Mover disco 1 de A a B"</span>);` },
+                { id: "c", html: `<span style="${S}">System</span>.out.println(<span style="${S}">"Mover disco 2 de A a C"</span>);` },
               ],
             },
             answer: { order: ["a", "b", "c", "d"] },
@@ -453,10 +453,10 @@ export default {
             prompt: "Ordena los pasos del algoritmo de búsqueda binaria sobre un arreglo ordenado.",
             payload: {
               lines: [
-                { id: "c", html: `<span style="${C}">// Paso 3: descartar la mitad del arreglo donde el valor no puede estar</span>` },
-                { id: "a", html: `<span style="${C}">// Paso 1: calcular medio = (izquierda + derecha) / 2</span>` },
                 { id: "d", html: `<span style="${C}">// Paso 4: repetir el proceso con la mitad restante</span>` },
                 { id: "b", html: `<span style="${C}">// Paso 2: comparar arreglo[medio] con el valor buscado</span>` },
+                { id: "c", html: `<span style="${C}">// Paso 3: descartar la mitad del arreglo donde el valor no puede estar</span>` },
+                { id: "a", html: `<span style="${C}">// Paso 1: calcular medio = (izquierda + derecha) / 2</span>` },
               ],
             },
             answer: { order: ["a", "b", "c", "d"] },
@@ -501,10 +501,10 @@ export default {
             prompt: "Ordena los pasos de la primera pasada de bubble sort sobre el arreglo [3, 1, 2], comparando elementos adyacentes de izquierda a derecha.",
             payload: {
               lines: [
+                { id: "b", html: `<span style="${C}">// Comparar índices 0 y 1: 3 &gt; 1 → intercambiar → [1, 3, 2]</span>` },
                 { id: "c", html: `<span style="${C}">// Comparar índices 1 y 2: 3 &gt; 2 → intercambiar → [1, 2, 3]</span>` },
                 { id: "a", html: `<span style="${C}">// Estado inicial: [3, 1, 2]</span>` },
                 { id: "d", html: `<span style="${C}">// Fin de la primera pasada: [1, 2, 3]</span>` },
-                { id: "b", html: `<span style="${C}">// Comparar índices 0 y 1: 3 &gt; 1 → intercambiar → [1, 3, 2]</span>` },
               ],
             },
             answer: { order: ["a", "b", "c", "d"] },
@@ -549,10 +549,10 @@ export default {
             prompt: "Ordena las fases de merge sort, desde que recibe el arreglo hasta que devuelve el resultado ordenado.",
             payload: {
               lines: [
-                { id: "c", html: `<span style="${C}">// 3. Combinar (merge) las dos mitades ya ordenadas en un solo arreglo ordenado</span>` },
                 { id: "a", html: `<span style="${C}">// 1. Dividir el arreglo en dos mitades</span>` },
-                { id: "d", html: `<span style="${C}">// 4. Devolver el arreglo combinado y ordenado</span>` },
+                { id: "c", html: `<span style="${C}">// 3. Combinar (merge) las dos mitades ya ordenadas en un solo arreglo ordenado</span>` },
                 { id: "b", html: `<span style="${C}">// 2. Ordenar recursivamente cada mitad con mergeSort</span>` },
+                { id: "d", html: `<span style="${C}">// 4. Devolver el arreglo combinado y ordenado</span>` },
               ],
             },
             answer: { order: ["a", "b", "c", "d"] },
