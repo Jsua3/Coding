@@ -127,4 +127,19 @@ test("prog1 y prog2: toda lección tiene su ejercicio extra", async () => {
   assert.equal(rows[0].n, 21);
 });
 
+test("global: 128 ejercicios, 2 por lección, todos bien formados", async () => {
+  await setupTestDb();
+  const rows = await query("SELECT * FROM exercises ORDER BY lesson_id, order_index");
+  assert.equal(rows.length, 128);
+  const byLesson = {};
+  for (const r of rows) (byLesson[r.lesson_id] = byLesson[r.lesson_id] || []).push(r);
+  assert.equal(Object.keys(byLesson).length, 64);
+  for (const exs of Object.values(byLesson)) {
+    assert.equal(exs.length, 2);
+    assert.equal(exs[0].type, "choice");
+    assert.notEqual(exs[1].type, "choice");
+    for (const e of exs) assertExerciseShape(e);
+  }
+});
+
 after(closeDb);

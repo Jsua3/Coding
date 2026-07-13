@@ -50,6 +50,22 @@ export default {
             ok: "Un algoritmo debe ser finito: tiene que terminar tras una cantidad limitada de pasos, sin importar el lenguaje o la velocidad de ejecución.",
             bad: "Un algoritmo puede describirse en pseudocódigo sin lenguaje concreto, puede tardar más de un segundo, y puede incluir operaciones distintas a las aritméticas; lo obligatorio es que termine.",
           },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada término con su definición.",
+            payload: {
+              left: ["Algoritmo", "Entrada", "Salida", "Paso"],
+              right: [
+                "Una instrucción individual y no ambigua dentro de la secuencia del algoritmo",
+                "Resultado que el algoritmo produce al terminar de ejecutarse",
+                "Secuencia finita y ordenada de instrucciones precisas que resuelve un problema",
+                "Dato que el algoritmo recibe antes de empezar a procesar",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 3], [2, 1], [3, 0]] },
+            ok: "Un algoritmo es la secuencia completa de pasos; la entrada es lo que recibe, la salida lo que produce, y un paso es cada instrucción individual dentro de esa secuencia.",
+            bad: "No confundas el todo (algoritmo) con sus partes: un paso es una instrucción, la entrada es lo que recibe y la salida lo que produce.",
+          },
         },
         {
           id: "algo-l2",
@@ -82,6 +98,21 @@ export default {
             ok: "El pseudocódigo no se ejecuta ni pertenece a ningún lenguaje: es una herramienta de diseño que te deja pensar en los pasos antes de preocuparte por la sintaxis.",
             bad: "El pseudocódigo no se ejecuta en la JVM, no es un lenguaje oficial de Java, y no reemplaza las pruebas; su valor está en separar el diseño de la sintaxis.",
           },
+          extra: {
+            type: "order",
+            prompt: "Ordena las líneas para construir el pseudocódigo que encuentra el mayor de dos números a y b.",
+            payload: {
+              lines: [
+                { id: "c", html: `  <span style="${K}">SI</span> a &gt; b <span style="${K}">ENTONCES</span> <span style="${K}">ESCRIBIR</span> a <span style="${K}">SINO</span> <span style="${K}">ESCRIBIR</span> b <span style="${K}">FIN SI</span>` },
+                { id: "a", html: `<span style="${K}">INICIO</span>` },
+                { id: "d", html: `<span style="${K}">FIN</span>` },
+                { id: "b", html: `  <span style="${K}">LEER</span> a, b` },
+              ],
+            },
+            answer: { order: ["a", "b", "c", "d"] },
+            ok: "El algoritmo primero declara el inicio, luego lee las dos entradas, después compara y escribe la mayor, y por último declara el fin.",
+            bad: "Sin LEER las entradas antes de compararlas no hay datos que evaluar, y FIN siempre cierra el algoritmo: no puede ir antes de INICIO ni de la comparación.",
+          },
         },
         {
           id: "algo-l3",
@@ -108,6 +139,22 @@ export default {
             correct: 3,
             ok: "El bucle multiplica resultado por cada i de 1 a 4: 1×1×2×3×4 = 24, el factorial de 4.",
             bad: "El bucle multiplica, no suma, así que no da 10; resultado sí cambia en cada vuelta y termina en 24, no en el último valor de i ni en su valor inicial.",
+          },
+          extra: {
+            type: "order",
+            prompt: "Traza este bucle: int contador = 0; for (int i = 1; i <= 4; i++) { contador = contador + i; } Ordena los valores que toma contador, desde el inicial hasta el último.",
+            payload: {
+              lines: [
+                { id: "c", html: `<span style="${C}">// contador = 3 (tras i = 2)</span>` },
+                { id: "a", html: `<span style="${C}">// contador = 0 (valor inicial, antes del bucle)</span>` },
+                { id: "e", html: `<span style="${C}">// contador = 10 (tras i = 4)</span>` },
+                { id: "b", html: `<span style="${C}">// contador = 1 (tras i = 1)</span>` },
+                { id: "d", html: `<span style="${C}">// contador = 6 (tras i = 3)</span>` },
+              ],
+            },
+            answer: { order: ["a", "b", "c", "d", "e"] },
+            ok: "contador empieza en 0; en cada vuelta se le suma el i actual: tras i=1 vale 1, tras i=2 vale 3 (1+2), tras i=3 vale 6 (3+3), tras i=4 vale 10 (6+4).",
+            bad: "La secuencia es acumulativa: cada vuelta suma el i actual al valor previo de contador, no al valor inicial; no puedes saltarte un valor intermedio.",
           },
         },
         {
@@ -147,6 +194,22 @@ export default {
             ok: "Por cada uno de los n elementos del bucle externo, el bucle interno recorre los n elementos otra vez: n × n = n², complejidad cuadrática.",
             bad: "No es constante ni lineal, porque el trabajo crece con el cuadrado de n; tampoco es logarítmico, que describe reducir el problema a la mitad en cada paso.",
           },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada complejidad con un ejemplo de operación.",
+            payload: {
+              left: ["O(1)", "O(log n)", "O(n)", "O(n²)"],
+              right: [
+                "Recorrer todos los elementos de un arreglo una sola vez con un bucle",
+                "Comparar cada elemento de un arreglo con todos los demás, usando dos bucles anidados",
+                "Acceder a un elemento de un arreglo por su índice, sin recorrer nada",
+                "Descartar la mitad de los elementos restantes en cada paso, como en la búsqueda binaria",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 3], [2, 0], [3, 1]] },
+            ok: "O(1) accede directo sin recorrer nada; O(log n) descarta la mitad en cada paso; O(n) recorre una vez; O(n²) compara cada par con bucles anidados.",
+            bad: "No confundas recorrer una vez (O(n)) con recorrer con bucles anidados (O(n²)); acceder por índice es O(1), y descartar la mitad en cada paso es O(log n).",
+          },
         },
       ],
     },
@@ -182,6 +245,24 @@ export default {
             ok: "Sin caso base, cada llamada genera otra llamada con n-1, sin detenerse nunca, hasta agotar la memoria de la pila de llamadas.",
             bad: "No es solo más lento, Java no agrega un caso base implícito, y el problema no es el valor de retorno de un caso puntual sino que la recursión nunca termina.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el caso base y la llamada recursiva de factorial.",
+            payload: {
+              code: [
+                `<span style="${K}">public static int</span> factorial(<span style="${K}">int</span> n) {`,
+                `  <span style="${K}">if</span> (n == <b0>) {`,
+                `    <span style="${K}">return</span> <span style="${N}">1</span>; <span style="${C}">// caso base</span>`,
+                `  }`,
+                `  <span style="${K}">return</span> n * factorial(n - <b1>); <span style="${C}">// llamada recursiva</span>`,
+                `}`,
+              ],
+              bank: ["0", "1", "n", "2"],
+            },
+            answer: { blanks: ["0", "1"] },
+            ok: "El caso base se cumple cuando n llega a 0, y cada llamada recursiva reduce n en 1 para acercarse a ese caso base.",
+            bad: "Si el caso base comparara con un valor distinto de 0, o si el decremento no fuera exactamente 1, la recursión podría saltarse el 0 y no terminar nunca.",
+          },
         },
         {
           id: "algo-l6",
@@ -210,6 +291,24 @@ export default {
             correct: 0,
             ok: "Cuando indice llega a arreglo.length, ya se procesaron todos los elementos; el caso base devuelve 0 porque no hay nada más que sumar.",
             bad: "No representa el primer elemento ni el mayor valor, y no es un error: es la condición de parada, exactamente en el límite válido del arreglo.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la función recursiva que suma los elementos de una lista.",
+            payload: {
+              code: [
+                `<span style="${K}">public static int</span> sumarLista(<span style="${K}">int</span>[] lista, <span style="${K}">int</span> indice) {`,
+                `  <span style="${K}">if</span> (indice == <b0>) {`,
+                `    <span style="${K}">return</span> <span style="${N}">0</span>; <span style="${C}">// caso base: no quedan elementos</span>`,
+                `  }`,
+                `  <span style="${K}">return</span> lista[indice] + sumarLista(lista, indice + <b1>);`,
+                `}`,
+              ],
+              bank: ["lista.length", "1", "0", "lista.length - 1"],
+            },
+            answer: { blanks: ["lista.length", "1"] },
+            ok: "El caso base se activa cuando indice llega a lista.length (ya no hay elementos); cada llamada recursiva avanza el índice en 1 para acercarse a ese límite.",
+            bad: "Si el caso base comparara con 0 en vez de lista.length, o si el índice no avanzara en 1, la recursión no recorrería toda la lista ni terminaría donde corresponde.",
           },
         },
         {
@@ -244,6 +343,21 @@ export default {
             ok: "El caso base es mover un único disco (n == 1) directamente, sin más llamadas recursivas; para n mayor, la función se divide en dos llamadas con n-1.",
             bad: "El código verifica n == 1, no n == 0, y comparar origen con destino no forma parte de la condición de parada; toda función recursiva necesita un caso base explícito para terminar.",
           },
+          extra: {
+            type: "order",
+            prompt: "Ordena la llamada inicial y los movimientos que imprime hanoi(2, \"A\", \"C\", \"B\") al resolver Torres de Hanói con 2 discos.",
+            payload: {
+              lines: [
+                { id: "c", html: `<span style="${S}">System</span>.out.println(<span style="${S}">"Mover disco 2 de A a C"</span>);` },
+                { id: "a", html: `hanoi(<span style="${N}">2</span>, <span style="${S}">"A"</span>, <span style="${S}">"C"</span>, <span style="${S}">"B"</span>);` },
+                { id: "d", html: `<span style="${S}">System</span>.out.println(<span style="${S}">"Mover disco 1 de B a C"</span>);` },
+                { id: "b", html: `<span style="${S}">System</span>.out.println(<span style="${S}">"Mover disco 1 de A a B"</span>);` },
+              ],
+            },
+            answer: { order: ["a", "b", "c", "d"] },
+            ok: "Primero se invoca hanoi(2, A, C, B); esa llamada mueve el disco 1 de A a B, luego el disco 2 de A a C, y por último el disco 1 de B a C: 3 movimientos en total.",
+            bad: "El disco grande (2) no puede moverse hasta liberar el disco pequeño (1) de encima, y el pequeño debe terminar en el destino después del grande, nunca antes de la llamada inicial.",
+          },
         },
         {
           id: "algo-l8",
@@ -274,6 +388,22 @@ export default {
             correct: 3,
             ok: "Ambas versiones calculan el mismo resultado, pero la recursiva acumula una llamada en la pila por cada nivel; con n grande eso puede agotar la pila, algo que la iterativa evita.",
             bad: "Los bucles for siguen existiendo en Java, la recursión no está limitada a números pares, y ambos enfoques calculan el mismo resultado; la diferencia real está en el uso de memoria de la pila.",
+          },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada término con su característica.",
+            payload: {
+              left: ["Recursión", "Iteración", "Caso base", "Desbordamiento de pila"],
+              right: [
+                "Repetir instrucciones usando un bucle, con memoria constante independiente del número de repeticiones",
+                "Error que ocurre cuando las llamadas recursivas se acumulan sin llegar nunca a un caso base",
+                "Una función que se llama a sí misma para resolver una versión más pequeña del mismo problema",
+                "Condición simple que detiene la recursión sin generar más llamadas",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 0], [2, 3], [3, 1]] },
+            ok: "La recursión se llama a sí misma, la iteración repite con bucles y memoria constante, el caso base detiene la recursión, y el desbordamiento ocurre si nunca se alcanza ese caso base.",
+            bad: "No confundas la causa (falta de caso base) con el efecto (desbordamiento de pila); y recuerda que la iteración, a diferencia de la recursión, no acumula llamadas en la pila.",
           },
         },
       ],
@@ -318,6 +448,21 @@ export default {
             ok: "La búsqueda binaria decide qué mitad descartar comparando con el centro; esa decisión solo es correcta si el orden garantiza que todo lo mayor (o menor) queda de un lado.",
             bad: "Un arreglo desordenado sí puede recorrerse con un bucle (así funciona la búsqueda lineal), la lineal no es siempre más rápida (es O(n) contra O(log n)), y el orden no tiene relación con permitir o no valores repetidos.",
           },
+          extra: {
+            type: "order",
+            prompt: "Ordena los pasos del algoritmo de búsqueda binaria sobre un arreglo ordenado.",
+            payload: {
+              lines: [
+                { id: "c", html: `<span style="${C}">// Paso 3: descartar la mitad del arreglo donde el valor no puede estar</span>` },
+                { id: "a", html: `<span style="${C}">// Paso 1: calcular medio = (izquierda + derecha) / 2</span>` },
+                { id: "d", html: `<span style="${C}">// Paso 4: repetir el proceso con la mitad restante</span>` },
+                { id: "b", html: `<span style="${C}">// Paso 2: comparar arreglo[medio] con el valor buscado</span>` },
+              ],
+            },
+            answer: { order: ["a", "b", "c", "d"] },
+            ok: "Primero calculas el medio, luego comparas con el objetivo; si no coincide, descartas la mitad donde no puede estar, y repites el proceso con la mitad restante.",
+            bad: "No puedes descartar una mitad antes de comparar, ni comparar antes de calcular el medio; el proceso se repite solo después de descartar, no antes.",
+          },
         },
         {
           id: "algo-l10",
@@ -350,6 +495,21 @@ export default {
             correct: 3,
             ok: "Los dos algoritmos, en el peor caso (arreglo en orden inverso), requieren aproximadamente n² comparaciones e intercambios: complejidad cuadrática compartida.",
             bad: "Ninguno es logarítmico ni constante, y bubble sort tampoco baja a O(n) en el peor caso: ambos comparten la misma cota O(n²) en ese escenario.",
+          },
+          extra: {
+            type: "order",
+            prompt: "Ordena los pasos de la primera pasada de bubble sort sobre el arreglo [3, 1, 2], comparando elementos adyacentes de izquierda a derecha.",
+            payload: {
+              lines: [
+                { id: "c", html: `<span style="${C}">// Comparar índices 1 y 2: 3 &gt; 2 → intercambiar → [1, 2, 3]</span>` },
+                { id: "a", html: `<span style="${C}">// Estado inicial: [3, 1, 2]</span>` },
+                { id: "d", html: `<span style="${C}">// Fin de la primera pasada: [1, 2, 3]</span>` },
+                { id: "b", html: `<span style="${C}">// Comparar índices 0 y 1: 3 &gt; 1 → intercambiar → [1, 3, 2]</span>` },
+              ],
+            },
+            answer: { order: ["a", "b", "c", "d"] },
+            ok: "Bubble sort compara pares adyacentes: primero 3 y 1 (se intercambian), luego 3 y 2 (se intercambian de nuevo), dejando el arreglo [1, 2, 3] al final de la primera pasada.",
+            bad: "La comparación avanza de izquierda a derecha sobre pares adyacentes; no se puede comparar el segundo par antes del primero, ni el arreglo queda ordenado antes de completar las comparaciones.",
           },
         },
         {
@@ -384,6 +544,21 @@ export default {
             ok: "Dividir a la mitad en cada nivel reduce drásticamente el número de comparaciones necesarias frente a comparar cada par adyacente repetidamente, dando O(n log n) en vez de O(n²).",
             bad: "Merge sort sí compara elementos durante el merge, bubble sort funciona con cualquier número, y merge sort depende justamente de la recursión para dividir el arreglo.",
           },
+          extra: {
+            type: "order",
+            prompt: "Ordena las fases de merge sort, desde que recibe el arreglo hasta que devuelve el resultado ordenado.",
+            payload: {
+              lines: [
+                { id: "c", html: `<span style="${C}">// 3. Combinar (merge) las dos mitades ya ordenadas en un solo arreglo ordenado</span>` },
+                { id: "a", html: `<span style="${C}">// 1. Dividir el arreglo en dos mitades</span>` },
+                { id: "d", html: `<span style="${C}">// 4. Devolver el arreglo combinado y ordenado</span>` },
+                { id: "b", html: `<span style="${C}">// 2. Ordenar recursivamente cada mitad con mergeSort</span>` },
+              ],
+            },
+            answer: { order: ["a", "b", "c", "d"] },
+            ok: "Merge sort primero divide el arreglo a la mitad, ordena cada mitad por separado (de forma recursiva), las combina en un solo arreglo ordenado, y finalmente devuelve ese resultado.",
+            bad: "No puedes combinar mitades que todavía no están ordenadas, ni devolver el resultado antes de combinarlo: primero se divide, después se ordena cada mitad, luego se combina y por último se devuelve.",
+          },
         },
         {
           id: "algo-l12",
@@ -411,6 +586,27 @@ export default {
             correct: 0,
             ok: "Insertion sort aprovecha que el arreglo pequeño ya está casi ordenado; merge sort garantiza O(n log n) consistente, necesario para que el arreglo de 10 millones termine en un tiempo razonable.",
             bad: "Bubble sort no escala bien a 10 millones de elementos, la búsqueda binaria sirve para buscar, no para ordenar, y O(n log n) es precisamente la complejidad que hace viable ordenar arreglos grandes.",
+          },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada problema con el algoritmo más adecuado para resolverlo.",
+            payload: {
+              left: [
+                "Buscar un valor en un arreglo ordenado de un millón de elementos",
+                "Ordenar un arreglo casi ordenado de 15 elementos",
+                "Ordenar un arreglo desordenado de un millón de elementos",
+                "Buscar un valor en un arreglo desordenado de 10 elementos",
+              ],
+              right: [
+                "Búsqueda lineal: revisa cada elemento hasta encontrarlo, sin depender de que esté ordenado",
+                "Merge sort: garantiza O(n log n) incluso en arreglos grandes y desordenados",
+                "Búsqueda binaria: descarta la mitad del espacio de búsqueda en cada paso",
+                "Insertion sort: eficiente cuando los datos ya están casi ordenados",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 3], [2, 1], [3, 0]] },
+            ok: "La búsqueda binaria exige orden y aprovecha arreglos grandes; insertion sort brilla con datos pequeños casi ordenados; merge sort garantiza buen rendimiento en arreglos grandes desordenados; y la búsqueda lineal sirve para arreglos pequeños sin garantía de orden.",
+            bad: "No uses búsqueda binaria sin arreglo ordenado, ni insertion sort para un millón de elementos desordenados: la elección depende del tamaño y del estado de los datos.",
           },
         },
       ],

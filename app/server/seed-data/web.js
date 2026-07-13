@@ -48,6 +48,21 @@ export default {
             ok: "<head> guarda metadatos (título, charset, enlaces a hojas de estilo) que el navegador usa pero no muestra como contenido visible; eso vive en <body>.",
             bad: "El contenido visible va en <body>, no en <head>; <head> no se limita a imágenes ni obliga a que el JavaScript se declare ahí.",
           },
+          extra: {
+            type: "order",
+            prompt: "Ordena las líneas para construir la estructura básica de un documento HTML, desde el doctype hasta el body.",
+            payload: {
+              lines: [
+                { id: "c", html: `  &lt;<span style="${K}">head</span>&gt;&lt;<span style="${K}">title</span>&gt;Mi página&lt;/<span style="${K}">title</span>&gt;&lt;/<span style="${K}">head</span>&gt;` },
+                { id: "a", html: `&lt;!DOCTYPE <span style="${K}">html</span>&gt;` },
+                { id: "d", html: `  &lt;<span style="${K}">body</span>&gt;&lt;<span style="${K}">h1</span>&gt;¡Hola!&lt;/<span style="${K}">h1</span>&gt;&lt;/<span style="${K}">body</span>&gt;` },
+                { id: "b", html: `&lt;<span style="${K}">html</span> lang=<span style="${S}">"es"</span>&gt;` },
+              ],
+            },
+            answer: { order: ["a", "b", "c", "d"] },
+            ok: "El documento empieza con el doctype, luego se abre <html>, después va <head> con los metadatos, y por último <body> con el contenido visible.",
+            bad: "El doctype siempre va primero, antes de <html>; y <head> debe aparecer antes que <body>, no al revés.",
+          },
         },
         {
           id: "web-l2",
@@ -80,6 +95,22 @@ export default {
             ok: "Las etiquetas semánticas describen qué es cada sección, algo que lectores de pantalla y buscadores aprovechan; <div> es válido pero no aporta ese significado.",
             bad: "<div> sigue siendo válido en HTML5 y sí admite class/id, y no hay una diferencia relevante de velocidad de renderizado; la ventaja real es semántica.",
           },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada etiqueta semántica con su uso.",
+            payload: {
+              left: ["<header>", "<nav>", "<main>", "<footer>"],
+              right: [
+                "Contiene el contenido principal y único de la página, sin repetirse en otras páginas",
+                "Información de cierre, como derechos de autor o enlaces secundarios, al final de la página",
+                "Encabezado introductorio de la página o de una sección, con logo o título",
+                "Agrupa los enlaces de navegación principal del sitio",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 3], [2, 0], [3, 1]] },
+            ok: "<header> introduce la página o sección, <nav> agrupa la navegación principal, <main> contiene el contenido único y central, y <footer> cierra con información secundaria.",
+            bad: "No confundas <main> (contenido central único) con <header> (encabezado introductorio); y <nav> se reserva para los enlaces de navegación, no para el cierre de la página.",
+          },
         },
         {
           id: "web-l3",
@@ -108,6 +139,23 @@ export default {
             ok: "El atributo for vincula la etiqueta con el input que comparte ese id: mejora la usabilidad (clic en el texto) y la accesibilidad (anuncio correcto por lectores de pantalla).",
             bad: "El vínculo no agrega required automáticamente ni permite enviar el formulario sin botón; y sí tiene un efecto funcional real, no es solo decorativo.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el formulario para que la etiqueta se vincule al campo de correo y el input tenga el tipo correcto.",
+            payload: {
+              code: [
+                `&lt;<span style="${K}">form</span>&gt;`,
+                `  &lt;<span style="${K}">label</span> for=<span style="${S}">"<b0>"</span>&gt;Correo:&lt;/<span style="${K}">label</span>&gt;`,
+                `  &lt;<span style="${K}">input</span> type=<span style="${S}">"<b1>"</span> id=<span style="${S}">"correo"</span> name=<span style="${S}">"correo"</span> required&gt;`,
+                `  &lt;<span style="${K}">button</span> type=<span style="${S}">"submit"</span>&gt;Enviar&lt;/<span style="${K}">button</span>&gt;`,
+                `&lt;/<span style="${K}">form</span>&gt;`,
+              ],
+              bank: ["correo", "email", "password", "usuario"],
+            },
+            answer: { blanks: ["correo", "email"] },
+            ok: "for=\"correo\" debe coincidir con el id=\"correo\" del input para vincular la etiqueta, y type=\"email\" es el tipo de dato esperado en ese campo.",
+            bad: "Si for no coincide exactamente con el id, la etiqueta no se vincula al campo; y type=\"password\" ocultaría el texto, algo que no corresponde a un campo de correo.",
+          },
         },
         {
           id: "web-l4",
@@ -133,6 +181,20 @@ export default {
             correct: 1,
             ok: "alt aporta un texto alternativo accesible: los lectores de pantalla lo leen, y el navegador lo muestra si src falla en cargar.",
             bad: "La imagen sí se muestra sin alt (aunque sin ser accesible), alt no reemplaza a src, y no tiene ningún efecto sobre el peso del archivo de imagen.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el atributo alt de la imagen y el href del enlace.",
+            payload: {
+              code: [
+                `&lt;<span style="${K}">img</span> src=<span style="${S}">"logo.png"</span> alt=<span style="${S}">"<b0>"</span>&gt;`,
+                `&lt;<span style="${K}">a</span> href=<span style="${S}">"<b1>"</span>&gt;Visita el sitio&lt;/<span style="${K}">a</span>&gt;`,
+              ],
+              bank: ["Logo de la empresa", "https://coding.dev", "logo.png", "#seccion-2"],
+            },
+            answer: { blanks: ["Logo de la empresa", "https://coding.dev"] },
+            ok: "alt describe la imagen para accesibilidad (\"Logo de la empresa\"), y href indica el destino del enlace, aquí una URL externa completa.",
+            bad: "alt no debe repetir el nombre del archivo (logo.png); necesita describir la imagen. Y href necesita una URL o ruta válida, no el texto visible del enlace.",
           },
         },
       ],
@@ -172,6 +234,22 @@ export default {
             ok: "Un selector de id (#header) tiene mayor especificidad que uno de clase (.tarjeta) o de etiqueta (p), así que su declaración gana: el texto se muestra en rojo.",
             bad: "El orden de escritura no decide aquí porque la especificidad se evalúa primero, y las clases no superan a los ids; el id es el que gana.",
           },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada tipo de selector con su nivel de especificidad.",
+            payload: {
+              left: ["Selector de etiqueta (p)", "Selector de clase (.tarjeta)", "Selector de id (#header)", "Estilo inline (style=\"...\")"],
+              right: [
+                "Mayor especificidad que clase o etiqueta; debe ser único por página",
+                "La especificidad más alta de todas, escrita directamente en el atributo del elemento",
+                "La especificidad más baja de las cuatro; afecta a todos los elementos de ese tipo",
+                "Especificidad media; se reutiliza en varios elementos que comparten una característica",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 3], [2, 0], [3, 1]] },
+            ok: "El orden de especificidad de menor a mayor es: etiqueta, clase, id, inline; cada nivel gana sobre el anterior cuando hay conflicto.",
+            bad: "No inviertas el orden: un selector de etiqueta nunca gana sobre uno de clase o id, y el estilo inline supera a los tres cuando compiten.",
+          },
         },
         {
           id: "web-l6",
@@ -202,6 +280,24 @@ export default {
             ok: "box-sizing: border-box redefine width para que incluya padding y border dentro de esos 200px, en lugar de sumarlos por fuera.",
             bad: "Sin border-box sí se sumarían llegando a 236px, pero border-box existe justamente para evitarlo; no resta el padding ni suma solo una parte.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa las propiedades del modelo de caja: espacio interno y borde.",
+            payload: {
+              code: [
+                `<span style="${K}">.tarjeta</span> {`,
+                `  <span style="${S}">width</span>: <span style="${N}">200px</span>;`,
+                `  <b0>: <span style="${N}">16px</span>;`,
+                `  <b1>: <span style="${N}">2px</span> <span style="${S}">solid</span> <span style="${S}">gray</span>;`,
+                `  <span style="${S}">margin</span>: <span style="${N}">24px</span>;`,
+                `}`,
+              ],
+              bank: ["padding", "border", "margin", "outline"],
+            },
+            answer: { blanks: ["padding", "border"] },
+            ok: "padding es el espacio interno entre el contenido y el borde, y border dibuja el borde visible alrededor del contenido y el padding.",
+            bad: "No confundas padding (espacio interno) con margin (espacio externo, fuera del borde); border es el trazo visible entre ambos.",
+          },
         },
         {
           id: "web-l7",
@@ -231,6 +327,24 @@ export default {
             correct: 1,
             ok: "justify-content distribuye el espacio y alinea los elementos hijos a lo largo del eje principal; por ejemplo, space-between separa el primero y el último hacia los extremos.",
             bad: "justify-content no afecta color, columnas ni tamaño de fuente: es una propiedad de alineación específica del eje principal en flexbox.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el contenedor flex: el modo de layout y la distribución en el eje principal.",
+            payload: {
+              code: [
+                `<span style="${K}">.contenedor</span> {`,
+                `  <span style="${S}">display</span>: <b0>;`,
+                `  <span style="${S}">justify-content</span>: <b1>;`,
+                `  <span style="${S}">align-items</span>: <span style="${S}">center</span>;`,
+                `  <span style="${S}">gap</span>: <span style="${N}">12px</span>;`,
+                `}`,
+              ],
+              bank: ["flex", "space-between", "block", "flex-start"],
+            },
+            answer: { blanks: ["flex", "space-between"] },
+            ok: "display: flex activa el layout flexbox en el contenedor, y justify-content: space-between separa los elementos hacia los extremos del eje principal.",
+            bad: "Sin display: flex las demás propiedades no tienen efecto; y space-between distribuye espacio entre elementos, no los centra ni los junta al inicio.",
           },
         },
         {
@@ -263,6 +377,27 @@ export default {
             correct: 2,
             ok: "La media query condiciona ese bloque de reglas a que el viewport mida como máximo 600px; fuera de esa condición, esas reglas no se aplican.",
             bad: "La regla no es incondicional, no elimina la clase, y no tiene relación con la resolución de imágenes: solo activa esos estilos bajo esa condición de ancho.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el umbral de la media query y el ancho que toma .columna dentro de ella.",
+            payload: {
+              code: [
+                `<span style="${K}">.columna</span> {`,
+                `  <span style="${S}">width</span>: <span style="${N}">50%</span>;`,
+                `}`,
+                ``,
+                `<span style="${K}">@media</span> (max-width: <b0>) {`,
+                `  <span style="${K}">.columna</span> {`,
+                `    <span style="${S}">width</span>: <b1>;`,
+                `  }`,
+                `}`,
+              ],
+              bank: ["600px", "100%", "50%", "768px"],
+            },
+            answer: { blanks: ["600px", "100%"] },
+            ok: "La media query se activa cuando el viewport mide 600px o menos, y dentro de ella .columna pasa a ocupar el 100% del ancho disponible.",
+            bad: "Si el umbral no fuera 600px, la regla se activaría en un punto distinto; y 50% dejaría la columna igual que fuera de la media query, sin adaptarse a pantallas pequeñas.",
           },
         },
       ],
@@ -302,6 +437,21 @@ export default {
             ok: "let y const respetan el ámbito de bloque ({ }), mientras que var tiene un comportamiento de ámbito de función que suele generar errores sutiles; por eso se prefieren.",
             bad: "var sigue siendo válido en todos los navegadores y sí admite números; la razón real es la previsibilidad del ámbito, no la velocidad de ejecución.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la declaración: una constante y una función flecha.",
+            payload: {
+              code: [
+                `<span style="${K}">const</span> IVA = <span style="${N}">0.19</span>;`,
+                ``,
+                `<b0> calcularTotal = (precio) <b1> precio * (<span style="${N}">1</span> + IVA);`,
+              ],
+              bank: ["const", "=>", "let", "function"],
+            },
+            answer: { blanks: ["const", "=>"] },
+            ok: "const declara una variable cuyo valor no volverá a reasignarse, y => define una función flecha de forma compacta.",
+            bad: "let permitiría reasignar la función más adelante, algo que no buscamos aquí; y function no usa la sintaxis de flecha =>, que es la que completa esta declaración.",
+          },
         },
         {
           id: "web-l10",
@@ -333,6 +483,20 @@ export default {
             ok: "querySelector devuelve el primer elemento que coincide con el selector \"h1\"; asignar textContent reemplaza el texto que contiene ese elemento.",
             bad: "No crea ni elimina elementos, y no modifica el color (eso requeriría .style.color); solo cambia el contenido de texto del primer h1 encontrado.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el método para seleccionar el elemento y la propiedad para cambiar su texto.",
+            payload: {
+              code: [
+                `<span style="${K}">const</span> titulo = document.<b0>(<span style="${S}">"h1"</span>);`,
+                `titulo.<b1> = <span style="${S}">"Nuevo título"</span>;`,
+              ],
+              bank: ["querySelector", "textContent", "querySelectorAll", "innerHTML"],
+            },
+            answer: { blanks: ["querySelector", "textContent"] },
+            ok: "querySelector busca el primer elemento que coincide con el selector, y textContent reemplaza el texto que contiene ese elemento.",
+            bad: "querySelectorAll devolvería una lista de elementos, no uno solo; e innerHTML interpretaría el valor como HTML, no como texto plano.",
+          },
         },
         {
           id: "web-l11",
@@ -359,6 +523,22 @@ export default {
             correct: 3,
             ok: "addEventListener registra la función como respuesta al evento; el navegador la invoca automáticamente cada vez que ese evento (click) ocurre sobre boton.",
             bad: "No se ejecuta al registrarla ni una sola vez fija: se ejecuta cada vez que ocurre el evento, y sí se llama automáticamente, no hace falta invocarla a mano.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el método para registrar el listener y el nombre del evento de clic.",
+            payload: {
+              code: [
+                `<span style="${K}">const</span> boton = document.querySelector(<span style="${S}">"#enviar"</span>);`,
+                `boton.<b0>(<span style="${S}">"<b1>"</span>, () =&gt; {`,
+                `  console.log(<span style="${S}">"¡Botón presionado!"</span>);`,
+                `});`,
+              ],
+              bank: ["addEventListener", "click", "removeEventListener", "submit"],
+            },
+            answer: { blanks: ["addEventListener", "click"] },
+            ok: "addEventListener registra la función como respuesta al evento, y \"click\" indica que se ejecutará cuando el usuario haga clic en boton.",
+            bad: "removeEventListener quitaría un listener existente, no lo registraría; y \"submit\" es el evento de un formulario, no de un clic en un botón.",
           },
         },
         {
@@ -391,6 +571,21 @@ export default {
             correct: 0,
             ok: "Las peticiones de red pueden fallar (sin conexión, servidor caído); try/catch permite capturar ese error y manejarlo en lugar de que la aplicación se rompa.",
             bad: "fetch sí puede usarse sin try/catch (solo que los errores no se manejarían), no afecta la velocidad, y await no exige estar dentro de un try: la razón es el manejo de errores.",
+          },
+          extra: {
+            type: "order",
+            prompt: "Ordena la cadena de promesas: hacer la petición, convertir la respuesta a JSON, usar los datos y manejar errores.",
+            payload: {
+              lines: [
+                { id: "c", html: `.then((datos) =&gt; console.log(datos))` },
+                { id: "a", html: `fetch(<span style="${S}">"https://api.ejemplo.com/usuarios"</span>)` },
+                { id: "d", html: `.catch((error) =&gt; console.log(<span style="${S}">"Error al obtener usuarios"</span>))` },
+                { id: "b", html: `.then((res) =&gt; res.json())` },
+              ],
+            },
+            answer: { order: ["a", "b", "c", "d"] },
+            ok: "Primero se hace la petición con fetch, luego se convierte la respuesta a JSON con .then(res => res.json()), después se usan los datos en otro .then, y por último .catch maneja cualquier error de la cadena.",
+            bad: "No puedes usar los datos antes de convertir la respuesta con res.json(), y catch debe ir al final para capturar errores de cualquier paso anterior de la cadena.",
           },
         },
       ],
