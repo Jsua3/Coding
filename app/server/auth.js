@@ -26,6 +26,12 @@ router.post("/register", async (req, res, next) => {
     if (typeof password !== "string" || password.length < 6) {
       return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
     }
+    if (name.trim().length > 80) {
+      return res.status(400).json({ error: "El nombre es demasiado largo (máximo 80 caracteres)" });
+    }
+    if (email.length > 120) {
+      return res.status(400).json({ error: "El correo es demasiado largo (máximo 120 caracteres)" });
+    }
     const clean = { name: name.trim(), email: email.toLowerCase() };
     const existing = await query("SELECT id FROM users WHERE email = ?", [clean.email]);
     if (existing.length) return res.status(409).json({ error: "Este correo ya está registrado" });

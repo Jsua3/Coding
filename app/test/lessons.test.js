@@ -81,6 +81,15 @@ test("respuesta correcta completa, da 50 XP una sola vez y avanza", async () => 
   assert.equal(Number(xp[0].total), 50);
 });
 
+test("completion ya insertada directamente tolera el duplicado sin 500", async () => {
+  const right = await correctIndexOf("l1");
+  await query("INSERT INTO lesson_completions (user_id, lesson_id) VALUES (?, ?)", [userId, "l1"]);
+  const res = await auth(request(app).post("/api/lessons/l1/answer")).send({ answerIndex: right });
+  assert.equal(res.status, 200);
+  assert.equal(res.body.alreadyCompleted, true);
+  assert.equal(res.body.xpAwarded, 0);
+});
+
 test("completar todo bd1 desbloquea bd2 y la última lección no tiene siguiente", async () => {
   const lessons = await query(
     `SELECT l.id FROM lessons l JOIN units u ON u.id = l.unit_id

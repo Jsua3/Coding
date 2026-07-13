@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { query } from "../db.js";
+import { query, getPool } from "../db.js";
 import { courseDetail } from "../services/progress.js";
 
 const router = Router();
@@ -68,9 +68,23 @@ router.post("/:id/answer", async (req, res, next) => {
       );
       alreadyCompleted = existing.length > 0;
       if (!alreadyCompleted) {
-        await query("INSERT INTO lesson_completions (user_id, lesson_id) VALUES (?, ?)", [req.userId, lesson.id]);
-        await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, ?, 50)", [req.userId, lesson.id]);
-        xpAwarded = 50;
+        const conn = await getPool().getConnection();
+        try {
+          await conn.beginTransaction();
+          await conn.query("INSERT INTO lesson_completions (user_id, lesson_id) VALUES (?, ?)", [req.userId, lesson.id]);
+          await conn.query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, ?, 50)", [req.userId, lesson.id]);
+          await conn.commit();
+          xpAwarded = 50;
+        } catch (e) {
+          await conn.rollback();
+          if (e && e.code === "ER_DUP_ENTRY") {
+            alreadyCompleted = true;
+          } else {
+            throw e;
+          }
+        } finally {
+          conn.release();
+        }
       }
     }
 

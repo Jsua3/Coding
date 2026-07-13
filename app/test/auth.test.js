@@ -38,6 +38,8 @@ test("validaciones de registro devuelven 400", async () => {
     { ...good, name: "  " },
     { ...good, email: "no-es-email" },
     { ...good, password: "corta" },
+    { ...good, name: "A".repeat(81) },
+    { ...good, email: `${"a".repeat(115)}@x.com` },
   ]) {
     const res = await request(app).post("/api/auth/register").send(body);
     assert.equal(res.status, 400, JSON.stringify(body));
