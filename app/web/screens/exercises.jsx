@@ -71,8 +71,8 @@ function BlanksExercise({ payload, value, onChange, locked }) {
                 const idx = slotCursor;
                 const token = placed[idx];
                 return token !== null ? (
-                  <span key={pi} onClick={() => remove(idx)} style={{ display: "inline-block", margin: "0 3px", cursor: locked ? "default" : "pointer" }}>
-                    <TokenChip text={token} />
+                  <span key={pi} style={{ display: "inline-block", margin: "0 3px" }}>
+                    <TokenChip text={token} onClick={() => remove(idx)} />
                   </span>
                 ) : (
                   <span key={pi} style={{ display: "inline-block", minWidth: 72, margin: "0 3px", borderBottom: "2px dashed var(--glass-stroke-strong)", height: "1.2em", verticalAlign: "middle" }}></span>
@@ -143,8 +143,8 @@ function MatchExercise({ payload, value, onChange, locked }) {
     setSelLeft(null);
   };
 
-  const cell = (text, active, color, onClick) => (
-    <div onClick={onClick} style={{ padding: "11px 14px", borderRadius: "var(--radius-md)", fontSize: "var(--text-sm)", color: "var(--text-primary)", background: active ? "var(--glass-bg-strong)" : "var(--glass-bg-subtle)", border: "1px solid " + (color || (active ? "var(--focus-ring)" : "var(--glass-stroke)")), borderLeft: color ? "3px solid " + color : undefined, cursor: locked ? "default" : "pointer", transition: "all var(--duration-fast) var(--ease-glass)" }}>
+  const cell = (text, active, color, onClick, key) => (
+    <div key={key} onClick={onClick} style={{ padding: "11px 14px", borderRadius: "var(--radius-md)", fontSize: "var(--text-sm)", color: "var(--text-primary)", background: active ? "var(--glass-bg-strong)" : "var(--glass-bg-subtle)", border: "1px solid " + (color || (active ? "var(--focus-ring)" : "var(--glass-stroke)")), borderLeft: color ? "3px solid " + color : undefined, cursor: locked ? "default" : "pointer", transition: "all var(--duration-fast) var(--ease-glass)" }}>
       {text}
     </div>
   );
@@ -152,10 +152,10 @@ function MatchExercise({ payload, value, onChange, locked }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {payload.left.map((t, i) => cell(t, selLeft === i || pairedL.has(i), pairColor[i], () => clickLeft(i)))}
+        {payload.left.map((t, i) => cell(t, selLeft === i || pairedL.has(i), pairColor[i], () => clickLeft(i), "l" + i))}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {payload.right.map((t, j) => cell(t, pairedR.has(j), pairColor["r" + j], () => clickRight(j)))}
+        {payload.right.map((t, j) => cell(t, pairedR.has(j), pairColor["r" + j], () => clickRight(j), "r" + j))}
       </div>
     </div>
   );
