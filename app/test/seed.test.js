@@ -117,4 +117,14 @@ test("bd1 y bd2: 2 ejercicios por lección, bien formados", async () => {
   }
 });
 
+test("prog1 y prog2: toda lección tiene su ejercicio extra", async () => {
+  await setupTestDb();
+  const rows = await query(
+    `SELECT COUNT(*) AS n FROM exercises e
+     JOIN lessons l ON l.id = e.lesson_id JOIN units u ON u.id = l.unit_id
+     WHERE u.course_id IN ('prog1','prog2') AND e.order_index = 1`
+  );
+  assert.equal(rows[0].n, 21);
+});
+
 after(closeDb);

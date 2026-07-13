@@ -45,6 +45,22 @@ export default {
             ok: "La JVM busca específicamente el método main dentro de la clase que le indiques; ahí empieza la ejecución.",
             bad: "No es el primero declarado, ni el constructor, ni println: la JVM busca por convención el método main.",
           },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada término con su definición.",
+            payload: {
+              left: ["Programa", "Compilador", "Algoritmo", "Bug"],
+              right: [
+                "Error en el programa que produce un comportamiento distinto del esperado",
+                "Secuencia finita y ordenada de pasos para resolver un problema",
+                "Software que traduce el código fuente a instrucciones que el procesador puede ejecutar",
+                "Secuencia de instrucciones escritas en un lenguaje de programación que la computadora ejecuta",
+              ],
+            },
+            answer: { pairs: [[0, 3], [1, 2], [2, 1], [3, 0]] },
+            ok: "Un programa es la secuencia de instrucciones, el compilador la traduce a código ejecutable, el algoritmo es la secuencia de pasos que resuelve el problema, y un bug es el error que aparece cuando algo falla.",
+            bad: "No confundas programa (el código) con algoritmo (la idea de los pasos): el compilador traduce, y el bug es el fallo, no el proceso de traducción.",
+          },
         },
         {
           id: "prog1-l2",
@@ -74,6 +90,21 @@ export default {
             ok: "int es un tipo primitivo para números enteros; String es una clase que representa texto. Cada tipo define qué valores y operaciones admite.",
             bad: "String no está restringido a main, una variable int normal sí puede reasignarse, y ambas variables no son del mismo tipo.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la declaración de variables con el tipo correcto para cada una.",
+            payload: {
+              code: [
+                `<b0> edad = <span style="${N}">20</span>;`,
+                `<b1> nombre = <span style="${S}">"Marcos"</span>;`,
+                `<span style="${K}">double</span> promedio = <span style="${N}">4.2</span>;`,
+              ],
+              bank: ["int", "String", "boolean", "char"],
+            },
+            answer: { blanks: ["int", "String"] },
+            ok: "edad guarda un número entero, así que va int; nombre es texto, así que va String; boolean y char no encajan con esos valores.",
+            bad: "int es para enteros y String para texto: no confundas con boolean (verdadero o falso) ni char (un solo carácter).",
+          },
         },
         {
           id: "prog1-l3",
@@ -100,6 +131,21 @@ export default {
             correct: 1,
             ok: "7 % 2 da como resto 1; 1 == 0 es false, así que la expresión completa evalúa a false: 7 es impar.",
             bad: "7 es impar, no par; % sí es un operador válido en Java, y el resultado de la expresión completa es un boolean, no el resto crudo.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la expresión para saber si numero es par y si está en el rango permitido.",
+            payload: {
+              code: [
+                `<span style="${K}">int</span> numero = <span style="${N}">10</span>;`,
+                `<span style="${K}">boolean</span> esPar = (numero <b0> <span style="${N}">2</span> == <span style="${N}">0</span>);`,
+                `<span style="${K}">boolean</span> valido = (numero &gt; <span style="${N}">0</span> <b1> numero &lt; <span style="${N}">100</span>);`,
+              ],
+              bank: ["%", "&&", "/", "||"],
+            },
+            answer: { blanks: ["%", "&&"] },
+            ok: "% obtiene el resto de la división, necesario para comprobar la paridad; && exige que ambas condiciones sean verdaderas a la vez para considerar el número válido.",
+            bad: "/ hace división entera y no calcula el resto, y || solo exige que una condición sea verdadera, no ambas: aquí hacen falta % y &&.",
           },
         },
         {
@@ -129,6 +175,24 @@ export default {
             correct: 3,
             ok: "Scanner conecta con la entrada estándar; su método nextInt() lee y convierte el texto escrito en un valor int.",
             bad: "System.out es para escribir, no leer; String almacena texto ya leído; Integer solo envuelve un valor entero, no lee entrada.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el código para leer el nombre del usuario y saludarlo.",
+            payload: {
+              code: [
+                `<span style="${K}">import</span> java.util.<span style="${S}">Scanner</span>;`,
+                ``,
+                `<span style="${S}">Scanner</span> teclado = <span style="${K}">new</span> <b0>(<span style="${S}">System</span>.in);`,
+                `<span style="${S}">System</span>.out.print(<span style="${S}">"Ingresa tu nombre: "</span>);`,
+                `<span style="${S}">String</span> nombre = teclado.nextLine();`,
+                `<b1>.out.println(<span style="${S}">"Hola, "</span> + nombre);`,
+              ],
+              bank: ["Scanner", "System", "Integer", "String"],
+            },
+            answer: { blanks: ["Scanner", "System"] },
+            ok: "new Scanner(System.in) crea el objeto que lee la entrada estándar, y System.out.println es quien imprime en consola; Integer y String no cumplen esos roles aquí.",
+            bad: "El objeto que lee del teclado se construye con new Scanner(...), no con Integer; y quien imprime es System, no String.",
           },
         },
       ],
@@ -168,6 +232,26 @@ export default {
             ok: '85 no cumple la condición del if (>= 90) pero sí la del else if (>= 70), así que entra ahí e imprime "Aprobado".',
             bad: "85 es menor que 90, así que no imprime Sobresaliente; sí cumple >= 70, así que no cae en Reprobado ni se queda sin imprimir.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la cadena de condiciones para clasificar la edad de una persona.",
+            payload: {
+              code: [
+                `<span style="${K}">int</span> edad = <span style="${N}">15</span>;`,
+                `<b0> (edad &gt;= <span style="${N}">18</span>) {`,
+                `  <span style="${S}">System</span>.out.println(<span style="${S}">"Adulto"</span>);`,
+                `} <b1> (edad &gt;= <span style="${N}">13</span>) {`,
+                `  <span style="${S}">System</span>.out.println(<span style="${S}">"Adolescente"</span>);`,
+                `} <span style="${K}">else</span> {`,
+                `  <span style="${S}">System</span>.out.println(<span style="${S}">"Niño"</span>);`,
+                `}`,
+              ],
+              bank: ["if", "else if", "switch", "while"],
+            },
+            answer: { blanks: ["if", "else if"] },
+            ok: "La primera condición se evalúa con if; para encadenar una segunda alternativa antes del else final se usa else if, no switch ni while.",
+            bad: "switch compara valores discretos, no rangos con >=, y while repite un bloque en vez de evaluar alternativas: la cadena correcta es if / else if / else.",
+          },
         },
         {
           id: "prog1-l6",
@@ -202,6 +286,27 @@ export default {
             ok: "Sin break, Java sigue ejecutando los case siguientes en orden (fall-through) hasta toparse con un break o el final del switch.",
             bad: "El código sí compila sin break; no salta directo a default y no se detiene después del primer case: continúa cayendo hacia los siguientes.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el switch que agrupa los meses de 30 días.",
+            payload: {
+              code: [
+                `<span style="${K}">int</span> mes = <span style="${N}">4</span>;`,
+                `<b0> (mes) {`,
+                `  <span style="${K}">case</span> <span style="${N}">4</span>:`,
+                `  <span style="${K}">case</span> <span style="${N}">6</span>:`,
+                `    <span style="${S}">System</span>.out.println(<span style="${S}">"30 días"</span>);`,
+                `    <b1>;`,
+                `  <span style="${K}">default</span>:`,
+                `    <span style="${S}">System</span>.out.println(<span style="${S}">"31 días"</span>);`,
+                `}`,
+              ],
+              bank: ["switch", "break", "if", "return"],
+            },
+            answer: { blanks: ["switch", "break"] },
+            ok: "switch abre la comparación contra mes, y break corta la ejecución para que no caiga al default; if no encadena varios case así, y return saldría del método entero, no solo del switch.",
+            bad: "if no compara varios valores discretos como switch, y return terminaría el método completo en vez de solo el switch: aquí faltan switch y break.",
+          },
         },
         {
           id: "prog1-l7",
@@ -230,6 +335,22 @@ export default {
             ok: "El bucle se repite mientras contador sea menor que 5: para 0, 1, 2, 3 y 4 la condición es verdadera, y se detiene al llegar a 5.",
             bad: "El bucle sí incluye contador = 0, se detiene antes de llegar a 5 (no lo incluye), y evalúa la condición en cada vuelta, no solo una vez.",
           },
+          extra: {
+            type: "order",
+            prompt: "Ordena las líneas para construir un bucle while que cuente de 0 a 2.",
+            payload: {
+              lines: [
+                { id: "a", html: `  contador++;` },
+                { id: "b", html: `<span style="${K}">int</span> contador = <span style="${N}">0</span>;` },
+                { id: "c", html: `  <span style="${S}">System</span>.out.println(contador);` },
+                { id: "d", html: `<span style="${K}">while</span> (contador &lt; <span style="${N}">3</span>) {` },
+                { id: "e", html: `}` },
+              ],
+            },
+            answer: { order: ["b", "d", "c", "a", "e"] },
+            ok: "Primero inicializas el contador, luego declaras la condición del while, después el cuerpo que lo usa, incrementas al final de cada vuelta y cierras el bloque.",
+            bad: "Sin inicializar el contador antes del while no hay valor que comparar, y el incremento debe ir dentro del bloque, antes de la llave de cierre — si no, el bucle nunca termina.",
+          },
         },
         {
           id: "prog1-l8",
@@ -255,6 +376,21 @@ export default {
             correct: 1,
             ok: "La inicialización se ejecuta una única vez, antes de la primera evaluación de la condición; condición, cuerpo y actualización se repiten en cada vuelta.",
             bad: "La condición y la actualización se repiten en cada vuelta, igual que el cuerpo; solo la inicialización ocurre una vez al arrancar el bucle.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la cabecera del for para recorrer del 0 al 9.",
+            payload: {
+              code: [
+                `<span style="${K}">for</span> (<span style="${K}">int</span> i = <b0>; i &lt; <span style="${N}">10</span>; i<b1>) {`,
+                `  <span style="${S}">System</span>.out.println(i);`,
+                `}`,
+              ],
+              bank: ["0", "++", "1", "--"],
+            },
+            answer: { blanks: ["0", "++"] },
+            ok: "El contador arranca en 0 para recorrer desde el primer elemento, y i++ lo incrementa en cada vuelta hasta llegar a 10; 1 lo dejaría corto y -- lo haría retroceder.",
+            bad: "Empezar en 1 se saltaría el primer valor, y -- decrementa en vez de avanzar hacia 10: la cabecera correcta usa 0 e i++.",
           },
         },
       ],
@@ -293,6 +429,25 @@ export default {
             ok: "main llama a saludar() dos veces seguidas, y cada llamada ejecuta el println una vez: dos impresiones en total.",
             bad: "saludar() sí se llama, y se llama exactamente dos veces, no una ni tres.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la definición del método y su llamada desde main.",
+            payload: {
+              code: [
+                `<span style="${K}">public static</span> <b0> saludar() {`,
+                `  <span style="${S}">System</span>.out.println(<span style="${S}">"¡Hola!"</span>);`,
+                `}`,
+                ``,
+                `<span style="${K}">public static void</span> main(<span style="${S}">String</span>[] args) {`,
+                `  <b1>();`,
+                `}`,
+              ],
+              bank: ["void", "saludar", "int", "main"],
+            },
+            answer: { blanks: ["void", "saludar"] },
+            ok: "saludar() no devuelve ningún valor, así que su tipo de retorno es void; y para ejecutarlo desde main hay que llamarlo por su nombre, saludar().",
+            bad: "int obligaría a un return con un número, cosa que el método no hace; y llamar main() no invoca el método que imprime el saludo — hace falta saludar().",
+          },
         },
         {
           id: "prog1-l10",
@@ -324,6 +479,25 @@ export default {
             ok: "sumar(3, 4) ejecuta return a + b con a=3 y b=4, así que devuelve 7, el valor que queda guardado en resultado.",
             bad: "El método no devuelve solo uno de los parámetros ni concatena texto: suma los dos enteros y devuelve 7.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el método para que reciba dos parámetros y devuelva su producto.",
+            payload: {
+              code: [
+                `<span style="${K}">public static</span> <span style="${K}">int</span> multiplicar(<span style="${K}">int</span> a, <span style="${K}">int</span> <b0>) {`,
+                `  <b1> a * b;`,
+                `}`,
+                ``,
+                `<span style="${K}">public static void</span> main(<span style="${S}">String</span>[] args) {`,
+                `  <span style="${K}">int</span> resultado = multiplicar(<span style="${N}">3</span>, <span style="${N}">5</span>);`,
+                `}`,
+              ],
+              bank: ["b", "return", "a", "void"],
+            },
+            answer: { blanks: ["b", "return"] },
+            ok: "El segundo parámetro necesita un nombre propio, b, distinto del primero; y para entregar el resultado de la multiplicación hace falta return, que void ni siquiera permite usar con un valor.",
+            bad: "Repetir a como nombre del segundo parámetro no compila por nombre duplicado, y void impediría devolver el resultado: el método necesita el parámetro b y la instrucción return.",
+          },
         },
         {
           id: "prog1-l11",
@@ -353,6 +527,22 @@ export default {
             correct: 0,
             ok: "y se declaró dentro del bloque if, así que su ámbito termina en la llave de cierre de ese bloque; fuera de él, el compilador no la reconoce.",
             bad: "y sí se inicializó, los int sí pueden declararse dentro de un if, y x e y tienen nombres distintos; el problema real es el ámbito del bloque.",
+          },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada tipo de ámbito con su ejemplo.",
+            payload: {
+              left: ["Variable local", "Parámetro", "Atributo", "Constante"],
+              right: [
+                "static final int MAX_INTENTOS = 3, un valor que no cambia durante toda la ejecución",
+                "double saldo declarado en la clase, fuera de cualquier método, vive mientras exista el objeto",
+                "int total declarado dentro de un método, solo existe mientras ese método se ejecuta",
+                "int cantidad recibido entre los paréntesis de un método, solo vive dentro de esa llamada",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 3], [2, 1], [3, 0]] },
+            ok: "Una variable local vive solo dentro del método donde se declara, el parámetro solo durante esa llamada, el atributo mientras exista el objeto, y una constante (static final) nunca cambia de valor.",
+            bad: "No confundas atributo (vive con el objeto) con variable local (vive solo dentro del método), ni parámetro (llega desde la llamada) con constante (fijada con static final).",
           },
         },
         {
@@ -388,6 +578,21 @@ export default {
             correct: 2,
             ok: "Separar responsabilidades hace que cada método sea más fácil de entender, probar y reutilizar sin arrastrar la lógica de impresión.",
             bad: "La separación no reduce memoria de forma relevante, Java no exige un mínimo de métodos, y el for funciona en cualquier método, no solo en los que retornan double.",
+          },
+          extra: {
+            type: "order",
+            prompt: "Ordena los pasos para leer, validar, calcular y mostrar el promedio de unas notas.",
+            payload: {
+              lines: [
+                { id: "a", html: `  mostrarResultado(promedio);` },
+                { id: "b", html: `  <span style="${K}">int</span>[] notas = leerNotas();` },
+                { id: "c", html: `  <span style="${K}">if</span> (notas.length == <span style="${N}">0</span>) <span style="${K}">return</span>;` },
+                { id: "d", html: `  <span style="${K}">double</span> promedio = calcularPromedio(notas);` },
+              ],
+            },
+            answer: { order: ["b", "c", "d", "a"] },
+            ok: "Primero lees los datos (leerNotas), validas que haya algo que procesar antes de continuar, calculas el resultado (calcularPromedio) y por último lo muestras (mostrarResultado).",
+            bad: "No calcules antes de validar los datos leídos, ni muestres un resultado que todavía no calculaste: el orden es leer → validar → calcular → mostrar.",
           },
         },
       ],
