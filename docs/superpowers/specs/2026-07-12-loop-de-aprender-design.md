@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS answer_attempts (
   exercise_id VARCHAR(40) NOT NULL,
   context ENUM('lesson','review') NOT NULL DEFAULT 'lesson',
   correct TINYINT(1) NOT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),  -- milisegundos: evita empates al derivar la cola de repaso
   CONSTRAINT fk_aa_user FOREIGN KEY (user_id) REFERENCES users(id),
   CONSTRAINT fk_aa_exercise FOREIGN KEY (exercise_id) REFERENCES exercises(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -106,7 +106,8 @@ Todo lo demás se **deriva** de los intentos (principio intacto: derivado, nunca
     xpAwarded,                // 50 al completar, +5 por corregir en repaso, 0 en otro caso
     perfectBonus,             // 10 si aplica (solo junto a lessonCompleted), 0 si no
     streak: {value, extended} | null,   // solo con lessonCompleted
-    courseProgress, nextLessonId,       // solo con lessonCompleted
+    courseProgress,                     // siempre (progreso actual del curso)
+    nextLessonId,                       // solo con lessonCompleted; null si no
     reviewCleared             // true si context=review y este acierto limpió el ejercicio
   }
   ```
@@ -156,9 +157,9 @@ Cuando la respuesta trae `lessonCompleted: true`, la pantalla entera transiciona
 
 ## 9. Contenido (seed)
 
-- Cada una de las 64 lecciones pasa de `quiz` a `exercises: [ex1, ex2]` en `seed-data/`:
-  - `ex1` = el choice existente convertido (id `"<lessonId>-ex1"`, mismo texto/opciones/explicaciones).
-  - `ex2` = **nuevo ejercicio estructurado** acorde al tema: `blanks` para sintaxis (SQL, Java, JS, HTML/CSS), `order` para algoritmos/flujos/secuencias, `match` para conceptos↔definiciones. Reglas de contenido idénticas al seed actual (español con tuteo, código técnicamente correcto, spans de color en código, sin emoji). Distractores plausibles en `blanks` (≥2 por ejercicio).
+- Cada una de las 64 lecciones conserva su `quiz` en `seed-data/` (el seed lo convierte automáticamente en el ejercicio 1 tipo choice, id `"<lessonId>-ex1"`) y gana un campo `extra` con el ejercicio estructurado (id `"<lessonId>-ex2"`). Así los 64 choice existentes no se reescriben a mano:
+  - `ex1` = derivado del `quiz` (mismo texto/opciones/explicaciones).
+  - `ex2` = **nuevo ejercicio estructurado** (`extra`) acorde al tema: `blanks` para sintaxis (SQL, Java, JS, HTML/CSS), `order` para algoritmos/flujos/secuencias, `match` para conceptos↔definiciones. Reglas de contenido idénticas al seed actual (español con tuteo, código técnicamente correcto, spans de color en código, sin emoji). Distractores plausibles en `blanks` (≥2 por ejercicio).
 - Mezclas por tipo balanceadas por materia (no todos `match`); total 128 ejercicios.
 - `seed.js` upserta `exercises` por id estable; sigue sin tocar datos de usuario.
 
