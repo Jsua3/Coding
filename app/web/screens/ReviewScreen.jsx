@@ -14,6 +14,8 @@ function ReviewScreen({ me, tab, setTab, onBack, refreshMe }) {
   const orbTimer = React.useRef(null);
   const xpRef = React.useRef(null);
 
+  React.useEffect(() => () => clearTimeout(orbTimer.current), []);
+
   const orbReact = (mood, ms) => {
     setOrbMood(mood);
     clearTimeout(orbTimer.current);
@@ -21,7 +23,7 @@ function ReviewScreen({ me, tab, setTab, onBack, refreshMe }) {
   };
 
   const load = () => {
-    setQueue(null); setError(null); setI(0); setValue(null); setResult(null); setEarned(0); setDone(false);
+    setQueue(null); setError(null); setI(0); setValue(null); setResult(null); setEarned(0); setDone(false); setOrbMood("idle");
     API.get("/review").then((r) => setQueue(r.exercises)).catch((e) => setError(e.message));
   };
   React.useEffect(load, []);
