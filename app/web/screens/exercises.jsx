@@ -144,7 +144,7 @@ function MatchExercise({ payload, value, onChange, locked }) {
   };
 
   const cell = (text, active, color, onClick, key) => (
-    <div key={key} onClick={onClick} style={{ padding: "11px 14px", borderRadius: "var(--radius-md)", fontSize: "var(--text-sm)", color: "var(--text-primary)", background: active ? "var(--glass-bg-strong)" : "var(--glass-bg-subtle)", border: "1px solid " + (color || (active ? "var(--focus-ring)" : "var(--glass-stroke)")), borderLeft: color ? "3px solid " + color : undefined, cursor: locked ? "default" : "pointer", transition: "all var(--duration-fast) var(--ease-glass)" }}>
+    <div key={key} onClick={onClick} style={{ padding: "11px 14px", borderRadius: "var(--radius-md)", fontSize: "var(--text-sm)", color: "var(--text-primary)", background: active ? "var(--glass-bg-strong)" : "var(--glass-bg-subtle)", borderStyle: "solid", borderColor: color || (active ? "var(--focus-ring)" : "var(--glass-stroke)"), borderWidth: color ? "1px 1px 1px 3px" : "1px", cursor: locked ? "default" : "pointer", transition: "all var(--duration-fast) var(--ease-glass)" }}>
       {text}
     </div>
   );
