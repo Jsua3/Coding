@@ -77,7 +77,7 @@ function DashboardScreen({ me, onOpenCourse, onOpenLesson, onOpenReview, tab, se
         ) : null}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
-        <StatPanel label="Racha" value={stats.streak + " días"} sub={"Tu mejor racha: " + stats.bestStreak + " días"} tone="none" />
+        <StatPanel label="Racha" value={stats.streak + (stats.streak === 1 ? " día" : " días")} sub={"Tu mejor racha: " + stats.bestStreak + (stats.bestStreak === 1 ? " día" : " días")} tone="none" />
         <StatPanel label="XP total" value={stats.xp.toLocaleString("es")} sub={"+" + stats.xpWeek + " esta semana"} tone="blue" />
         <StatPanel label="Materias activas" value={String(stats.activeCourses)} sub={stats.completedCourses + " completadas · " + stats.lockedCourses + " bloqueadas"} tone="cyan" />
       </div>
