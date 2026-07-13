@@ -23,24 +23,26 @@ test("seed inserta bd1 y bd2 con estructura válida", async () => {
   );
   assert.equal(bd2Lessons.length, 9);
 
-  const [q5] = await query("SELECT * FROM quiz_questions WHERE lesson_id = 'l5'");
-  assert.equal(q5.correct_index, 1);
-  assert.match(q5.question, /promedio/);
+  const [ex1] = await query("SELECT * FROM exercises WHERE id = 'l5-ex1'");
+  const answer = typeof ex1.answer === "string" ? JSON.parse(ex1.answer) : ex1.answer;
+  assert.equal(answer.index, 1);
+  assert.match(ex1.prompt, /promedio/);
 });
 
-test("toda lección sembrada tiene contenido y quiz bien formados", async () => {
+test("toda lección sembrada tiene contenido y su ejercicio choice bien formado", async () => {
   await setupTestDb();
   const rows = await query(
-    `SELECT l.id, l.content, q.options, q.correct_index
-     FROM lessons l LEFT JOIN quiz_questions q ON q.lesson_id = l.id`
+    `SELECT l.id, l.content, e.payload, e.answer
+     FROM lessons l LEFT JOIN exercises e ON e.lesson_id = l.id AND e.order_index = 0`
   );
   for (const row of rows) {
-    const content = parseMaybe(row.content);
+    const content = typeof row.content === "string" ? JSON.parse(row.content) : row.content;
     assert.ok(Array.isArray(content) && content.length >= 2, `contenido corto en ${row.id}`);
-    assert.notEqual(row.options, null, `falta quiz en ${row.id}`);
-    const options = parseMaybe(row.options);
-    assert.equal(options.length, 4, `opciones en ${row.id}`);
-    assert.ok(row.correct_index >= 0 && row.correct_index <= 3, `correct_index en ${row.id}`);
+    assert.notEqual(row.payload, null, `falta ejercicio choice en ${row.id}`);
+    const payload = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
+    const answer = typeof row.answer === "string" ? JSON.parse(row.answer) : row.answer;
+    assert.equal(payload.options.length, 4, `opciones en ${row.id}`);
+    assert.ok(answer.index >= 0 && answer.index <= 3, `answer.index en ${row.id}`);
   }
 });
 
@@ -51,14 +53,14 @@ test("el seed es idempotente (upsert por id)", async () => {
   assert.ok(rows[0].n >= 2);
 });
 
-test("seed completo: 6 cursos, 64 lecciones, 64 quizzes", async () => {
+test("seed completo: 6 cursos, 64 lecciones, 128 ejercicios", async () => {
   await setupTestDb();
   const courses = await query("SELECT id FROM courses");
   assert.equal(courses.length, 6);
   const lessons = await query("SELECT COUNT(*) AS n FROM lessons");
   assert.equal(lessons[0].n, 64);
-  const quizzes = await query("SELECT COUNT(*) AS n FROM quiz_questions");
-  assert.equal(quizzes[0].n, 64);
+  const exercises = await query("SELECT COUNT(*) AS n FROM exercises");
+  assert.equal(exercises[0].n, 128);
   const perCourse = await query(
     `SELECT u.course_id, COUNT(l.id) AS n FROM lessons l JOIN units u ON u.id = l.unit_id GROUP BY u.course_id`
   );

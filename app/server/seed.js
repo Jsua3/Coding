@@ -33,13 +33,6 @@ export async function runSeed() {
           [l.id, u.id, l.title, l.mins, lessonIndex, JSON.stringify(l.content)]
         );
         await query(
-          `INSERT INTO quiz_questions (lesson_id, question, options, correct_index, explain_ok, explain_bad)
-           VALUES (?, ?, ?, ?, ?, ?)
-           ON DUPLICATE KEY UPDATE question = VALUES(question), options = VALUES(options),
-             correct_index = VALUES(correct_index), explain_ok = VALUES(explain_ok), explain_bad = VALUES(explain_bad)`,
-          [l.id, l.quiz.question, JSON.stringify(l.quiz.options), l.quiz.correct, l.quiz.ok, l.quiz.bad]
-        );
-        await query(
           `INSERT INTO exercises (id, lesson_id, order_index, type, prompt, payload, answer, explain_ok, explain_bad)
            VALUES (?, ?, 0, 'choice', ?, ?, ?, ?, ?)
            ON DUPLICATE KEY UPDATE lesson_id=VALUES(lesson_id), order_index=VALUES(order_index), type=VALUES(type),

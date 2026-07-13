@@ -35,16 +35,7 @@ CREATE TABLE IF NOT EXISTS lessons (
   CONSTRAINT fk_lessons_unit FOREIGN KEY (unit_id) REFERENCES units(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS quiz_questions (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  lesson_id VARCHAR(30) NOT NULL UNIQUE,
-  question TEXT NOT NULL,
-  options JSON NOT NULL,
-  correct_index TINYINT NOT NULL,
-  explain_ok TEXT NOT NULL,
-  explain_bad TEXT NOT NULL,
-  CONSTRAINT fk_quiz_lesson FOREIGN KEY (lesson_id) REFERENCES lessons(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+DROP TABLE IF EXISTS quiz_questions;
 
 CREATE TABLE IF NOT EXISTS lesson_completions (
   user_id INT NOT NULL,
