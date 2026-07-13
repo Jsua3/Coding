@@ -20,3 +20,22 @@ export async function resetUserData() {
 }
 
 export { query, closeDb };
+
+export async function correctResponseFor(exerciseId) {
+  const [row] = await query("SELECT type, answer FROM exercises WHERE id = ?", [exerciseId]);
+  const answer = typeof row.answer === "string" ? JSON.parse(row.answer) : row.answer;
+  if (row.type === "choice") return { index: answer.index };
+  if (row.type === "blanks") return { blanks: answer.blanks };
+  if (row.type === "order") return { order: answer.order };
+  return { pairs: answer.pairs };
+}
+
+export async function wrongResponseFor(exerciseId) {
+  const [row] = await query("SELECT type, payload, answer FROM exercises WHERE id = ?", [exerciseId]);
+  const answer = typeof row.answer === "string" ? JSON.parse(row.answer) : row.answer;
+  const payload = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
+  if (row.type === "choice") return { index: (answer.index + 1) % payload.options.length };
+  if (row.type === "blanks") return { blanks: [...answer.blanks].reverse() };
+  if (row.type === "order") return { order: [...answer.order].reverse() };
+  return { pairs: answer.pairs.map(([l], i, arr) => [l, arr[(i + 1) % arr.length][1]]) };
+}
