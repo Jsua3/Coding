@@ -37,6 +37,22 @@ export default {
             ok: "El SGBD gestiona el almacenamiento, la integridad y la concurrencia de los datos; la interfaz y la lógica de la app viven en otra capa.",
             bad: "Recuerda: el SGBD vive en la capa de datos. Interfaz, compilación y correos son responsabilidades de otras capas del sistema.",
           },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada término con su definición.",
+            payload: {
+              left: ["SGBD", "SQL", "Tabla", "Fila"],
+              right: [
+                "Lenguaje estándar para consultar y manipular bases de datos relacionales",
+                "Registro individual con los valores de todas las columnas de una tabla",
+                "Software que almacena, organiza y protege los datos de una aplicación",
+                "Conjunto de columnas con nombre que almacena datos de un mismo tipo de entidad",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 0], [2, 3], [3, 1]] },
+            ok: "SGBD es el software gestor, SQL es el lenguaje para hablar con él, una tabla agrupa columnas de una entidad y una fila es un registro concreto de esa tabla.",
+            bad: "Repasa: SGBD es el programa, SQL el lenguaje, la tabla la estructura de columnas y la fila el registro individual.",
+          },
         },
         {
           id: "l2",
@@ -65,6 +81,23 @@ export default {
             correct: 1,
             ok: "Exacto: cada fila es un registro completo — un estudiante con su id, su nombre y su promedio.",
             bad: "Las columnas son los atributos; la fila es el registro completo de un estudiante concreto.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la definición de la tabla productos con los tipos de dato correctos.",
+            payload: {
+              code: [
+                `<span style="${K}">CREATE TABLE</span> productos (`,
+                `  id <b0>,`,
+                `  nombre <b1>(<span style="${N}">60</span>),`,
+                `  precio <span style="${S}">DECIMAL</span>(<span style="${N}">6</span>,<span style="${N}">2</span>)`,
+                `);`,
+              ],
+              bank: ["INT", "VARCHAR", "BOOLEAN", "DATE"],
+            },
+            answer: { blanks: ["INT", "VARCHAR"] },
+            ok: "id es un número entero (INT) y nombre es texto de longitud variable (VARCHAR); BOOLEAN y DATE no encajan con esos datos.",
+            bad: "id guarda un entero, así que va INT; nombre es texto, así que va VARCHAR — no confundas con BOOLEAN o DATE.",
           },
         },
         {
@@ -99,6 +132,27 @@ export default {
             ok: "La clave foránea impone integridad referencial: cada estudiante_id de matriculas debe existir como id en estudiantes.",
             bad: "La FK no exige unicidad, orden ni igual cantidad de filas; solo obliga a que el valor referenciado exista en la tabla referenciada.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa las claves de las tablas productos y pedidos.",
+            payload: {
+              code: [
+                `<span style="${K}">CREATE TABLE</span> productos (`,
+                `  id <span style="${S}">INT</span> <b0>,`,
+                `  nombre <span style="${S}">VARCHAR</span>(<span style="${N}">60</span>)`,
+                `);`,
+                `<span style="${K}">CREATE TABLE</span> pedidos (`,
+                `  id <span style="${S}">INT</span> <span style="${K}">PRIMARY KEY</span>,`,
+                `  producto_id <span style="${S}">INT</span>,`,
+                `  <b1> (producto_id) <span style="${K}">REFERENCES</span> productos(id)`,
+                `);`,
+              ],
+              bank: ["PRIMARY KEY", "FOREIGN KEY", "UNIQUE", "NOT NULL"],
+            },
+            answer: { blanks: ["PRIMARY KEY", "FOREIGN KEY"] },
+            ok: "id de productos necesita PRIMARY KEY para identificarse de forma única, y producto_id de pedidos necesita FOREIGN KEY para referenciar esa clave.",
+            bad: "La columna que identifica la fila lleva PRIMARY KEY; la columna que apunta a otra tabla lleva FOREIGN KEY, no UNIQUE ni NOT NULL.",
+          },
         },
       ],
     },
@@ -127,6 +181,22 @@ export default {
             ok: "Una relación N:M necesita una tabla intermedia (por ejemplo, matriculas) con una FK hacia estudiantes y otra hacia cursos.",
             bad: "Una FK directa en una sola tabla solo modela relaciones 1:N; para N:M hace falta una tabla de unión.",
           },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada tipo de relación (o atributo) con su ejemplo.",
+            payload: {
+              left: ["Relación 1:1", "Relación 1:N", "Relación N:M", "Atributo"],
+              right: [
+                "Un profesor dicta varios cursos, pero cada curso tiene un solo profesor",
+                "El promedio de un estudiante: un dato propio de la fila, no un vínculo con otra tabla",
+                "Un estudiante tiene un único expediente y ese expediente pertenece a un solo estudiante",
+                "Un estudiante se matricula en varios cursos y cada curso tiene varios estudiantes",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 0], [2, 3], [3, 1]] },
+            ok: "1:1 vincula una fila con una única fila de otra tabla, 1:N una fila con varias, N:M varias con varias mediante tabla intermedia, y un atributo es un dato propio de la fila.",
+            bad: "No confundas relación con atributo: la relación conecta filas entre tablas (1:1, 1:N, N:M); el atributo es solo un dato de la propia fila.",
+          },
         },
         {
           id: "l5",
@@ -153,6 +223,21 @@ export default {
             correct: 1,
             ok: "WHERE filtra y ORDER BY … DESC ordena de mayor a menor.",
             bad: "Recuerda: la cláusula WHERE va después de FROM y necesitas DESC para ordenar de mayor a menor.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la consulta para obtener los productos con precio menor a 100, ordenados de menor a mayor.",
+            payload: {
+              code: [
+                `<span style="${K}">SELECT</span> nombre, precio <span style="${K}">FROM</span> productos`,
+                `<b0> precio &lt; <span style="${N}">100</span>`,
+                `<span style="${K}">ORDER BY</span> precio <b1>;`,
+              ],
+              bank: ["WHERE", "ASC", "HAVING", "DESC", "GROUP BY"],
+            },
+            answer: { blanks: ["WHERE", "ASC"] },
+            ok: "WHERE filtra fila por fila y ASC ordena de menor a mayor (además es el orden por defecto).",
+            bad: "El filtro de filas va con WHERE (HAVING es para grupos) y el orden de menor a mayor es ASC.",
           },
         },
         {
@@ -182,6 +267,21 @@ export default {
             ok: "INNER JOIN solo conserva las filas con coincidencia en ambas tablas: sin matrícula, sin fila en el resultado.",
             bad: "INNER JOIN sí devuelve filas y no compara por tamaño de id; conserva solo a quienes encuentran pareja en ambas tablas, así que sin matrícula quedan fuera.",
           },
+          extra: {
+            type: "order",
+            prompt: "Ordena las líneas para construir la consulta que lista cada estudiante con el nombre de su carrera.",
+            payload: {
+              lines: [
+                { id: "a", html: `<span style="${K}">ON</span> e.carrera_id = c.id;` },
+                { id: "b", html: `<span style="${K}">SELECT</span> e.nombre, c.nombre` },
+                { id: "c", html: `<span style="${K}">INNER JOIN</span> carreras c` },
+                { id: "d", html: `<span style="${K}">FROM</span> estudiantes e` },
+              ],
+            },
+            answer: { order: ["b", "d", "c", "a"] },
+            ok: "Primero proyectas (SELECT), luego la tabla base (FROM), después unes (INNER JOIN) y por último la condición de unión (ON).",
+            bad: "Recuerda el orden: SELECT → FROM → INNER JOIN → ON. El ON siempre acompaña al JOIN que condiciona.",
+          },
         },
         {
           id: "l7",
@@ -203,6 +303,22 @@ export default {
             correct: 3,
             ok: "Es una dependencia transitiva: facultad_del_profesor depende de profesor_id, no de id (la clave del curso), así que se viola 3FN.",
             bad: "El problema no es atomicidad (1FN) ni una clave compuesta (2FN); la tabla sí tiene un defecto de diseño: una dependencia transitiva.",
+          },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada forma normal (o la ausencia de normalización) con su regla.",
+            payload: {
+              left: ["1FN", "2FN", "3FN", "Sin normalizar"],
+              right: [
+                "Ningún atributo no clave depende de otro atributo no clave (sin dependencias transitivas)",
+                "Una misma celda guarda varios valores separados por comas",
+                "Todo atributo no clave depende de la clave primaria completa",
+                "Cada columna guarda un único valor atómico, sin listas ni grupos repetidos",
+              ],
+            },
+            answer: { pairs: [[0, 3], [1, 2], [2, 0], [3, 1]] },
+            ok: "1FN exige atomicidad, 2FN exige depender de toda la clave, 3FN elimina dependencias transitivas, y sin normalizar ni siquiera hay atomicidad.",
+            bad: "Ordena la exigencia: sin normalizar hay celdas con listas; 1FN exige un valor por celda; 2FN depende de la clave completa; 3FN elimina dependencias transitivas.",
           },
         },
       ],
@@ -236,6 +352,20 @@ export default {
             ok: "COUNT(*) cuenta las filas y AVG(promedio) calcula el promedio; combinadas sin GROUP BY devuelven un único resultado resumen.",
             bad: "Sumar una columna de texto (SUM(nombre)) no tiene sentido, y agrupar por nombre no da un resumen general de toda la tabla.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la consulta para saber cuántos productos hay y su precio promedio.",
+            payload: {
+              code: [
+                `<span style="${K}">SELECT</span> <b0>(*) <span style="${K}">AS</span> total, <b1>(precio) <span style="${K}">AS</span> precio_promedio`,
+                `<span style="${K}">FROM</span> productos;`,
+              ],
+              bank: ["COUNT", "AVG", "SUM", "MAX"],
+            },
+            answer: { blanks: ["COUNT", "AVG"] },
+            ok: "COUNT(*) cuenta las filas y AVG(precio) calcula el promedio de esa columna; juntas resumen la tabla en una sola fila.",
+            bad: "Para contar filas usa COUNT, no SUM ni MAX; para el promedio usa AVG, que es distinto de sumar o de encontrar el máximo.",
+          },
         },
         {
           id: "bd1-l9",
@@ -264,6 +394,21 @@ export default {
             ok: "HAVING se evalúa después del GROUP BY, cuando ya existen los agregados por grupo; por eso es el único lugar donde puedes filtrar por COUNT(*) > 20.",
             bad: "HAVING no es obligatorio ni ordena resultados, y COUNT sí puede usarse en el SELECT sin HAVING; la clave es que HAVING filtra grupos ya agregados.",
           },
+          extra: {
+            type: "order",
+            prompt: "Ordena las líneas para construir la consulta que lista los cursos con más de 15 matriculados.",
+            payload: {
+              lines: [
+                { id: "a", html: `<span style="${K}">HAVING</span> <span style="${K}">COUNT</span>(*) &gt; <span style="${N}">15</span>;` },
+                { id: "b", html: `<span style="${K}">GROUP BY</span> curso_id` },
+                { id: "c", html: `<span style="${K}">SELECT</span> curso_id, <span style="${K}">COUNT</span>(*) <span style="${K}">AS</span> total` },
+                { id: "d", html: `<span style="${K}">FROM</span> matriculas` },
+              ],
+            },
+            answer: { order: ["c", "d", "b", "a"] },
+            ok: "Primero proyectas (SELECT) con el agregado, luego la tabla base (FROM), agrupas por curso (GROUP BY) y por último filtras los grupos ya formados (HAVING).",
+            bad: "Recuerda el orden: SELECT → FROM → GROUP BY → HAVING; HAVING solo tiene sentido después de agrupar.",
+          },
         },
         {
           id: "bd1-l10",
@@ -290,6 +435,23 @@ export default {
             correct: 0,
             ok: "SELECT AVG(promedio) FROM estudiantes devuelve un solo número, el promedio general, que la consulta externa usa para comparar cada fila.",
             bad: "La subconsulta no lista nombres ni repite la tabla completa; WHERE sí admite subconsultas, siempre que su resultado sea compatible con la comparación.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la consulta para obtener los estudiantes matriculados en el curso 7, usando una subconsulta.",
+            payload: {
+              code: [
+                `<span style="${K}">SELECT</span> nombre <span style="${K}">FROM</span> estudiantes`,
+                `<span style="${K}">WHERE</span> id <b0> (`,
+                `  <span style="${K}">SELECT</span> estudiante_id <span style="${K}">FROM</span> <b1>`,
+                `  <span style="${K}">WHERE</span> curso_id = <span style="${N}">7</span>`,
+                `);`,
+              ],
+              bank: ["IN", "matriculas", "=", "cursos"],
+            },
+            answer: { blanks: ["IN", "matriculas"] },
+            ok: "IN compara contra la lista de valores que arroja la subconsulta, y esa lista sale de matriculas, la tabla que registra las matrículas por curso.",
+            bad: "El operador = solo acepta un valor único, no una lista, por eso hace falta IN; y la subconsulta debe leer de matriculas, no de cursos, para obtener los estudiante_id.",
           },
         },
       ],

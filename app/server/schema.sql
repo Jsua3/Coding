@@ -64,3 +64,27 @@ CREATE TABLE IF NOT EXISTS xp_events (
   CONSTRAINT fk_xp_user FOREIGN KEY (user_id) REFERENCES users(id),
   CONSTRAINT fk_xp_lesson FOREIGN KEY (lesson_id) REFERENCES lessons(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS exercises (
+  id VARCHAR(40) PRIMARY KEY,
+  lesson_id VARCHAR(30) NOT NULL,
+  order_index INT NOT NULL,
+  type ENUM('choice','blanks','order','match') NOT NULL,
+  prompt TEXT NOT NULL,
+  payload JSON NOT NULL,
+  answer JSON NOT NULL,
+  explain_ok TEXT NOT NULL,
+  explain_bad TEXT NOT NULL,
+  CONSTRAINT fk_ex_lesson FOREIGN KEY (lesson_id) REFERENCES lessons(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS answer_attempts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  exercise_id VARCHAR(40) NOT NULL,
+  context ENUM('lesson','review') NOT NULL DEFAULT 'lesson',
+  correct TINYINT(1) NOT NULL,
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  CONSTRAINT fk_aa_user FOREIGN KEY (user_id) REFERENCES users(id),
+  CONSTRAINT fk_aa_exercise FOREIGN KEY (exercise_id) REFERENCES exercises(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

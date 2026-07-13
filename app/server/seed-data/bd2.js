@@ -43,6 +43,21 @@ export default {
             ok: "La transacción agrupa ambas operaciones en una unidad atómica: si algo falla a mitad de camino, el SGBD revierte todo y ninguna cuenta queda a medias.",
             bad: "Una transacción no acelera la ejecución ni es obligatoria para usar UPDATE; su propósito es garantizar que el conjunto de operaciones sea todo-o-nada.",
           },
+          extra: {
+            type: "order",
+            prompt: "Ordena los pasos para actualizar el stock y registrar un pedido dentro de una única transacción.",
+            payload: {
+              lines: [
+                { id: "a", html: `<span style="${K}">COMMIT</span>;` },
+                { id: "b", html: `<span style="${K}">INSERT INTO</span> pedidos (producto_id, cantidad) <span style="${K}">VALUES</span> (<span style="${N}">42</span>, <span style="${N}">1</span>);` },
+                { id: "c", html: `<span style="${K}">START TRANSACTION</span>;` },
+                { id: "d", html: `<span style="${K}">UPDATE</span> inventario <span style="${K}">SET</span> stock = stock - <span style="${N}">1</span> <span style="${K}">WHERE</span> producto_id = <span style="${N}">42</span>;` },
+              ],
+            },
+            answer: { order: ["c", "d", "b", "a"] },
+            ok: "Toda transacción empieza con START TRANSACTION, agrupa las operaciones que deben ir juntas (UPDATE e INSERT) y termina con COMMIT para confirmarlas todas a la vez.",
+            bad: "Sin START TRANSACTION al inicio no delimitas la unidad, y sin COMMIT al final los cambios nunca se confirman; el orden importa.",
+          },
         },
         {
           id: "bd2-l2",
@@ -72,6 +87,26 @@ export default {
             ok: "ROLLBACK deshace todos los cambios de la transacción activa, incluidos el UPDATE y el INSERT.",
             bad: "COMMIT haría permanentes los cambios (justo lo contrario de lo que quieres); SELECT y DELETE no revierten una transacción.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa los dos scripts: uno confirma la transacción, el otro la revierte.",
+            payload: {
+              code: [
+                `<span style="${C}">-- Camino feliz: todo salió bien</span>`,
+                `<span style="${K}">START TRANSACTION</span>;`,
+                `<span style="${K}">UPDATE</span> inventario <span style="${K}">SET</span> stock = stock - <span style="${N}">1</span> <span style="${K}">WHERE</span> producto_id = <span style="${N}">42</span>;`,
+                `<b0>;`,
+                `<span style="${C}">-- Camino con error: revertimos todo</span>`,
+                `<span style="${K}">START TRANSACTION</span>;`,
+                `<span style="${K}">UPDATE</span> inventario <span style="${K}">SET</span> stock = stock - <span style="${N}">1</span> <span style="${K}">WHERE</span> producto_id = <span style="${N}">42</span>;`,
+                `<b1>;`,
+              ],
+              bank: ["COMMIT", "ROLLBACK", "SELECT", "DELETE"],
+            },
+            answer: { blanks: ["COMMIT", "ROLLBACK"] },
+            ok: "COMMIT confirma de forma permanente los cambios cuando todo salió bien; ROLLBACK los deshace por completo cuando detectas un error antes de confirmar.",
+            bad: "No confundas la dirección: COMMIT hace permanentes los cambios, ROLLBACK los borra como si nunca hubieran ocurrido; ni SELECT ni DELETE cierran una transacción.",
+          },
         },
         {
           id: "bd2-l3",
@@ -93,6 +128,22 @@ export default {
             correct: 3,
             ok: "El Aislamiento controla cómo interactúan transacciones concurrentes, evitando que una vea datos a medio modificar por otra y así se prevenga la doble venta.",
             bad: "Atomicidad protege el todo-o-nada de una transacción, Consistencia las reglas del esquema y Durabilidad la persistencia tras un COMMIT; ninguna regula directamente la concurrencia entre transacciones.",
+          },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada propiedad ACID con su significado.",
+            payload: {
+              left: ["Atomicidad", "Consistencia", "Aislamiento", "Durabilidad"],
+              right: [
+                "Lo confirmado sobrevive a fallos del sistema",
+                "Todo o nada: no hay efectos a medias",
+                "Los datos siempre cumplen las reglas definidas",
+                "Las transacciones concurrentes no se pisan entre sí",
+              ],
+            },
+            answer: { pairs: [[0, 1], [1, 2], [2, 3], [3, 0]] },
+            ok: "Atomicidad = todo o nada; consistencia = reglas intactas; aislamiento = concurrencia sin interferencia; durabilidad = lo confirmado no se pierde.",
+            bad: "Repasa: atomicidad habla de 'todo o nada', durabilidad de sobrevivir fallos, aislamiento de concurrencia y consistencia de reglas.",
           },
         },
       ],
@@ -130,6 +181,22 @@ export default {
             ok: "Un trigger AFTER INSERT se dispara automáticamente en cada INSERT sobre la tabla, sin que la aplicación tenga que invocarlo.",
             bad: "Los triggers no se llaman manualmente ni corren en un horario fijo; tampoco dependen de cuántas filas afecte el INSERT, se ejecutan por cada fila insertada.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa el trigger que registra la fecha de última modificación cada vez que se actualiza un producto.",
+            payload: {
+              code: [
+                `<span style="${K}">CREATE TRIGGER</span> antes_actualizar_producto`,
+                `<b0> <span style="${K}">UPDATE ON</span> productos`,
+                `<span style="${K}">FOR EACH ROW</span>`,
+                `<span style="${K}">SET</span> <b1>.actualizado_en = <span style="${K}">NOW</span>();`,
+              ],
+              bank: ["BEFORE", "NEW", "AFTER", "OLD"],
+            },
+            answer: { blanks: ["BEFORE", "NEW"] },
+            ok: "BEFORE UPDATE permite modificar la fila antes de guardarla, y NEW es la fila con los valores nuevos que se está por escribir; por eso SET NEW.actualizado_en funciona ahí.",
+            bad: "Con AFTER UPDATE ya no puedes modificar la fila porque ya se guardó, y OLD apunta a los valores anteriores, no a los nuevos; necesitas BEFORE y NEW.",
+          },
         },
         {
           id: "bd2-l5",
@@ -161,6 +228,24 @@ export default {
             correct: 2,
             ok: "El procedimiento guarda la lógica una sola vez en el SGBD; cualquier cliente la reutiliza con CALL sin duplicar sentencias SQL.",
             bad: "Un procedimiento sigue siendo SQL ejecutado por la base de datos, no la reemplaza, y no tiene relación con convertir tablas en vistas.",
+          },
+          extra: {
+            type: "order",
+            prompt: "Ordena las líneas para crear y llamar un procedimiento que descuenta stock de un producto.",
+            payload: {
+              lines: [
+                { id: "a", html: `  <span style="${K}">UPDATE</span> inventario <span style="${K}">SET</span> stock = stock - p_cantidad <span style="${K}">WHERE</span> producto_id = p_producto;` },
+                { id: "b", html: `<span style="${K}">CALL</span> actualizar_stock(<span style="${N}">42</span>, <span style="${N}">3</span>);` },
+                { id: "c", html: `<span style="${K}">DELIMITER</span> //` },
+                { id: "d", html: `<span style="${K}">END</span> //` },
+                { id: "e", html: `<span style="${K}">BEGIN</span>` },
+                { id: "f", html: `<span style="${K}">DELIMITER</span> ;` },
+                { id: "g", html: `<span style="${K}">CREATE PROCEDURE</span> actualizar_stock(<span style="${K}">IN</span> p_producto <span style="${S}">INT</span>, <span style="${K}">IN</span> p_cantidad <span style="${S}">INT</span>)` },
+              ],
+            },
+            answer: { order: ["c", "g", "e", "a", "d", "f", "b"] },
+            ok: "Primero fijas el delimitador y declaras el procedimiento con sus parámetros, abres BEGIN, colocas la lógica (UPDATE), cierras con END y restauras el delimitador antes de invocarlo con CALL.",
+            bad: "El orden es DELIMITER // → CREATE PROCEDURE(...) → BEGIN → la lógica → END // → DELIMITER ; → CALL; sin DELIMITER // no puedes usar ; dentro del cuerpo.",
           },
         },
         {
@@ -197,6 +282,24 @@ export default {
             ok: "Una función siempre devuelve un valor con RETURN y se integra en expresiones SQL, como SELECT nombre, letra_calificacion(promedio); eso la distingue de un procedimiento.",
             bad: "Las funciones sí reciben parámetros y se usan dentro de consultas, no con CALL; ejecutarse ante un INSERT es comportamiento de un trigger, no de una función.",
           },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la función que calcula el precio con IVA a partir de un precio base.",
+            payload: {
+              code: [
+                `<span style="${K}">CREATE FUNCTION</span> precio_con_iva(precio <span style="${S}">DECIMAL</span>(<span style="${N}">8</span>,<span style="${N}">2</span>))`,
+                `<b0> <span style="${S}">DECIMAL</span>(<span style="${N}">8</span>,<span style="${N}">2</span>)`,
+                `<span style="${K}">DETERMINISTIC</span>`,
+                `<span style="${K}">BEGIN</span>`,
+                `  <b1> precio * <span style="${N}">1.19</span>;`,
+                `<span style="${K}">END</span>;`,
+              ],
+              bank: ["RETURNS", "RETURN", "CALL", "SET"],
+            },
+            answer: { blanks: ["RETURNS", "RETURN"] },
+            ok: "RETURNS declara el tipo de dato que la función devuelve, y RETURN dentro del cuerpo entrega ese valor calculado; CALL es para procedimientos y SET solo asigna variables.",
+            bad: "No confundas RETURNS (el tipo de retorno en la firma) con RETURN (la instrucción que entrega el valor); una función no se invoca con CALL ni devuelve nada con SET.",
+          },
         },
       ],
     },
@@ -229,6 +332,22 @@ export default {
             ok: "Cada índice se debe actualizar en cada escritura, así que indexar todo penaliza el rendimiento de INSERT, UPDATE y DELETE a cambio de lecturas más rápidas.",
             bad: "MySQL permite varios índices por tabla, no afectan las columnas que devuelve el SELECT y no vuelven la tabla de solo lectura; el costo real está en las escrituras.",
           },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada concepto sobre índices con su descripción.",
+            payload: {
+              left: ["Índice", "Columna de uso frecuente en WHERE", "Costo de un índice", "Tabla sin índice adecuado"],
+              right: [
+                "Cada INSERT, UPDATE o DELETE debe actualizar también el índice",
+                "El SGBD debe recorrer la tabla completa para encontrar las filas",
+                "Estructura auxiliar que acelera la localización de filas sin recorrer toda la tabla",
+                "Es la candidata ideal para crear un índice sobre ella",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 3], [2, 0], [3, 1]] },
+            ok: "Un índice acelera búsquedas; conviene crearlo sobre columnas muy consultadas en WHERE; tiene un costo porque cada escritura debe mantenerlo; y sin él, el SGBD recorre la tabla entera.",
+            bad: "Recuerda: el índice acelera lecturas pero encarece escrituras, conviene en columnas muy filtradas, y su ausencia obliga a un recorrido completo de la tabla.",
+          },
         },
         {
           id: "bd2-l8",
@@ -254,6 +373,21 @@ export default {
             correct: 1,
             ok: "type = ALL significa full table scan: el SGBD revisó cada fila porque no encontró (o no usó) un índice útil para esa condición.",
             bad: "ALL no significa que se usaron todos los índices, ni que la consulta falló, ni que la tabla esté vacía: describe una lectura secuencial completa de la tabla.",
+          },
+          extra: {
+            type: "blanks",
+            prompt: "Completa la lectura del resultado de EXPLAIN sobre una consulta que filtra por email.",
+            payload: {
+              code: [
+                `<span style="${K}">EXPLAIN</span> <span style="${K}">SELECT</span> * <span style="${K}">FROM</span> usuarios <span style="${K}">WHERE</span> email = <span style="${S}">'ana@correo.com'</span>;`,
+                `<span style="${C}">-- Si la columna type muestra <b0>, el SGBD recorrió toda la tabla</span>`,
+                `<span style="${C}">-- Si la columna key muestra el nombre de un <b1>, la consulta lo aprovechó</span>`,
+              ],
+              bank: ["ALL", "índice", "COMMIT", "trigger"],
+            },
+            answer: { blanks: ["ALL", "índice"] },
+            ok: "type = ALL indica un recorrido completo de la tabla sin índice útil, y cuando key muestra el nombre de un índice, la consulta lo está aprovechando para no escanear todo.",
+            bad: "ALL es la señal de un full scan, no de un COMMIT; y lo que aparece en key es el nombre de un índice usado, no de un trigger.",
           },
         },
         {
@@ -282,6 +416,22 @@ export default {
             correct: 2,
             ok: "FOR UPDATE bloquea la fila leída hasta que la transacción termine, evitando que dos transacciones concurrentes resten el mismo cupo a la vez.",
             bad: "FOR UPDATE no reemplaza el COMMIT, no ordena resultados ni crea índices; su función es adquirir un bloqueo exclusivo sobre la fila leída.",
+          },
+          extra: {
+            type: "match",
+            prompt: "Empareja cada concepto de bloqueos y concurrencia con su efecto.",
+            payload: {
+              left: ["SELECT … FOR UPDATE", "Transacción bloqueada", "Interbloqueo (deadlock)", "Liberación del bloqueo"],
+              right: [
+                "Espera a que la transacción que tiene el bloqueo termine con COMMIT o ROLLBACK",
+                "Ocurre automáticamente cuando la transacción hace COMMIT o ROLLBACK",
+                "Toma un bloqueo exclusivo sobre la fila leída, para modificarla sin interferencias",
+                "Dos transacciones se esperan mutuamente y ninguna puede avanzar; el SGBD cancela una",
+              ],
+            },
+            answer: { pairs: [[0, 2], [1, 0], [2, 3], [3, 1]] },
+            ok: "FOR UPDATE toma el bloqueo, una transacción bloqueada espera a que se libere con COMMIT o ROLLBACK, un deadlock es la espera mutua que el SGBD resuelve cancelando una, y la liberación llega justo con ese COMMIT o ROLLBACK.",
+            bad: "No mezcles causa y efecto: FOR UPDATE bloquea, la espera es consecuencia del bloqueo activo, el deadlock es un caso de espera cruzada, y liberar el bloqueo depende de terminar la transacción.",
           },
         },
       ],

@@ -39,6 +39,24 @@ export async function runSeed() {
              correct_index = VALUES(correct_index), explain_ok = VALUES(explain_ok), explain_bad = VALUES(explain_bad)`,
           [l.id, l.quiz.question, JSON.stringify(l.quiz.options), l.quiz.correct, l.quiz.ok, l.quiz.bad]
         );
+        await query(
+          `INSERT INTO exercises (id, lesson_id, order_index, type, prompt, payload, answer, explain_ok, explain_bad)
+           VALUES (?, ?, 0, 'choice', ?, ?, ?, ?, ?)
+           ON DUPLICATE KEY UPDATE lesson_id=VALUES(lesson_id), order_index=VALUES(order_index), type=VALUES(type),
+             prompt=VALUES(prompt), payload=VALUES(payload), answer=VALUES(answer),
+             explain_ok=VALUES(explain_ok), explain_bad=VALUES(explain_bad)`,
+          [l.id + "-ex1", l.id, l.quiz.question, JSON.stringify({ options: l.quiz.options }), JSON.stringify({ index: l.quiz.correct }), l.quiz.ok, l.quiz.bad]
+        );
+        if (l.extra) {
+          await query(
+            `INSERT INTO exercises (id, lesson_id, order_index, type, prompt, payload, answer, explain_ok, explain_bad)
+             VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE lesson_id=VALUES(lesson_id), order_index=VALUES(order_index), type=VALUES(type),
+               prompt=VALUES(prompt), payload=VALUES(payload), answer=VALUES(answer),
+               explain_ok=VALUES(explain_ok), explain_bad=VALUES(explain_bad)`,
+            [l.id + "-ex2", l.id, l.extra.type, l.extra.prompt, JSON.stringify(l.extra.payload), JSON.stringify(l.extra.answer), l.extra.ok, l.extra.bad]
+          );
+        }
       }
     }
   }

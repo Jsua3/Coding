@@ -12,6 +12,7 @@ export async function setupTestDb() {
 
 export async function resetUserData() {
   await query("SET FOREIGN_KEY_CHECKS = 0");
+  await query("TRUNCATE TABLE answer_attempts");
   await query("TRUNCATE TABLE xp_events");
   await query("TRUNCATE TABLE lesson_completions");
   await query("TRUNCATE TABLE users");
