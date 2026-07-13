@@ -199,17 +199,18 @@ function CelebrationScreen({ data, onNext, onBack, me, tab, setTab }) {
     if (data.streak && data.streak.extended) {
       timers.push(setTimeout(() => { setShowStreak(true); FX.sound.play("streak"); }, 1400));
     }
+    let rafId = null;
     timers.push(setTimeout(() => {
       const start = performance.now();
       const dur = 900;
       const tick = (now) => {
         const t = Math.min(1, (now - start) / dur);
         setRing(Math.round(data.prevProgress + (data.courseProgress - data.prevProgress) * (1 - Math.pow(1 - t, 3))));
-        if (t < 1) requestAnimationFrame(tick);
+        if (t < 1) rafId = requestAnimationFrame(tick);
       };
-      requestAnimationFrame(tick);
+      rafId = requestAnimationFrame(tick);
     }, 500));
-    return () => timers.forEach(clearTimeout);
+    return () => { timers.forEach(clearTimeout); if (rafId !== null) cancelAnimationFrame(rafId); };
   }, []);
 
   return (
