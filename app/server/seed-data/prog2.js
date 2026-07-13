@@ -284,6 +284,7 @@ export default {
                 `  <span style="${K}">public</span> <span style="${S}">Vehiculo</span>(<span style="${S}">String</span> marca) {`,
                 `    <span style="${K}">this</span>.marca = marca;`,
                 `  }`,
+                `  <span style="${K}">public</span> <span style="${K}">void</span> arrancar() { <span style="${S}">System</span>.out.println(<span style="${S}">"Motor encendido"</span>); }`,
                 `}`,
                 ``,
                 `<span style="${K}">public class</span> <span style="${S}">Moto</span> <span style="${K}">extends</span> <span style="${S}">Vehiculo</span> {`,
