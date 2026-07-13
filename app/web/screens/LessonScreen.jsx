@@ -129,12 +129,16 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
       setResult(null);
       return;
     }
+    if (step >= exercises.length) {
+      onBack();
+      return;
+    }
     setStep(step + 1);
     setValue(null);
     setResult(null);
   };
 
-  if (celebration && window.CelebrationScreen) {
+  if (celebration) {
     return <CelebrationScreen data={celebration} onNext={celebration.nextLessonId ? () => onOpenLesson(celebration.nextLessonId) : null} onBack={onBack} me={me} tab={tab} setTab={setTab} />;
   }
 
@@ -167,7 +171,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
                 Ejercicio {step} de {exercises.length}
               </div>
               <p style={{ margin: "0 0 16px", fontSize: "var(--text-base)", fontWeight: 500, color: "var(--text-primary)" }}>{ex.prompt}</p>
-              <ExerciseBody exercise={ex} value={value} onChange={setValue} locked={Boolean(result) || sending} />
+              <ExerciseBody key={ex.id} exercise={ex} value={value} onChange={setValue} locked={Boolean(result) || sending} />
               <div style={{ marginTop: 20 }}>
                 <Button fullWidth disabled={!responseComplete(ex, value) || sending || Boolean(result && result.correct)} onClick={check}>
                   {sending ? "Comprobando…" : "Comprobar"}

@@ -101,7 +101,7 @@ function ReviewScreen({ me, tab, setTab, onBack, refreshMe }) {
             <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>{ex.courseSubject} · {ex.lessonTitle}</span>
           </div>
           <p style={{ margin: "0 0 16px", fontSize: "var(--text-base)", fontWeight: 500, color: "var(--text-primary)" }}>{ex.prompt}</p>
-          <ExerciseBody exercise={ex} value={value} onChange={setValue} locked={Boolean(result) || sending} />
+          <ExerciseBody key={ex.id} exercise={ex} value={value} onChange={setValue} locked={Boolean(result) || sending} />
           <div style={{ marginTop: 20 }}>
             <Button fullWidth disabled={!responseComplete(ex, value) || sending || Boolean(result && result.correct)} onClick={check}>
               {sending ? "Comprobando…" : "Comprobar"}
