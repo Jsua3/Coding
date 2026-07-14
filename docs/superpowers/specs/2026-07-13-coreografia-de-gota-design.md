@@ -38,7 +38,7 @@ Seis piezas, todas solo con `transform`/`opacity`/`filter` y tokens del DS. Valo
 
 `fx-bloom` (keyframe del span que inyecta `FX.bloom`): `0%: opacity 0.82, scale(0.18), blur(0)` → `54%: opacity 0.62, scale(1.05), blur(0.5px)` → `100%: opacity 0, scale(1.38), blur(1.5px)`, 640ms `--ease-out`, `forwards`.
 
-**Reduced motion:** todas las clases nuevas entran al bloque `@media (prefers-reduced-motion: reduce)` existente — `anim-evaporate`, `anim-melt-out`, `fx-bead` y el span de bloom con `animation: none`; `anim-drop-in`, `anim-melt-in`, `anim-condense` a `animation-duration: 1ms` (como `anim-screen-in`/`anim-rise`, para que el contenido nunca quede oculto).
+**Reduced motion:** todas las clases nuevas entran al bloque `@media (prefers-reduced-motion: reduce)` existente — `anim-evaporate` y `anim-melt-out` con `animation: none`; `fx-bead` y el span de bloom con `display: none` (su estado base es visible, así que solo `animation: none` los dejaría fijos en pantalla); `anim-drop-in`, `anim-melt-in`, `anim-condense` a `animation-duration: 1ms` (como `anim-screen-in`/`anim-rise`, para que el contenido nunca quede oculto).
 
 `anim-rise` se conserva (lo usa quien no migre aún); la FeedbackBand deja de usarlo.
 

@@ -71,7 +71,7 @@ function ReviewScreen({ me, tab, setTab, onBack, refreshMe }) {
     );
   }
 
-  const ex = queue[shownI];
+  const ex = queue[Math.min(shownI, queue.length - 1)];
   const meltClass = iPhase === "out" ? "anim-melt-out" : "anim-melt-in";
 
   const check = async () => {
@@ -89,7 +89,7 @@ function ReviewScreen({ me, tab, setTab, onBack, refreshMe }) {
   };
 
   const continueNext = (e) => {
-    if (iPhase === "out") return;
+    if (!result || i !== shownI) return;
     if (i + 1 < queue.length) {
       setI(i + 1);
       return;

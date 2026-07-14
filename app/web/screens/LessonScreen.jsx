@@ -130,7 +130,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
   };
 
   const continueNext = (e) => {
-    if (stepPhase === "out") return;
+    if (!result || step !== shownStep) return;
     if (result.lessonCompleted) {
       let x = e ? e.clientX : 0;
       let y = e ? e.clientY : 0;

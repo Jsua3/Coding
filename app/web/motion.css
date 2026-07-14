@@ -126,7 +126,7 @@
   .anim-pop, .anim-shake, .anim-pulse-glow, .fx-spark { animation: none !important; }
   .orb, .orb--happy, .orb--celebrate { animation: none !important; }
   .anim-screen-in, .anim-rise { animation-duration: 1ms !important; }
-  .anim-evaporate, .anim-melt-out, .fx-bead { animation: none !important; }
-  .fx-bloom { display: none !important; }
+  .anim-evaporate, .anim-melt-out { animation: none !important; }
+  .fx-bead, .fx-bloom { display: none !important; }
   .anim-drop-in, .anim-melt-in, .anim-condense { animation-duration: 1ms !important; animation-delay: 0ms !important; }
 }
