@@ -153,12 +153,12 @@ El lenguaje manda animar **solo `transform`/`opacity`/`filter`**. Aquí hacemos 
 
 ```css
 .lg-noise {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.74' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
 }
 ```
 
-(Data-URI exacto, el mismo de `docs/liquid-glass.md` §8.) SVG inline: cero peticiones HTTP. Al ser `fixed` con `z-index: 0` y pintarse **antes** que el contenido, queda **detrás del vidrio**: los paneles lo refractan con su `backdrop-filter` — el grano se lee *a través* del cristal, que es justo lo correcto. Los gradientes puros de la aurora producen *banding* (franjas visibles) y una lisura irreal; el grano al ~3.5% lo rompe y da tacto mineral. No se ve conscientemente; se nota si lo quitas.
+(Data-URI exacto, el mismo de `docs/liquid-glass.md` §8.) SVG inline: cero peticiones HTTP. `z-index: -1` y **no `0`**: por el orden de pintado de CSS, un elemento posicionado con `z-index: 0` se pinta *por encima* del contenido de bloque no posicionado — el grano taparía la app. Con `-1` queda **detrás del contenido pero encima del fondo de página**: los paneles lo refractan con su `backdrop-filter` — el grano se lee *a través* del cristal, que es justo lo correcto. Los gradientes puros de la aurora producen *banding* (franjas visibles) y una lisura irreal; el grano al ~3.5% lo rompe y da tacto mineral. No se ve conscientemente; se nota si lo quitas.
 
 Bajo reduced motion **se conserva** (es textura estática, no movimiento).
 
