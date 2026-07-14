@@ -46,7 +46,7 @@ function App() {
     screen = <CourseScreen me={me} courseId={route.courseId} tab={tab} setTab={setTab}
       onBack={go.dashboard} onOpenLesson={(lessonId) => go.lesson(route.courseId, lessonId)} />;
   } else if (route.screen === "lesson") {
-    screen = <LessonScreen me={me} courseId={route.courseId} lessonId={route.lessonId} tab={tab} setTab={setTab}
+    screen = <LessonScreen key={route.lessonId} me={me} courseId={route.courseId} lessonId={route.lessonId} tab={tab} setTab={setTab}
       onBack={() => go.course(route.courseId)} onOpenLesson={(lessonId) => go.lesson(route.courseId, lessonId)}
       showToast={showToast} refreshMe={loadMe} />;
   } else if (route.screen === "review") {

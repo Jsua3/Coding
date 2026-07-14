@@ -80,6 +80,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
     API.get("/lessons/" + lessonId).then(setLesson).catch((e) => setError(e.message));
   };
   React.useEffect(load, [lessonId]);
+  // también corre en el montaje: no-op (ambos ya son null)
   React.useEffect(() => { setValue(null); setResult(null); }, [shownStep]);
 
   if (error) {
@@ -129,6 +130,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
   };
 
   const continueNext = (e) => {
+    if (stepPhase === "out") return;
     if (result.lessonCompleted) {
       let x = e ? e.clientX : 0;
       let y = e ? e.clientY : 0;
