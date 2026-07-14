@@ -3,12 +3,15 @@ const KITC = window.CodingDesignSystem_2ecb3a;
 function LessonRow({ lesson, onOpen }) {
   const { Badge } = KITC;
   const [hover, setHover] = React.useState(false);
+  const ref = React.useRef(null);
+  React.useEffect(() => Liquid.ripple(ref.current), []);
   return (
     <div
+      ref={ref}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       onClick={() => onOpen(lesson.id)}
-      style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", borderRadius: "var(--radius-md)", cursor: "pointer", background: hover ? "var(--glass-bg-strong)" : lesson.current ? "var(--glass-tint-cyan)" : "transparent", border: "1px solid " + (lesson.current ? "rgba(82,201,184,0.35)" : hover ? "var(--glass-stroke)" : "transparent"), transition: "all var(--duration-fast) var(--ease-glass)" }}
+      style={{ position: "relative", overflow: "hidden", display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", borderRadius: "var(--radius-md)", cursor: "pointer", background: hover ? "var(--glass-bg-strong)" : lesson.current ? "var(--glass-tint-cyan)" : "transparent", border: "1px solid " + (lesson.current ? "rgba(82,201,184,0.35)" : hover ? "var(--glass-stroke)" : "transparent"), transition: "all var(--duration-fast) var(--ease-glass)" }}
     >
       <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: 99, flexShrink: 0, background: lesson.done ? "linear-gradient(180deg, #58CFA0, #3DB27E)" : "var(--glass-bg)", border: "1px solid " + (lesson.done ? "rgba(255,255,255,0.35)" : "var(--glass-stroke-strong)"), boxShadow: lesson.done ? "0 0 12px rgba(76,199,147,0.35)" : "var(--refraction-edge)", color: lesson.done ? "#03160C" : "var(--text-tertiary)" }}>
         {lesson.done ? <KIcon d={ICONS.check} size={13} /> : <KIcon d={ICONS.play} size={12} />}

@@ -1,5 +1,19 @@
 const KITE = window.CodingDesignSystem_2ecb3a;
 
+// Superficie que responde al tacto con una onda. Cumple el contrato del host de Liquid.ripple.
+function RippleBox({ style, onClick, children, disabled }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    if (disabled) return;
+    return Liquid.ripple(ref.current);
+  }, [disabled]);
+  return (
+    <div ref={ref} onClick={onClick} style={{ position: "relative", overflow: "hidden", ...style }}>
+      {children}
+    </div>
+  );
+}
+
 function responseComplete(exercise, value) {
   if (!value) return false;
   const p = exercise.payload;
@@ -20,20 +34,26 @@ function ChoiceExercise({ payload, value, onChange, locked }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {payload.options.map((o, i) => (
-        <div key={i} onClick={() => !locked && onChange({ index: i })}
+        <RippleBox key={i} disabled={locked} onClick={() => !locked && onChange({ index: i })}
           style={{ padding: "12px 14px", borderRadius: "var(--radius-md)", background: sel === i ? "var(--glass-bg-strong)" : "var(--glass-bg-subtle)", border: "1px solid " + (sel === i ? "var(--focus-ring)" : "var(--glass-stroke)"), cursor: locked ? "default" : "pointer", transition: "all var(--duration-fast) var(--ease-glass)" }}>
           <Radio name="ex-choice" checked={sel === i} onChange={() => !locked && onChange({ index: i })}
             label={<span style={{ fontFamily: "var(--font-mono)", fontSize: 12.5 }}>{o}</span>} />
-        </div>
+        </RippleBox>
       ))}
     </div>
   );
 }
 
 function TokenChip({ text, ghost, onClick }) {
+  const ref = React.useRef(null);
+  const live = Boolean(onClick) && !ghost;
+  React.useEffect(() => {
+    if (!live) return;
+    return Liquid.ripple(ref.current);
+  }, [live]);
   return (
-    <button onClick={onClick} disabled={ghost || !onClick}
-      style={{ fontFamily: "var(--font-mono)", fontSize: 12.5, padding: "7px 14px", borderRadius: "var(--radius-pill)", border: "1px solid var(--glass-stroke-strong)", background: ghost ? "transparent" : "var(--glass-bg-strong)", color: ghost ? "var(--text-tertiary)" : "var(--text-primary)", opacity: ghost ? 0.35 : 1, cursor: onClick && !ghost ? "pointer" : "default", boxShadow: ghost ? "none" : "var(--refraction-edge)", transition: "all var(--duration-fast) var(--ease-glass)" }}>
+    <button ref={ref} onClick={onClick} disabled={ghost || !onClick}
+      style={{ position: "relative", overflow: "hidden", fontFamily: "var(--font-mono)", fontSize: 12.5, padding: "7px 14px", borderRadius: "var(--radius-pill)", border: "1px solid var(--glass-stroke-strong)", background: ghost ? "transparent" : "var(--glass-bg-strong)", color: ghost ? "var(--text-tertiary)" : "var(--text-primary)", opacity: ghost ? 0.35 : 1, cursor: onClick && !ghost ? "pointer" : "default", boxShadow: ghost ? "none" : "var(--refraction-edge)", transition: "all var(--duration-fast) var(--ease-glass)" }}>
       {text}
     </button>
   );
@@ -104,18 +124,18 @@ function OrderExercise({ payload, value, onChange, locked }) {
       <div style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "var(--tracking-caps)", fontWeight: 600, marginBottom: 8 }}>Tu secuencia</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6, minHeight: 44, marginBottom: 14, padding: 8, borderRadius: "var(--radius-md)", border: "1px dashed var(--glass-stroke-strong)" }}>
         {order.map((id, i) => (
-          <div key={id} style={{ ...lineStyle, background: "var(--glass-bg-strong)" }} onClick={() => !locked && onChange({ order: order.filter((x) => x !== id) })}>
+          <RippleBox key={id} disabled={locked} style={{ ...lineStyle, background: "var(--glass-bg-strong)" }} onClick={() => !locked && onChange({ order: order.filter((x) => x !== id) })}>
             <span style={{ color: "var(--accent-cyan)", fontWeight: 700, minWidth: 16 }}>{i + 1}</span>
             <span dangerouslySetInnerHTML={{ __html: byId[id].html }} />
-          </div>
+          </RippleBox>
         ))}
         {order.length === 0 ? <div style={{ color: "var(--text-tertiary)", fontSize: "var(--text-sm)", padding: 6 }}>Toca las líneas de abajo en el orden correcto</div> : null}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {available.map((l) => (
-          <div key={l.id} style={lineStyle} onClick={() => !locked && onChange({ order: [...order, l.id] })}>
+          <RippleBox key={l.id} disabled={locked} style={lineStyle} onClick={() => !locked && onChange({ order: [...order, l.id] })}>
             <span dangerouslySetInnerHTML={{ __html: l.html }} />
-          </div>
+          </RippleBox>
         ))}
       </div>
     </div>
@@ -144,9 +164,9 @@ function MatchExercise({ payload, value, onChange, locked }) {
   };
 
   const cell = (text, active, color, onClick, key) => (
-    <div key={key} onClick={onClick} style={{ padding: "11px 14px", borderRadius: "var(--radius-md)", fontSize: "var(--text-sm)", color: "var(--text-primary)", background: active ? "var(--glass-bg-strong)" : "var(--glass-bg-subtle)", borderStyle: "solid", borderColor: color || (active ? "var(--focus-ring)" : "var(--glass-stroke)"), borderWidth: color ? "1px 1px 1px 3px" : "1px", cursor: locked ? "default" : "pointer", transition: "all var(--duration-fast) var(--ease-glass)" }}>
+    <RippleBox key={key} disabled={locked} onClick={onClick} style={{ padding: "11px 14px", borderRadius: "var(--radius-md)", fontSize: "var(--text-sm)", color: "var(--text-primary)", background: active ? "var(--glass-bg-strong)" : "var(--glass-bg-subtle)", borderStyle: "solid", borderColor: color || (active ? "var(--focus-ring)" : "var(--glass-stroke)"), borderWidth: color ? "1px 1px 1px 3px" : "1px", cursor: locked ? "default" : "pointer", transition: "all var(--duration-fast) var(--ease-glass)" }}>
       {text}
-    </div>
+    </RippleBox>
   );
 
   return (
