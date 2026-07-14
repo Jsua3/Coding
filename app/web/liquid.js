@@ -26,5 +26,28 @@ const Liquid = {
     el.addEventListener("pointerdown", onDown);
     return () => el.removeEventListener("pointerdown", onDown);
   },
+  // Los elementos .lg-reveal no "aparecen": se condensan (de vapor a sólido) al entrar en pantalla.
+  // Ceremonia de primera vez: una vez revelado, se deja de observar.
+  reveal(container) {
+    if (!container) return () => {};
+    const els = Array.from(container.querySelectorAll(".lg-reveal:not(.is-visible)"));
+    if (!els.length) return () => {};
+    if ((window.FX && FX.reducedMotion) || !("IntersectionObserver" in window)) {
+      els.forEach((el) => el.classList.add("is-visible"));
+      return () => {};
+    }
+    // Stagger con techo: los primeros ~6 entran en cascada; el resto, juntos.
+    // Sin el techo, una grilla de 20 tarjetas tarda más de un segundo y la página se percibe lenta.
+    els.forEach((el, i) => el.style.setProperty("--reveal-delay", Math.min(i * 55, 330) + "ms"));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        io.unobserve(entry.target);
+      });
+    }, { threshold: 0.12 });
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  },
 };
 window.Liquid = Liquid;

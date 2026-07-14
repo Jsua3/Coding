@@ -27,8 +27,25 @@
   100% { transform: scale(1); opacity: 0; } /* muere justo al llegar */
 }
 
+/* ---------- Reveal: el elemento no aparece, se CONDENSA (vapor → sólido) ---------- */
+.lg-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(10px); /* ← la firma líquida: sin esto es un fade+slide cualquiera */
+  transition:
+    opacity var(--duration-slow) var(--ease-glass) var(--reveal-delay, 0ms),
+    transform var(--duration-slow) var(--ease-glass) var(--reveal-delay, 0ms),
+    filter var(--duration-slow) ease var(--reveal-delay, 0ms);
+}
+.lg-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: none; /* en reposo no hay filter: el backdrop-filter de los paneles funciona normal */
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */
   .lg-ripple { display: none !important; }
+  .lg-reveal { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
 }
