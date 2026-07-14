@@ -104,4 +104,21 @@ function usePhase(value, outMs) {
   return { shown, phase };
 }
 
-Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle, usePhase });
+// true cuando la página bajó más de `px`. Sin listener de scroll: un centinela invisible al tope
+// + IntersectionObserver = cero trabajo por frame.
+function useScrolled(px) {
+  const [scrolled, setScrolled] = React.useState(false);
+  React.useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
+    const sentinel = document.createElement("div");
+    sentinel.setAttribute("aria-hidden", "true");
+    sentinel.style.cssText = "position:absolute;top:0;left:0;width:1px;height:" + px + "px;pointer-events:none;";
+    document.body.appendChild(sentinel);
+    const io = new IntersectionObserver(([entry]) => setScrolled(!entry.isIntersecting), { threshold: 0 });
+    io.observe(sentinel);
+    return () => { io.disconnect(); sentinel.remove(); };
+  }, [px]);
+  return scrolled;
+}
+
+Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle, usePhase, useScrolled });
