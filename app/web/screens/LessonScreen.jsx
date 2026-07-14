@@ -80,6 +80,11 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
     }
   }, [celebration]);
 
+  // Red de seguridad: si el usuario se va sin pasar por la celebración (pulsa Volver, o una pestaña),
+  // el logro se anuncia igual — la cola no puede perder logros.
+  // INVARIANTE: este cleanup captura `showAchievements` del primer render, y eso solo es seguro
+  // porque esa función cierra exclusivamente sobre refs (announcedAch, pendingAch, achTimer) y
+  // setAchQueue, todos estables. Si algún día lee estado de App, este closure se pudre en silencio.
   React.useEffect(() => () => {
     if (achPendientes.current && showAchievements) {
       showAchievements(achPendientes.current, false);
