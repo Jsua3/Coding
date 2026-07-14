@@ -53,56 +53,73 @@ function DashboardScreen({ me, onOpenCourse, onOpenLesson, onOpenReview, tab, se
   };
   React.useEffect(load, []);
 
+  const rootRef = React.useRef(null);
+  React.useEffect(() => Liquid.reveal(rootRef.current), [courses, me.stats.reviewCount]);
+
   const stats = me.stats;
   const cont = me.continue;
 
   return (
     <PageFrame>
       <NavBar onHome={() => {}} tab={tab} setTab={setTab} user={{ initials: me.user.initials, streak: stats.streak }} />
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, margin: "44px 4px 24px" }}>
-        <div>
-          <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>
-            Hola, {me.user.name.split(" ")[0]}
-          </h1>
-          <p style={{ margin: "6px 0 0", fontSize: "var(--text-md)", color: "var(--text-secondary)" }}>
-            {cont
-              ? <React.Fragment>Continúa donde quedaste: <strong style={{ color: "var(--text-primary)" }}>{cont.lessonTitle}</strong></React.Fragment>
-              : "¡Completaste todas tus materias!"}
-          </p>
-        </div>
-        {cont ? (
-          <Button size="lg" iconLeft={<KIcon d={ICONS.play} />} onClick={() => onOpenLesson(cont.courseId, cont.lessonId)}>
-            Continuar lección
-          </Button>
-        ) : null}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
-        <StatPanel label="Racha" value={stats.streak + (stats.streak === 1 ? " día" : " días")} sub={"Tu mejor racha: " + stats.bestStreak + (stats.bestStreak === 1 ? " día" : " días")} tone="none" />
-        <StatPanel label="XP total" value={stats.xp.toLocaleString("es")} sub={"+" + stats.xpWeek + " esta semana"} tone="blue" />
-        <StatPanel label="Materias activas" value={String(stats.activeCourses)} sub={stats.completedCourses + " completadas · " + stats.lockedCourses + " bloqueadas"} tone="cyan" />
-      </div>
-      {me.stats.reviewCount > 0 ? (
-        <KITD.GlassPanel tint="none" padding="var(--space-5)" style={{ marginBottom: 28, border: "1px solid rgba(230,175,107,0.35)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <Orb size={44} mood="idle" />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--text-primary)" }}>Repaso pendiente</div>
-              <div style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)" }}>{me.stats.reviewCount} {me.stats.reviewCount === 1 ? "ejercicio" : "ejercicios"} por repasar · +5 XP cada uno</div>
-            </div>
-            <KITD.Button variant="secondary" onClick={onOpenReview}>Repasar ahora</KITD.Button>
+      <div ref={rootRef}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, margin: "44px 4px 24px" }}>
+          <div>
+            <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>
+              Hola, {me.user.name.split(" ")[0]}
+            </h1>
+            <p style={{ margin: "6px 0 0", fontSize: "var(--text-md)", color: "var(--text-secondary)" }}>
+              {cont
+                ? <React.Fragment>Continúa donde quedaste: <strong style={{ color: "var(--text-primary)" }}>{cont.lessonTitle}</strong></React.Fragment>
+                : "¡Completaste todas tus materias!"}
+            </p>
           </div>
-        </KITD.GlassPanel>
-      ) : null}
-      <h2 style={{ margin: "0 4px 16px", fontFamily: "var(--font-display)", fontSize: "var(--text-xl)", fontWeight: 700, letterSpacing: "var(--tracking-heading)", color: "var(--text-primary)" }}>Tus materias</h2>
-      {error ? (
-        <ErrorPanel message={error} onRetry={load} />
-      ) : !courses ? (
-        <LoadingPanel />
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-          {courses.map((c) => <CourseCard key={c.id} course={c} onOpen={onOpenCourse} />)}
+          {cont ? (
+            <Button size="lg" iconLeft={<KIcon d={ICONS.play} />} onClick={() => onOpenLesson(cont.courseId, cont.lessonId)}>
+              Continuar lección
+            </Button>
+          ) : null}
         </div>
-      )}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
+          <div className="lg-reveal">
+            <StatPanel label="Racha" value={stats.streak + (stats.streak === 1 ? " día" : " días")} sub={"Tu mejor racha: " + stats.bestStreak + (stats.bestStreak === 1 ? " día" : " días")} tone="none" />
+          </div>
+          <div className="lg-reveal">
+            <StatPanel label="XP total" value={stats.xp.toLocaleString("es")} sub={"+" + stats.xpWeek + " esta semana"} tone="blue" />
+          </div>
+          <div className="lg-reveal">
+            <StatPanel label="Materias activas" value={String(stats.activeCourses)} sub={stats.completedCourses + " completadas · " + stats.lockedCourses + " bloqueadas"} tone="cyan" />
+          </div>
+        </div>
+        {me.stats.reviewCount > 0 ? (
+          <div className="lg-reveal">
+            <KITD.GlassPanel tint="none" padding="var(--space-5)" style={{ marginBottom: 28, border: "1px solid rgba(230,175,107,0.35)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+                <Orb size={44} mood="idle" />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--text-primary)" }}>Repaso pendiente</div>
+                  <div style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)" }}>{me.stats.reviewCount} {me.stats.reviewCount === 1 ? "ejercicio" : "ejercicios"} por repasar · +5 XP cada uno</div>
+                </div>
+                <KITD.Button variant="secondary" onClick={onOpenReview}>Repasar ahora</KITD.Button>
+              </div>
+            </KITD.GlassPanel>
+          </div>
+        ) : null}
+        <h2 style={{ margin: "0 4px 16px", fontFamily: "var(--font-display)", fontSize: "var(--text-xl)", fontWeight: 700, letterSpacing: "var(--tracking-heading)", color: "var(--text-primary)" }}>Tus materias</h2>
+        {error ? (
+          <ErrorPanel message={error} onRetry={load} />
+        ) : !courses ? (
+          <LoadingPanel />
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            {courses.map((c) => (
+              <div key={c.id} className="lg-reveal">
+                <CourseCard course={c} onOpen={onOpenCourse} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </PageFrame>
   );
 }

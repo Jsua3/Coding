@@ -36,6 +36,9 @@ function CourseScreen({ me, courseId, onBack, onOpenLesson, tab, setTab }) {
   };
   React.useEffect(load, [courseId]);
 
+  const rootRef = React.useRef(null);
+  React.useEffect(() => Liquid.reveal(rootRef.current), [course]);
+
   const statusTone = { "EN CURSO": "cyan", "NUEVO": "blue", "COMPLETADO": "success" };
   const progressTone = course
     ? (course.status === "COMPLETADO" ? "success" : course.subjectTone === "amber" ? "blue" : course.subjectTone)
@@ -57,32 +60,38 @@ function CourseScreen({ me, courseId, onBack, onOpenLesson, tab, setTab }) {
         <LoadingPanel />
       ) : (
         <React.Fragment>
-          <GlassPanel tint={course.subjectTone === "amber" ? "none" : course.subjectTone} padding="var(--space-7)" radius="var(--radius-xl)" style={{ marginBottom: 20 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-              <div style={{ flex: 1 }}>
-                <Badge tone={statusTone[course.status] || "neutral"} dot={course.status === "EN CURSO"}>{course.status}</Badge>
-                <h1 style={{ margin: "12px 0 6px", fontFamily: "var(--font-display)", fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>{course.title}</h1>
-                <p style={{ margin: 0, fontSize: "var(--text-md)", color: "var(--text-secondary)", maxWidth: 560 }}>{course.description}</p>
-                {current ? (
-                  <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-                    <Button iconLeft={<KIcon d={ICONS.play} />} onClick={() => onOpenLesson(current.id)}>
-                      {course.progress > 0 ? "Continuar lección" : "Empezar"}
-                    </Button>
+          <div ref={rootRef}>
+            <div className="lg-reveal">
+              <GlassPanel tint={course.subjectTone === "amber" ? "none" : course.subjectTone} padding="var(--space-7)" radius="var(--radius-xl)" style={{ marginBottom: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+                  <div style={{ flex: 1 }}>
+                    <Badge tone={statusTone[course.status] || "neutral"} dot={course.status === "EN CURSO"}>{course.status}</Badge>
+                    <h1 style={{ margin: "12px 0 6px", fontFamily: "var(--font-display)", fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>{course.title}</h1>
+                    <p style={{ margin: 0, fontSize: "var(--text-md)", color: "var(--text-secondary)", maxWidth: 560 }}>{course.description}</p>
+                    {current ? (
+                      <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+                        <Button iconLeft={<KIcon d={ICONS.play} />} onClick={() => onOpenLesson(current.id)}>
+                          {course.progress > 0 ? "Continuar lección" : "Empezar"}
+                        </Button>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
-              </div>
-              <Progress value={course.progress} shape="ring" tone={progressTone} size="lg" showLabel />
-            </div>
-          </GlassPanel>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            {course.units.map((u) => (
-              <GlassPanel key={u.id} padding="var(--space-5)">
-                <div style={{ fontSize: "var(--text-xs)", fontWeight: 600, letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--text-tertiary)", margin: "0 4px 10px" }}>{u.name}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  {u.lessons.map((l) => <LessonRow key={l.id} lesson={l} onOpen={onOpenLesson} />)}
+                  <Progress value={course.progress} shape="ring" tone={progressTone} size="lg" showLabel />
                 </div>
               </GlassPanel>
-            ))}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              {course.units.map((u) => (
+                <div key={u.id} className="lg-reveal">
+                  <GlassPanel padding="var(--space-5)">
+                    <div style={{ fontSize: "var(--text-xs)", fontWeight: 600, letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--text-tertiary)", margin: "0 4px 10px" }}>{u.name}</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                      {u.lessons.map((l) => <LessonRow key={l.id} lesson={l} onOpen={onOpenLesson} />)}
+                    </div>
+                  </GlassPanel>
+                </div>
+              ))}
+            </div>
           </div>
         </React.Fragment>
       )}
