@@ -7,8 +7,10 @@ import { unlockedFor } from "./achievements.js";
 // Los contadores de los que dependen los logros. TODOS son monótonos (solo crecen), y por eso es
 // seguro derivar los logros en vez de guardarlos: el conjunto de desbloqueados nunca encoge.
 export async function achievementStats(userId) {
+  // Desempate por lesson_id: completed_at es DATETIME (precisión de segundo), así que dos lecciones
+  // del mismo segundo tendrían orden no determinista — y perfectRun depende del orden.
   const completions = await query(
-    "SELECT lesson_id, completed_at FROM lesson_completions WHERE user_id = ? ORDER BY completed_at",
+    "SELECT lesson_id, completed_at FROM lesson_completions WHERE user_id = ? ORDER BY completed_at, lesson_id",
     [userId]
   );
   const events = await query("SELECT lesson_id, amount FROM xp_events WHERE user_id = ?", [userId]);
@@ -30,14 +32,20 @@ export async function achievementStats(userId) {
 
   const hours = completions.map((c) => new Date(c.completed_at).getHours());
 
-  // ¿Algún ejercicio con 3+ fallos y, después, un acierto EN REPASO?
+  // ¿Algún acierto EN REPASO que llegara DESPUÉS de al menos 3 fallos de ese mismo ejercicio?
+  // El orden se deriva del id del intento, nunca del timestamp (regla del proyecto): un acierto
+  // registrado antes de los fallos no es una resurrección, es lo contrario.
   const [res] = await query(
     `SELECT COUNT(*) AS n FROM (
-       SELECT a.exercise_id
-       FROM answer_attempts a
-       WHERE a.user_id = ?
-       GROUP BY a.exercise_id
-       HAVING SUM(a.correct = 0) >= 3 AND SUM(a.context = 'review' AND a.correct = 1) >= 1
+       SELECT r.id
+       FROM answer_attempts r
+       WHERE r.user_id = ? AND r.context = 'review' AND r.correct = 1
+         AND (
+           SELECT COUNT(*) FROM answer_attempts f
+           WHERE f.user_id = r.user_id AND f.exercise_id = r.exercise_id
+             AND f.correct = 0 AND f.id < r.id
+         ) >= 3
+       LIMIT 1
      ) t`,
     [userId]
   );

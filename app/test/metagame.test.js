@@ -35,8 +35,13 @@ before(async () => { await setupTestDb(); });
 beforeEach(async () => { await resetUserData(); });
 after(async () => { await closeDb(); });
 
+// Email unico por usuario: algun test necesita varios usuarios a la vez (el email es UNIQUE).
+let seq = 0;
 async function crearUsuario() {
-  const r = await query("INSERT INTO users (name, email, password_hash) VALUES ('Test', 'stats@test.dev', 'x')");
+  seq += 1;
+  const r = await query("INSERT INTO users (name, email, password_hash) VALUES ('Test', ?, 'x')", [
+    `stats${seq}@test.dev`,
+  ]);
   return r.insertId;
 }
 
@@ -44,6 +49,7 @@ test("sin actividad, todos los contadores estan a cero", async () => {
   const id = await crearUsuario();
   const s = await achievementStats(id);
   assert.equal(s.lessonsDone, 0);
+  assert.equal(s.bestStreak, 0);
   assert.equal(s.perfectLessons, 0);
   assert.equal(s.reviewCleared, 0);
   assert.equal(s.coursesCompleted, 0);
@@ -52,6 +58,19 @@ test("sin actividad, todos los contadores estan a cero", async () => {
   assert.equal(s.nightOwl, false);
   assert.equal(s.resurrected, false);
   assert.equal((await unlockedIds(id)).size, 0);
+});
+
+test("bestStreak sale de la MEJOR racha historica, no de la actual", async () => {
+  const id = await crearUsuario();
+  // Tres dias seguidos hace tiempo, y luego un dia suelto: la mejor racha es 3, la actual seria 0.
+  await query(
+    `INSERT INTO lesson_completions (user_id, lesson_id, completed_at) VALUES
+     (?, 'l1', '2026-01-01 10:00:00'), (?, 'l2', '2026-01-02 10:00:00'),
+     (?, 'l3', '2026-01-03 10:00:00'), (?, 'l4', '2026-02-20 10:00:00')`,
+    [id, id, id, id]
+  );
+  const s = await achievementStats(id);
+  assert.equal(s.bestStreak, 3);
 });
 
 test("las lecciones perfectas se derivan del importe 10 del evento de XP", async () => {
@@ -98,6 +117,38 @@ test("resucitado: 3 fallos y luego un acierto EN REPASO", async () => {
   await query("INSERT INTO answer_attempts (user_id, exercise_id, context, correct) VALUES (?, ?, 'review', 1)", [id, ex]);
   s = await achievementStats(id);
   assert.equal(s.resurrected, true);
+});
+
+test("resucitado NO cae si el acierto en repaso llego ANTES de los fallos", async () => {
+  const id = await crearUsuario();
+  const ex = "l1-ex1";
+  // Primero el acierto en repaso (el cliente puede mandar context: 'review' a mano)...
+  await query("INSERT INTO answer_attempts (user_id, exercise_id, context, correct) VALUES (?, ?, 'review', 1)", [id, ex]);
+  // ...y DESPUES los tres fallos. No es una resurreccion: es lo contrario.
+  await query(
+    "INSERT INTO answer_attempts (user_id, exercise_id, context, correct) VALUES (?,?, 'lesson', 0), (?,?, 'lesson', 0), (?,?, 'lesson', 0)",
+    [id, ex, id, ex, id, ex]
+  );
+  const s = await achievementStats(id);
+  assert.equal(s.resurrected, false);
+});
+
+test("las horas frontera: 04:59 nocturno, 05:00 y 06:59 madrugador, 07:00 ninguno", async () => {
+  // Un usuario por caso: los dos secretos son un some() sobre TODAS las completaciones del usuario,
+  // asi que meterlos juntos los mezclaria. Cazan un off-by-one en los bordes (>= vs >).
+  const casos = [
+    ["2026-07-10 04:59:59", { earlyBird: false, nightOwl: true }],
+    ["2026-07-10 05:00:00", { earlyBird: true, nightOwl: false }],
+    ["2026-07-10 06:59:59", { earlyBird: true, nightOwl: false }],
+    ["2026-07-10 07:00:00", { earlyBird: false, nightOwl: false }],
+  ];
+  for (const [ts, esperado] of casos) {
+    const id = await crearUsuario();
+    await query("INSERT INTO lesson_completions (user_id, lesson_id, completed_at) VALUES (?, 'l1', ?)", [id, ts]);
+    const s = await achievementStats(id);
+    assert.equal(s.earlyBird, esperado.earlyBird, `earlyBird a las ${ts}`);
+    assert.equal(s.nightOwl, esperado.nightOwl, `nightOwl a las ${ts}`);
+  }
 });
 
 test("perfectRun cuenta lecciones perfectas CONSECUTIVAS por orden de completado", async () => {
