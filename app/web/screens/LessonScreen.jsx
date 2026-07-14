@@ -32,15 +32,17 @@ function StepBar({ total, current }) {
 
 function FeedbackBand({ result, onContinue, onRetry }) {
   const { Button } = KITX;
-  if (!result) return null;
-  const ok = result.correct;
+  const { shown, phase } = usePhase(result, 160);
+  if (!shown) return null;
+  const ok = shown.correct;
   return (
-    <div className="anim-rise" style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 60 }}>
+    <div className={phase === "out" ? "anim-evaporate" : "anim-drop-in"} style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 60, pointerEvents: phase === "out" ? "none" : "auto" }}>
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 32px 24px" }}>
         <div style={{ position: "relative", borderRadius: "var(--radius-lg)", padding: "16px 22px", display: "flex", alignItems: "center", gap: 16, background: ok ? "rgba(76,199,147,0.14)" : "rgba(230,121,132,0.13)", border: "1px solid " + (ok ? "rgba(76,199,147,0.45)" : "rgba(230,121,132,0.45)"), boxShadow: "var(--shadow-float)" }}>
           <span aria-hidden style={{ position: "absolute", inset: 0, zIndex: -1, borderRadius: "inherit", WebkitBackdropFilter: "blur(28px) saturate(135%)", backdropFilter: "blur(28px) saturate(135%)" }}></span>
+          {phase === "in" ? <span aria-hidden className="fx-bead" style={{ top: -4, left: 26 }}></span> : null}
           <strong style={{ color: ok ? "#4CC793" : "#E67984", fontSize: "var(--text-md)", flexShrink: 0 }}>{ok ? "¡Correcto!" : "No exactamente"}</strong>
-          <span style={{ flex: 1, color: "var(--text-secondary)", fontSize: "var(--text-base)" }}>{result.explanation}</span>
+          <span style={{ flex: 1, color: "var(--text-secondary)", fontSize: "var(--text-base)" }}>{shown.explanation}</span>
           {ok
             ? <Button onClick={onContinue}>Continuar</Button>
             : <Button variant="secondary" onClick={onRetry}>Intentar de nuevo</Button>}
