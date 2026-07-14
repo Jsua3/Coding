@@ -4,6 +4,7 @@ import { courseDetail } from "../services/progress.js";
 import { validateResponse } from "../services/exercises.js";
 import { currentStreak, toDayString } from "../services/gamification.js";
 import { isPendingReview } from "../services/review.js";
+import { XP_LESSON, XP_PERFECT, XP_REVIEW } from "../services/xp.js";
 
 const router = Router();
 
@@ -54,8 +55,8 @@ router.post("/:id/answer", async (req, res, next) => {
     let streak = null;
 
     if (reviewCleared) {
-      await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, ?, 5)", [req.userId, ex.lesson_id]);
-      xpAwarded = 5;
+      await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, ?, ?)", [req.userId, ex.lesson_id, XP_REVIEW]);
+      xpAwarded = XP_REVIEW;
     }
 
     if (context === "lesson" && correct) {
@@ -87,14 +88,14 @@ router.post("/:id/answer", async (req, res, next) => {
           try {
             await conn.beginTransaction();
             await conn.query("INSERT INTO lesson_completions (user_id, lesson_id) VALUES (?, ?)", [req.userId, ex.lesson_id]);
-            await conn.query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, ?, 50)", [req.userId, ex.lesson_id]);
+            await conn.query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, ?, ?)", [req.userId, ex.lesson_id, XP_LESSON]);
             if (perfect) {
-              await conn.query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, ?, 10)", [req.userId, ex.lesson_id]);
+              await conn.query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, ?, ?)", [req.userId, ex.lesson_id, XP_PERFECT]);
             }
             await conn.commit();
             lessonCompleted = true;
-            xpAwarded = 50;
-            perfectBonus = perfect ? 10 : 0;
+            xpAwarded = XP_LESSON;
+            perfectBonus = perfect ? XP_PERFECT : 0;
           } catch (e) {
             await conn.rollback();
             if (!(e && e.code === "ER_DUP_ENTRY")) throw e;
