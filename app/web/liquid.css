@@ -43,9 +43,97 @@
   filter: none; /* en reposo no hay filter: el backdrop-filter de los paneles funciona normal */
 }
 
+/* ---------- NavBar líquida: una gota que se parte en tres por tensión superficial ---------- */
+.lg-nav {
+  position: sticky;
+  top: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: stretch; /* píldoras y puentes con la misma altura: es UNA superficie */
+}
+
+/* Píldoras y puentes comparten el material. Borde SIEMPRE de 1px (el ancho nunca cambia ⇒ nunca hay
+   layout); lo que cambia es el COLOR: los cantos internos son transparentes en estado fusionado, y
+   así las piezas se tocan sin costura. */
+.lg-nav__pill,
+.lg-nav__bridge {
+  position: relative;
+  background: rgba(16, 23, 44, 0.6);
+  border: 1px solid transparent;
+  border-top-color: var(--glass-stroke);
+  border-bottom-color: var(--glass-stroke);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.09), var(--shadow-glass);
+}
+
+.lg-nav__pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition:
+    transform 520ms var(--ease-spring),
+    border-color 380ms var(--ease-glass),
+    border-radius 380ms var(--ease-glass),
+    box-shadow 380ms var(--ease-glass);
+}
+.lg-nav__pill--logo {
+  padding: 10px 20px 10px 24px;
+  cursor: pointer;
+  border-left-color: var(--glass-stroke);
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+}
+.lg-nav__pill--tabs {
+  padding: 10px 16px;
+  border-radius: 0;
+}
+.lg-nav__pill--actions {
+  padding: 10px 12px 10px 16px;
+  border-right-color: var(--glass-stroke);
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+}
+
+/* El puente: la masa conectiva. Al partirse adelgaza en Y mientras se estira en X
+   (conservación de volumen) y SOLO DESPUÉS se desvanece — por eso la opacidad va con 120ms de
+   retardo: el cuello se ve romperse, no apagarse. */
+.lg-nav__bridge {
+  flex: 1;
+  min-width: 10px;
+  transform-origin: center;
+  transition: transform 420ms var(--ease-glass), opacity 300ms var(--ease-glass) 120ms;
+}
+
+/* --- Estado partido --- */
+.lg-nav--split .lg-nav__bridge {
+  transform: scaleY(0) scaleX(1.1);
+  opacity: 0;
+}
+.lg-nav--split .lg-nav__pill {
+  border-color: var(--glass-stroke);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--refraction-edge), var(--shadow-glass);
+}
+.lg-nav--split .lg-nav__pill--logo { transform: translateX(-10px); }
+.lg-nav--split .lg-nav__pill--actions { transform: translateX(10px); }
+
+/* Squash & stretch, en la propiedad individual `scale` para no pelear con el translate del rebote.
+   Escalas siempre inversas = conservación de volumen: es lo que el ojo lee como materia blanda.
+   `--merged` solo se aplica tras la primera partida, así nada se anima al cargar la página. */
+.lg-nav--split .lg-nav__pill,
+.lg-nav--merged .lg-nav__pill {
+  animation: lg-nav-squash 520ms var(--ease-glass);
+}
+@keyframes lg-nav-squash {
+  0%, 100% { scale: 1 1; }
+  40% { scale: 1.02 0.95; } /* estirada en X, chata en Y */
+  70% { scale: 0.99 1.02; } /* se pasa y se comprime al revés */
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */
   .lg-ripple { display: none !important; }
   .lg-reveal { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
+  .lg-nav__pill, .lg-nav__bridge { transition: none !important; animation: none !important; }
+  /* display:none y NO animation:none — el estado base del puente es visible, y con animation:none
+     quedaría a scaleY(1) en estado partido: la navbar se vería fusionada y rota a la vez. */
+  .lg-nav--split .lg-nav__bridge { display: none !important; }
 }

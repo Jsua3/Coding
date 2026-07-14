@@ -27,21 +27,36 @@ function SoundToggle() {
   );
 }
 
+// El blur del vidrio: SIEMPRE en una capa aria-hidden aparte, jamás sobre un elemento con texto.
+function NavGlass() {
+  return <span aria-hidden style={{ position: "absolute", inset: 0, zIndex: -1, borderRadius: "inherit", WebkitBackdropFilter: "blur(var(--blur-lg)) saturate(var(--saturate-glass))", backdropFilter: "blur(var(--blur-lg)) saturate(var(--saturate-glass))" }}></span>;
+}
+
 function NavBar({ onHome, tab, setTab, user }) {
   const { Tabs, IconButton, Badge } = KIT;
+  const split = useScrolled(32);
+  const [hasSplit, setHasSplit] = React.useState(false);
+  React.useEffect(() => { if (split) setHasSplit(true); }, [split]);
+  const cls = "lg-nav" + (split ? " lg-nav--split" : hasSplit ? " lg-nav--merged" : "");
   return (
-    <div style={{ position: "sticky", top: 20, zIndex: 40, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, padding: "10px 12px 10px 24px", borderRadius: "var(--radius-pill)", background: "rgba(16, 23, 44, 0.6)", border: "1px solid var(--glass-stroke)", boxShadow: "var(--refraction-edge), var(--shadow-glass)" }}>
-      <span aria-hidden style={{ position: "absolute", inset: 0, zIndex: -1, borderRadius: "inherit", WebkitBackdropFilter: "blur(var(--blur-lg)) saturate(var(--saturate-glass))", backdropFilter: "blur(var(--blur-lg)) saturate(var(--saturate-glass))" }}></span>
-      <div onClick={onHome} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+    <div className={cls}>
+      <div className="lg-nav__pill lg-nav__pill--logo" onClick={onHome}>
+        <NavGlass />
         <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: "var(--weight-heavy)", letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>Coding</span>
         <span style={{ width: 4, height: 18, borderRadius: 3, background: "var(--accent-cyan)", boxShadow: "0 0 10px var(--accent-cyan)" }}></span>
       </div>
-      <Tabs size="sm" value={tab} onChange={setTab} style={{ width: 380 }} items={[
-        { id: "inicio", label: "Inicio" },
-        { id: "materias", label: "Materias" },
-        { id: "progreso", label: "Progreso" },
-      ]} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
+      <div className="lg-nav__pill lg-nav__pill--tabs">
+        <NavGlass />
+        <Tabs size="sm" value={tab} onChange={setTab} style={{ width: 380 }} items={[
+          { id: "inicio", label: "Inicio" },
+          { id: "materias", label: "Materias" },
+          { id: "progreso", label: "Progreso" },
+        ]} />
+      </div>
+      <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
+      <div className="lg-nav__pill lg-nav__pill--actions">
+        <NavGlass />
         <SoundToggle />
         <IconButton label="Buscar" size="sm" variant="ghost"><KIcon d={ICONS.search} /></IconButton>
         <Badge tone="amber" dot>{user.streak} {user.streak === 1 ? "día" : "días"}</Badge>
