@@ -251,6 +251,37 @@
 .lg-menu__item--danger:hover { background: rgba(230, 121, 132, 0.14); color: var(--danger); }
 .lg-menu__sep { height: 1px; margin: 6px 4px; background: var(--glass-stroke); }
 
+/* ---------- Progreso: heatmap y gráfica semanal (cero librerías) ---------- */
+.lg-heat {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.lg-heat__cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: var(--glass-bg-subtle);
+}
+.lg-heat__cell--1 { background: rgba(82, 201, 184, 0.30); }
+.lg-heat__cell--2 { background: rgba(82, 201, 184, 0.55); }
+.lg-heat__cell--3 { background: rgba(82, 201, 184, 0.85); box-shadow: 0 0 8px rgba(82, 201, 184, 0.35); }
+
+.lg-bars { display: flex; align-items: flex-end; gap: 10px; height: 140px; }
+.lg-bars__col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%; }
+.lg-bars__bar {
+  width: 100%;
+  min-height: 3px;
+  border-radius: var(--radius-sm) var(--radius-sm) 3px 3px;
+  background: linear-gradient(180deg, rgba(94, 151, 230, 0.85), rgba(82, 201, 184, 0.55));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform-origin: bottom center;
+  transition: height var(--duration-slow) var(--ease-out);
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */

@@ -58,6 +58,8 @@ function App() {
     const comun = { me, tab, setTab: goTab };
     screen = tab === "materias"
       ? <MateriasScreen {...comun} onOpenCourse={(id) => go.course(id)} />
+      : tab === "progreso"
+      ? <ProgressScreen {...comun} />
       : <InicioScreen {...comun}
           onOpenLesson={(courseId, lessonId) => go.lesson(courseId, lessonId)}
           onOpenReview={go.review} />;
