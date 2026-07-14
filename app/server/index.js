@@ -9,6 +9,7 @@ import meRouter from "./routes/me.js";
 import lessonsRouter from "./routes/lessons.js";
 import exercisesRouter from "./routes/exercises.js";
 import reviewRouter from "./routes/review.js";
+import progressRouter from "./routes/progress.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -24,6 +25,7 @@ export function createApp() {
   app.use("/api/lessons", requireAuth, lessonsRouter);
   app.use("/api/exercises", requireAuth, exercisesRouter);
   app.use("/api/review", requireAuth, reviewRouter);
+  app.use("/api/progress", requireAuth, progressRouter);
 
   app.use("/api", (req, res) => res.status(404).json({ error: "Recurso no encontrado" }));
   app.use("/ds", express.static(path.join(__dirname, "..", "..", "Coding Design System")));
