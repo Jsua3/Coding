@@ -15,12 +15,13 @@ function App() {
   };
 
   const [achQueue, setAchQueue] = React.useState([]);
-  const achTimer = React.useRef(null);
   // Dos requests concurrentes completando la misma lección pueden anunciar el mismo logro dos
   // veces (la que pierde la carrera ER_DUP_ENTRY lee un set "después" que ya lo contiene). El
   // servidor no puede saber qué ya anunció la otra request, así que deduplicamos aquí, donde vive
   // la ceremonia. Vive en App (no en una screen) porque debe sobrevivir a un remount de LessonScreen.
   const announcedAch = React.useRef(new Set());
+  const pendingAch = React.useRef([]);
+  const achTimer = React.useRef(null);
   React.useEffect(() => () => clearTimeout(achTimer.current), []);
 
   // Si la respuesta completó la lección, la celebración se lleva la escena: el toast espera 900ms
@@ -30,8 +31,17 @@ function App() {
     const nuevos = lista.filter((a) => !announcedAch.current.has(a.id));
     if (!nuevos.length) return;
     nuevos.forEach((a) => announcedAch.current.add(a.id));
-    clearTimeout(achTimer.current);
-    achTimer.current = setTimeout(() => setAchQueue((q) => [...q, ...nuevos]), trasCelebracion ? 900 : 0);
+
+    // ACUMULAMOS, no reemplazamos: un clearTimeout a secas cancelaría el vaciado del lote anterior,
+    // y como sus ids ya están marcados como anunciados, ese logro no volvería a aparecer jamás.
+    pendingAch.current = [...pendingAch.current, ...nuevos];
+    if (achTimer.current) return; // ya hay un vaciado en vuelo: este lote viaja con él
+    achTimer.current = setTimeout(() => {
+      achTimer.current = null;
+      const lote = pendingAch.current;
+      pendingAch.current = [];
+      setAchQueue((q) => [...q, ...lote]);
+    }, trasCelebracion ? 900 : 0);
   };
 
   const loadMe = async () => {
@@ -46,7 +56,17 @@ function App() {
   };
 
   React.useEffect(() => {
-    API.onUnauthorized = () => { setMe(null); setRoute({ screen: "login" }); };
+    API.onUnauthorized = () => {
+      setMe(null);
+      setRoute({ screen: "login" });
+      // Los ids de logro son del catálogo, no del usuario: si no limpiamos, el siguiente que entre
+      // en esta pestaña no vería SU "Primer paso" porque ya lo dimos por anunciado.
+      announcedAch.current.clear();
+      pendingAch.current = [];
+      clearTimeout(achTimer.current);
+      achTimer.current = null;
+      setAchQueue([]);
+    };
     if (API.token) loadMe();
   }, []);
 
