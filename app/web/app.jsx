@@ -37,30 +37,36 @@ function App() {
     review: () => setRoute({ screen: "review" }),
   };
 
+  // Las pestañas SON navegación: cambiar de pestaña te devuelve al área principal desde donde estés.
+  const goTab = (id) => { setTab(id); setRoute({ screen: "dashboard" }); };
+
   let screen;
   if (route.screen === "login") {
     screen = <LoginScreen onLoggedIn={() => { setRoute({ screen: "loading" }); loadMe(); }} />;
   } else if (route.screen === "loading" || !me) {
     screen = <LoadingPanel />;
   } else if (route.screen === "course") {
-    screen = <CourseScreen me={me} courseId={route.courseId} tab={tab} setTab={setTab}
+    screen = <CourseScreen me={me} courseId={route.courseId} tab={tab} setTab={goTab}
       onBack={go.dashboard} onOpenLesson={(lessonId) => go.lesson(route.courseId, lessonId)} />;
   } else if (route.screen === "lesson") {
-    screen = <LessonScreen key={route.lessonId} me={me} courseId={route.courseId} lessonId={route.lessonId} tab={tab} setTab={setTab}
+    screen = <LessonScreen key={route.lessonId} me={me} courseId={route.courseId} lessonId={route.lessonId} tab={tab} setTab={goTab}
       onBack={() => go.course(route.courseId)} onOpenLesson={(lessonId) => go.lesson(route.courseId, lessonId)}
       showToast={showToast} refreshMe={loadMe} />;
   } else if (route.screen === "review") {
-    screen = <ReviewScreen me={me} tab={tab} setTab={setTab} onBack={go.dashboard} refreshMe={loadMe} />;
+    screen = <ReviewScreen me={me} tab={tab} setTab={goTab} onBack={go.dashboard} refreshMe={loadMe} />;
   } else {
-    screen = <DashboardScreen me={me} tab={tab} setTab={setTab}
-      onOpenCourse={(id) => go.course(id)} onOpenLesson={(courseId, lessonId) => go.lesson(courseId, lessonId)}
-      onOpenReview={go.review} />;
+    const comun = { me, tab, setTab: goTab };
+    screen = tab === "materias"
+      ? <MateriasScreen {...comun} onOpenCourse={(id) => go.course(id)} />
+      : <InicioScreen {...comun}
+          onOpenLesson={(courseId, lessonId) => go.lesson(courseId, lessonId)}
+          onOpenReview={go.review} />;
   }
 
   return (
     <React.Fragment>
       <span aria-hidden className="lg-noise"></span>
-      <div key={route.screen + ":" + (route.lessonId || route.courseId || "")} className="anim-screen-in">
+      <div key={route.screen + ":" + tab + ":" + (route.lessonId || route.courseId || "")} className="anim-screen-in">
         {screen}
       </div>
       {toast ? (
