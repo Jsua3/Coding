@@ -3,3 +3,6 @@ node_modules/
 *.log
 .idea/
 *.zip
+
+# Material de estudio personal (PDFs con copyright — jamás subir al remoto)
+docs/documentos-carrera/
