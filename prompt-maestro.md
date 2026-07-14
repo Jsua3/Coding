@@ -10,7 +10,7 @@
 
 **Objetivo del producto:** que estudiar se sienta vivo y adictivo — lecciones cortas con teoría + ejercicios interactivos, feedback inmediato, XP, rachas, celebraciones y repaso de errores. La referencia de calidad son "las mejores apps de aprendizaje actuales" (Duolingo, Brilliant, Mimo, Sololearn).
 
-**Identidad visual:** lenguaje **Liquid Glass** — vidrio translúcido con blur, refracción, sombras frías y fondo aurora oscuro. Está definida por completo en la carpeta `Coding Design System/` (16 componentes React + tokens CSS + guidelines). **Esa carpeta es fuente de verdad visual y NUNCA se modifica**; la app la consume servida como estáticos en `/ds`.
+**Identidad visual:** lenguaje **Liquid Glass** — vidrio translúcido con blur, refracción, sombras frías y fondo aurora oscuro. Está definida por completo en la carpeta `Coding Design System/` (16 componentes React + tokens CSS + guidelines). **Esa carpeta es fuente de verdad visual y NUNCA se modifica**; la app la consume servida como estáticos en `/ds`. La física y el vocabulario del lenguaje (capas ópticas, cursor como fuente de luz, coreografía de gota, disciplina de motion) están en **`docs/liquid-glass.md`** — léelo antes de diseñar o animar algo nuevo.
 
 ---
 
@@ -60,9 +60,11 @@ coding/                                  (repo git, rama master; SIN remoto conf
 ├── Coding Design System/                ← INTOCABLE; servido en /ds (styles.css, _ds_bundle.js, ui_kits de referencia)
 ├── prompt-maestro.md                    ← este documento
 ├── CLAUDE.md                            ← puntero corto a este documento
-├── docs/superpowers/
-│   ├── specs/                           ← specs de diseño aprobadas por iteración
-│   └── plans/                           ← planes de implementación (tareas TDD paso a paso)
+├── docs/
+│   ├── liquid-glass.md                  ← el lenguaje de diseño: física del vidrio, cursor, coreografía de gota
+│   └── superpowers/
+│       ├── specs/                       ← specs de diseño aprobadas por iteración
+│       └── plans/                       ← planes de implementación (tareas TDD paso a paso)
 ├── .claude/launch.json                  ← lanza el dev server (npm start --prefix app, puerto 3000)
 ├── .superpowers/sdd/progress.md         ← ledger de ejecución (git-ignorado, historial de tareas/reviews)
 └── app/
