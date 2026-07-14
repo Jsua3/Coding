@@ -44,13 +44,27 @@ function App() {
     }, trasCelebracion ? 900 : 0);
   };
 
+  // Los ids de logro son del catálogo, no del usuario: si no limpiamos al terminar la sesión, el
+  // siguiente que entre en esta pestaña no vería SU "Primer paso" porque ya lo dimos por anunciado.
+  // Se llama desde TODOS los caminos que acaban en el login, no solo desde el cierre voluntario.
+  const resetAchievements = () => {
+    announcedAch.current.clear();
+    pendingAch.current = [];
+    clearTimeout(achTimer.current);
+    achTimer.current = null;
+    setAchQueue([]);
+  };
+
   const loadMe = async () => {
     try {
       const data = await API.get("/me");
       setMe(data);
       setRoute((r) => (r.screen === "loading" ? { screen: "dashboard" } : r));
     } catch {
+      // Aquí caen los fallos que NO son 401 (sin conexión, 5xx): también acaban en el login, así
+      // que también tienen que limpiar la ceremonia.
       API.setToken(null);
+      resetAchievements();
       setRoute({ screen: "login" });
     }
   };
@@ -58,14 +72,8 @@ function App() {
   React.useEffect(() => {
     API.onUnauthorized = () => {
       setMe(null);
+      resetAchievements();
       setRoute({ screen: "login" });
-      // Los ids de logro son del catálogo, no del usuario: si no limpiamos, el siguiente que entre
-      // en esta pestaña no vería SU "Primer paso" porque ya lo dimos por anunciado.
-      announcedAch.current.clear();
-      pendingAch.current = [];
-      clearTimeout(achTimer.current);
-      achTimer.current = null;
-      setAchQueue([]);
     };
     if (API.token) loadMe();
   }, []);
