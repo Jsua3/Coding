@@ -1,0 +1,16 @@
+/* Liquid Glass — el vidrio vivo. Extiende motion.css; lee los tokens del design system. */
+
+/* ---------- Textura: ruido fractal sobre la aurora ---------- */
+/* z-index -1: se pinta detrás del contenido pero encima del fondo de página,
+   así el backdrop-filter de los paneles lo refracta (el grano se lee A TRAVÉS del vidrio). */
+.lg-noise {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.74' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* El ruido es textura estática, no movimiento: se conserva. */
+}

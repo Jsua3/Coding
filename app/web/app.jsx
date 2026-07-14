@@ -59,6 +59,7 @@ function App() {
 
   return (
     <React.Fragment>
+      <span aria-hidden className="lg-noise"></span>
       <div key={route.screen + ":" + (route.lessonId || route.courseId || "")} className="anim-screen-in">
         {screen}
       </div>
