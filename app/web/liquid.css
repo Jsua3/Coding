@@ -116,15 +116,22 @@
 
 /* Squash & stretch, en la propiedad individual `scale` para no pelear con el translate del rebote.
    Escalas siempre inversas = conservación de volumen: es lo que el ojo lee como materia blanda.
-   `--merged` solo se aplica tras la primera partida, así nada se anima al cargar la página. */
-.lg-nav--split .lg-nav__pill,
-.lg-nav--merged .lg-nav__pill {
-  animation: lg-nav-squash 520ms var(--ease-glass);
-}
-@keyframes lg-nav-squash {
+   `--merged` solo se aplica tras la primera partida, así nada se anima al cargar la página.
+
+   Dos nombres distintos a propósito: una animación CSS solo re-arranca si el animation-name
+   resuelto cambia de valor. Con un único nombre, alternar --split/--merged la dejaría muda
+   después de la primera partida. */
+.lg-nav--split .lg-nav__pill { animation: lg-nav-squash-split 520ms var(--ease-glass); }
+.lg-nav--merged .lg-nav__pill { animation: lg-nav-squash-merge 520ms var(--ease-glass); }
+@keyframes lg-nav-squash-split {
   0%, 100% { scale: 1 1; }
   40% { scale: 1.02 0.95; } /* estirada en X, chata en Y */
   70% { scale: 0.99 1.02; } /* se pasa y se comprime al revés */
+}
+@keyframes lg-nav-squash-merge {
+  0%, 100% { scale: 1 1; }
+  40% { scale: 1.02 0.95; }
+  70% { scale: 0.99 1.02; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -45,7 +45,7 @@ function NavBar({ onHome, tab, setTab, user }) {
         <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: "var(--weight-heavy)", letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>Coding</span>
         <span style={{ width: 4, height: 18, borderRadius: 3, background: "var(--accent-cyan)", boxShadow: "0 0 10px var(--accent-cyan)" }}></span>
       </div>
-      <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
+      <span className="lg-nav__bridge"><NavGlass /></span>
       <div className="lg-nav__pill lg-nav__pill--tabs">
         <NavGlass />
         <Tabs size="sm" value={tab} onChange={setTab} style={{ width: 380 }} items={[
@@ -54,7 +54,7 @@ function NavBar({ onHome, tab, setTab, user }) {
           { id: "progreso", label: "Progreso" },
         ]} />
       </div>
-      <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
+      <span className="lg-nav__bridge"><NavGlass /></span>
       <div className="lg-nav__pill lg-nav__pill--actions">
         <NavGlass />
         <SoundToggle />
