@@ -73,4 +73,35 @@ function ErrorPanel({ message, onRetry }) {
   );
 }
 
-Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle });
+// Retiene el valor anterior durante la fase de salida para poder animar desmontajes.
+// Contrato completo en docs/superpowers/specs/2026-07-13-coreografia-de-gota-design.md §4.
+function usePhase(value, outMs) {
+  const [shown, setShown] = React.useState(value);
+  const [phase, setPhase] = React.useState("in");
+  const timer = React.useRef(null);
+  const shownRef = React.useRef(value);
+  shownRef.current = shown;
+
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+
+  React.useEffect(() => {
+    if (value === shownRef.current) {
+      clearTimeout(timer.current);
+      setPhase("in");
+      return;
+    }
+    if (shownRef.current == null || (window.FX && FX.reducedMotion)) {
+      clearTimeout(timer.current);
+      setShown(value);
+      setPhase("in");
+      return;
+    }
+    setPhase("out");
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => { setShown(value); setPhase("in"); }, outMs);
+  }, [value]);
+
+  return { shown, phase };
+}
+
+Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle, usePhase });
