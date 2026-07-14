@@ -63,6 +63,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
   const [celebration, setCelebration] = React.useState(null);
   const [orbMood, setOrbMood] = React.useState("idle");
   const [panelAnim, setPanelAnim] = React.useState("");
+  const { shown: shownStep, phase: stepPhase } = usePhase(step, 160);
   const orbTimer = React.useRef(null);
   const panelTimer = React.useRef(null);
 
@@ -79,6 +80,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
     API.get("/lessons/" + lessonId).then(setLesson).catch((e) => setError(e.message));
   };
   React.useEffect(load, [lessonId]);
+  React.useEffect(() => { setValue(null); setResult(null); }, [shownStep]);
 
   if (error) {
     return (
@@ -99,7 +101,8 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
 
   const exercises = lesson.exercises || [];
   const totalSteps = exercises.length + 1;
-  const ex = step > 0 ? exercises[step - 1] : null;
+  const ex = shownStep > 0 ? exercises[shownStep - 1] : null;
+  const meltClass = stepPhase === "out" ? "anim-melt-out" : "anim-melt-in";
 
   const check = async () => {
     setSending(true);
@@ -125,8 +128,16 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
     }
   };
 
-  const continueNext = () => {
+  const continueNext = (e) => {
     if (result.lessonCompleted) {
+      let x = e ? e.clientX : 0;
+      let y = e ? e.clientY : 0;
+      if (!x && !y && e && e.currentTarget && e.currentTarget.getBoundingClientRect) {
+        const r = e.currentTarget.getBoundingClientRect();
+        x = r.left + r.width / 2;
+        y = r.top + r.height / 2;
+      }
+      if (x || y) FX.bloom(x, y);
       setCelebration({ ...result, lessonTitle: lesson.title, courseSubject: lesson.courseSubject, prevProgress: lesson.courseProgress });
       setResult(null);
       return;
@@ -136,8 +147,6 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
       return;
     }
     setStep(step + 1);
-    setValue(null);
-    setResult(null);
   };
 
   if (celebration) {
@@ -151,33 +160,37 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
         <IconButton label="Volver" onClick={onBack}><KIcon d={ICONS.back} /></IconButton>
         <span style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>{lesson.courseSubject} / {lesson.unitName.split(" · ")[0]}</span>
         <div style={{ flex: 1 }}></div>
-        <StepBar total={totalSteps} current={step + (result && result.correct ? 1 : 0)} />
+        <StepBar total={totalSteps} current={shownStep + (result && result.correct ? 1 : 0)} />
         <span style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", whiteSpace: "nowrap" }}>Lección {lesson.position.index} de {lesson.position.total}</span>
       </div>
 
-      {step === 0 ? (
+      {shownStep === 0 ? (
         <GlassPanel padding="var(--space-7)" radius="var(--radius-xl)" style={{ maxWidth: 760, margin: "0 auto" }}>
-          <Badge tone="cyan">LECCIÓN {lesson.position.index}</Badge>
-          <h1 style={{ margin: "12px 0 10px", fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", fontWeight: 800, letterSpacing: "var(--tracking-heading)", color: "var(--text-primary)" }}>{lesson.title}</h1>
-          <ContentBlocks content={lesson.content} />
-          <div style={{ marginTop: 20, textAlign: "right" }}>
-            <Button size="lg" onClick={() => setStep(1)} iconLeft={<KIcon d={ICONS.play} />}>Continuar</Button>
+          <div className={meltClass}>
+            <Badge tone="cyan">LECCIÓN {lesson.position.index}</Badge>
+            <h1 style={{ margin: "12px 0 10px", fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", fontWeight: 800, letterSpacing: "var(--tracking-heading)", color: "var(--text-primary)" }}>{lesson.title}</h1>
+            <ContentBlocks content={lesson.content} />
+            <div style={{ marginTop: 20, textAlign: "right" }}>
+              <Button size="lg" onClick={() => setStep(1)} iconLeft={<KIcon d={ICONS.play} />}>Continuar</Button>
+            </div>
           </div>
         </GlassPanel>
       ) : (
         <div style={{ display: "flex", gap: 18, alignItems: "flex-start", maxWidth: 820, margin: "0 auto" }}>
           <Orb size={56} mood={orbMood} style={{ marginTop: 8 }} />
           <GlassPanel tint="blue" padding="var(--space-6)" radius="var(--radius-xl)" style={{ flex: 1 }}>
-            <div className={panelAnim}>
-              <div style={{ fontSize: "var(--text-xs)", fontWeight: 600, letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--text-tertiary)", marginBottom: 10 }}>
-                Ejercicio {step} de {exercises.length}
-              </div>
-              <p style={{ margin: "0 0 16px", fontSize: "var(--text-base)", fontWeight: 500, color: "var(--text-primary)" }}>{ex.prompt}</p>
-              <ExerciseBody key={ex.id} exercise={ex} value={value} onChange={setValue} locked={Boolean(result) || sending} />
-              <div style={{ marginTop: 20 }}>
-                <Button fullWidth disabled={!responseComplete(ex, value) || sending || Boolean(result && result.correct)} onClick={check}>
-                  {sending ? "Comprobando…" : "Comprobar"}
-                </Button>
+            <div className={meltClass}>
+              <div className={panelAnim}>
+                <div style={{ fontSize: "var(--text-xs)", fontWeight: 600, letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--text-tertiary)", marginBottom: 10 }}>
+                  Ejercicio {shownStep} de {exercises.length}
+                </div>
+                <p style={{ margin: "0 0 16px", fontSize: "var(--text-base)", fontWeight: 500, color: "var(--text-primary)" }}>{ex.prompt}</p>
+                <ExerciseBody key={ex.id} exercise={ex} value={value} onChange={setValue} locked={Boolean(result) || sending} />
+                <div style={{ marginTop: 20 }}>
+                  <Button fullWidth disabled={!responseComplete(ex, value) || sending || Boolean(result && result.correct)} onClick={check}>
+                    {sending ? "Comprobando…" : "Comprobar"}
+                  </Button>
+                </div>
               </div>
             </div>
           </GlassPanel>
