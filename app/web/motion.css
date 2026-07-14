@@ -69,8 +69,64 @@
   100% { transform: scale(1); filter: brightness(1); }
 }
 
+/* Coreografía de gota — spec 2026-07-13 */
+.anim-drop-in { animation: drop-in 320ms var(--ease-out) both; transform-origin: bottom center; }
+@keyframes drop-in {
+  0% { opacity: 0; transform: translateY(105%) scaleY(1.18) scaleX(0.96); }
+  58% { opacity: 1; transform: translateY(-3px) scaleY(0.97) scaleX(1.04); }
+  100% { opacity: 1; transform: none; }
+}
+
+.anim-evaporate { animation: evaporate 160ms var(--ease-glass) forwards; }
+@keyframes evaporate {
+  to { opacity: 0; filter: blur(6px); transform: translateY(-6px) scale(0.96); }
+}
+
+.anim-melt-out { animation: melt-out 160ms var(--ease-glass) forwards; }
+@keyframes melt-out {
+  to { opacity: 0; filter: blur(5px); }
+}
+
+.anim-melt-in { animation: melt-in 280ms var(--ease-out) both; }
+@keyframes melt-in {
+  from { opacity: 0; filter: blur(5px); transform: translateY(8px); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+.anim-condense { animation: condense 640ms var(--ease-glass) both; }
+.anim-condense--delayed { animation-delay: 80ms; }
+@keyframes condense {
+  from { opacity: 0; filter: blur(10px); transform: translateY(18px) scale(0.97); }
+  to { opacity: 1; filter: none; transform: none; }
+}
+
+.fx-bead {
+  position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(226, 236, 255, 0.72); pointer-events: none;
+  animation: bead 640ms var(--ease-out) both;
+}
+@keyframes bead {
+  0%, 18% { opacity: 0.72; transform: scale(1.15); }
+  100% { opacity: 0; transform: scale(0.42); }
+}
+
+.fx-bloom {
+  position: fixed; z-index: 190; border-radius: 50%; pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(82, 201, 184, 0.35), rgba(226, 236, 255, 0.12) 45%, transparent 70%);
+  animation: bloom 640ms var(--ease-out) forwards;
+}
+@keyframes bloom {
+  0% { opacity: 0.82; transform: scale(0.18); filter: blur(0); }
+  54% { opacity: 0.62; transform: scale(1.05); filter: blur(0.5px); }
+  100% { opacity: 0; transform: scale(1.38); filter: blur(1.5px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .anim-pop, .anim-shake, .anim-pulse-glow, .fx-spark { animation: none !important; }
   .orb, .orb--happy, .orb--celebrate { animation: none !important; }
   .anim-screen-in, .anim-rise { animation-duration: 1ms !important; }
+  .anim-evaporate, .anim-melt-out, .fx-bead { animation: none !important; }
+  .fx-bloom { display: none !important; }
+  .anim-drop-in, .anim-melt-in, .anim-condense { animation-duration: 1ms !important; animation-delay: 0ms !important; }
 }
