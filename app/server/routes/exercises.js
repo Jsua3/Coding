@@ -125,11 +125,18 @@ router.post("/:id/answer", async (req, res, next) => {
 
     let achievementsUnlocked = [];
     if (antes) {
-      const despues = await unlockedIds(req.userId);
-      achievementsUnlocked = [...despues]
-        .filter((id) => !antes.has(id))
-        .map(achievementInfo)
-        .filter(Boolean);
+      try {
+        const despues = await unlockedIds(req.userId);
+        achievementsUnlocked = [...despues]
+          .filter((id) => !antes.has(id))
+          .map(achievementInfo)
+          .filter(Boolean);
+      } catch (e) {
+        // El toast es ceremonia, no registro. Si el cálculo falla, el usuario conserva su XP y su
+        // lección completada (ya están confirmados en la BD) y el logro sigue estando en Progreso.
+        // Tirar la respuesta entera por no poder celebrar sería el peor de los dos males.
+        console.error("No se pudieron calcular los logros desbloqueados:", e);
+      }
     }
 
     res.json({
