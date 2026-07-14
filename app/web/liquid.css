@@ -56,7 +56,8 @@
 }
 .lg-nav--split { box-shadow: none; } /* al partirse, cada píldora recupera la suya */
 
-/* La capa de vidrio: blur + biseles. inset: -1px es EXACTAMENTE la caja de borde (el borde mide
+/* La capa de vidrio: el blur (los biseles van en el ::after, que pinta encima del relleno).
+   inset: -1px es EXACTAMENTE la caja de borde (el borde mide
    siempre 1px), así el vidrio de dos piezas contiguas se toca sin hueco ni solape: con inset: 0
    quedaba una franja de 2px sin blur ni saturación en cada unión, y el bisel superior se cortaba. */
 .lg-nav__glass {
