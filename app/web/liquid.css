@@ -282,6 +282,31 @@
   transition: height var(--duration-slow) var(--ease-out);
 }
 
+/* ---------- Toast de logro: cae del cielo y se evapora ---------- */
+.lg-ach {
+  position: fixed;
+  top: 96px;
+  left: 50%;
+  transform-origin: top center;
+  z-index: 95;
+  width: 340px;
+  margin-left: -170px;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: rgba(16, 23, 44, 0.74);
+  border: 1px solid rgba(146, 137, 227, 0.45);
+  box-shadow: var(--refraction-edge), var(--shadow-float), 0 0 40px rgba(146, 137, 227, 0.22);
+}
+/* El blur, en su capa aparte: jamás sobre un elemento con texto. */
+.lg-ach__glass {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--saturate-glass));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--saturate-glass));
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */

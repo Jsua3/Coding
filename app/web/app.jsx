@@ -14,6 +14,26 @@ function App() {
     toastTimer.current = setTimeout(() => setToast(null), 3200);
   };
 
+  const [achQueue, setAchQueue] = React.useState([]);
+  const achTimer = React.useRef(null);
+  // Dos requests concurrentes completando la misma lección pueden anunciar el mismo logro dos
+  // veces (la que pierde la carrera ER_DUP_ENTRY lee un set "después" que ya lo contiene). El
+  // servidor no puede saber qué ya anunció la otra request, así que deduplicamos aquí, donde vive
+  // la ceremonia. Vive en App (no en una screen) porque debe sobrevivir a un remount de LessonScreen.
+  const announcedAch = React.useRef(new Set());
+  React.useEffect(() => () => clearTimeout(achTimer.current), []);
+
+  // Si la respuesta completó la lección, la celebración se lleva la escena: el toast espera 900ms
+  // para no pisar el bloom.
+  const showAchievements = (lista, trasCelebracion) => {
+    if (!lista || !lista.length) return;
+    const nuevos = lista.filter((a) => !announcedAch.current.has(a.id));
+    if (!nuevos.length) return;
+    nuevos.forEach((a) => announcedAch.current.add(a.id));
+    clearTimeout(achTimer.current);
+    achTimer.current = setTimeout(() => setAchQueue((q) => [...q, ...nuevos]), trasCelebracion ? 900 : 0);
+  };
+
   const loadMe = async () => {
     try {
       const data = await API.get("/me");
@@ -51,9 +71,9 @@ function App() {
   } else if (route.screen === "lesson") {
     screen = <LessonScreen key={route.lessonId} me={me} courseId={route.courseId} lessonId={route.lessonId} tab={tab} setTab={goTab}
       onBack={() => go.course(route.courseId)} onOpenLesson={(lessonId) => go.lesson(route.courseId, lessonId)}
-      showToast={showToast} refreshMe={loadMe} />;
+      showToast={showToast} showAchievements={showAchievements} refreshMe={loadMe} />;
   } else if (route.screen === "review") {
-    screen = <ReviewScreen me={me} tab={tab} setTab={goTab} onBack={go.dashboard} refreshMe={loadMe} />;
+    screen = <ReviewScreen me={me} tab={tab} setTab={goTab} onBack={go.dashboard} showAchievements={showAchievements} refreshMe={loadMe} />;
   } else {
     const comun = { me, tab, setTab: goTab };
     screen = tab === "materias"
@@ -76,6 +96,7 @@ function App() {
           <Toast tone={toast.tone} title={toast.title} description={toast.description} onClose={() => setToast(null)} />
         </div>
       ) : null}
+      <AchievementToast achievement={achQueue[0] || null} onDone={() => setAchQueue((q) => q.slice(1))} />
     </React.Fragment>
   );
 }

@@ -35,7 +35,7 @@ function NavGlass() {
 
 // El avatar abre el menú de perfil: cae como una gota y se evapora al cerrarse (usePhase retiene
 // el contenido durante los 160ms de salida). Se cierra al tocar fuera o con Escape.
-function AvatarMenu({ user, onLogout }) {
+function AvatarMenu({ user, onLogout, onProgress }) {
   const [open, setOpen] = React.useState(false);
   const { shown, phase } = usePhase(open ? true : null, 160);
   const rootRef = React.useRef(null);
@@ -66,6 +66,11 @@ function AvatarMenu({ user, onLogout }) {
             <div style={{ fontSize: "var(--text-base)", fontWeight: 700, color: "var(--text-primary)" }}>{user.name}</div>
             <div style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", marginTop: 2, wordBreak: "break-all" }}>{user.email}</div>
           </div>
+          <div className="lg-menu__sep"></div>
+          <button role="menuitem" className="lg-menu__item" onClick={() => { setOpen(false); onProgress(); }}>
+            <KIcon d={ICONS.book} size={14} />
+            Tu progreso
+          </button>
           <div className="lg-menu__sep"></div>
           <button role="menuitem" className="lg-menu__item lg-menu__item--danger" onClick={() => { setOpen(false); onLogout(); }}>
             <KIcon d={ICONS.logout} size={14} />
@@ -130,7 +135,7 @@ function NavBar({ onHome, tab, setTab, user }) {
         <SoundToggle />
         <IconButton label="Buscar" size="sm" variant="ghost"><KIcon d={ICONS.search} /></IconButton>
         <Badge tone="amber" dot>{user.streak} {user.streak === 1 ? "día" : "días"}</Badge>
-        <AvatarMenu user={user} onLogout={() => API.logout()} />
+        <AvatarMenu user={user} onLogout={() => API.logout()} onProgress={() => setTab("progreso")} />
       </div>
     </div>
   );
@@ -209,4 +214,37 @@ function useScrolled(px) {
   return scrolled;
 }
 
-Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle, usePhase, useScrolled });
+// El logro cae como una gota desde arriba y se evapora al irse. usePhase retiene el contenido
+// durante los 160ms de salida, igual que la banda de feedback.
+function AchievementToast({ achievement, onDone }) {
+  const { shown, phase } = usePhase(achievement, 160);
+  const timer = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!achievement) return;
+    if (window.FX) FX.sound.play("achievement");
+    clearTimeout(timer.current);
+    timer.current = setTimeout(onDone, 2600);
+    return () => clearTimeout(timer.current);
+  }, [achievement]);
+
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+
+  if (!shown) return null;
+  return (
+    <div role="status" className={"lg-ach " + (phase === "out" ? "anim-evaporate" : "anim-drop-in")}
+      style={{ pointerEvents: "none" }}>
+      <span aria-hidden className="lg-ach__glass"></span>
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <Orb size={40} mood="celebrate" />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: "var(--text-xs)", fontWeight: 600, letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--accent-violet)" }}>Logro desbloqueado</div>
+          <div style={{ margin: "3px 0 2px", fontSize: "var(--text-md)", fontWeight: 700, color: "var(--text-primary)" }}>{shown.name}</div>
+          <div style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)" }}>{shown.description}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle, usePhase, useScrolled, AchievementToast });

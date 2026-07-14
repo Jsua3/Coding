@@ -52,7 +52,7 @@ function FeedbackBand({ result, onContinue, onRetry }) {
   );
 }
 
-function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTab, showToast, refreshMe }) {
+function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTab, showToast, showAchievements, refreshMe }) {
   const { GlassPanel, Badge, Button, IconButton } = KITX;
   const [lesson, setLesson] = React.useState(null);
   const [error, setError] = React.useState(null);
@@ -122,6 +122,9 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
       clearTimeout(panelTimer.current);
       panelTimer.current = setTimeout(() => setPanelAnim(""), 400);
       if (r.xpAwarded > 0) refreshMe();
+      if (r.achievementsUnlocked && r.achievementsUnlocked.length && showAchievements) {
+        showAchievements(r.achievementsUnlocked, r.lessonCompleted);
+      }
     } catch (e) {
       setError(e.message);
     } finally {

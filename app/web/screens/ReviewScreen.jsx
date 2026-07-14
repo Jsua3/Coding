@@ -1,6 +1,6 @@
 const KITR = window.CodingDesignSystem_2ecb3a;
 
-function ReviewScreen({ me, tab, setTab, onBack, refreshMe }) {
+function ReviewScreen({ me, tab, setTab, onBack, showAchievements, refreshMe }) {
   const { GlassPanel, Badge, Button } = KITR;
   const [queue, setQueue] = React.useState(null);
   const [error, setError] = React.useState(null);
@@ -81,6 +81,9 @@ function ReviewScreen({ me, tab, setTab, onBack, refreshMe }) {
       setResult(r);
       if (r.correct) { orbReact("happy", 700); FX.sound.play("correct"); } else { orbReact("sad", 900); FX.sound.play("wrong"); }
       if (r.reviewCleared) setEarned((e) => e + r.xpAwarded);
+      if (r.achievementsUnlocked && r.achievementsUnlocked.length && showAchievements) {
+        showAchievements(r.achievementsUnlocked, false);
+      }
     } catch (e) {
       setError(e.message);
     } finally {

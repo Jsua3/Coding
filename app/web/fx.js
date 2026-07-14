@@ -78,6 +78,7 @@ const FX = {
         else if (name === "complete") { this._note(523.25, 0, 0.12); this._note(659.25, 0.09, 0.12); this._note(783.99, 0.18, 0.2); }
         else if (name === "perfect") { this._note(659.25, 0, 0.1); this._note(783.99, 0.08, 0.1); this._note(1046.5, 0.16, 0.24); }
         else if (name === "streak") { this._note(880, 0, 0.1, "sine", 0.12); this._note(1046.5, 0.09, 0.18, "sine", 0.12); }
+        else if (name === "achievement") { this._note(523.25, 0, 0.1); this._note(659.25, 0.08, 0.1); this._note(783.99, 0.16, 0.1); this._note(1046.5, 0.24, 0.3); }
       } catch (e) { /* audio no disponible: silencio */ }
     },
   },
