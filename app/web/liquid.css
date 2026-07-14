@@ -66,10 +66,22 @@
   border-radius: inherit;
   -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--saturate-glass));
   backdrop-filter: blur(var(--blur-lg)) saturate(var(--saturate-glass));
+}
+
+/* Los biseles van en un ::after que pinta ENCIMA del relleno (la capa de vidrio está en z-index: -1
+   y quedaría debajo, apagando el filo 2.5×). inset: -1px para que siga abarcando la caja de borde
+   y el filo no se corte en las uniones. */
+.lg-nav__pill::after,
+.lg-nav__bridge::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.09);
   transition: box-shadow 380ms var(--ease-glass);
 }
-.lg-nav--split .lg-nav__pill > .lg-nav__glass { box-shadow: var(--refraction-edge); }
+.lg-nav--split .lg-nav__pill::after { box-shadow: var(--refraction-edge); }
 
 /* Píldoras y puentes comparten el material. Borde SIEMPRE de 1px (el ancho nunca cambia ⇒ nunca hay
    layout); lo que cambia es el COLOR: los cantos internos son transparentes en estado fusionado, y
@@ -160,6 +172,7 @@
   .lg-ripple { display: none !important; }
   .lg-reveal { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
   .lg-nav__pill, .lg-nav__bridge { transition: none !important; animation: none !important; }
+  .lg-nav__pill::after, .lg-nav__bridge::after { transition: none !important; }
   .lg-nav__glass { transition: none !important; }
   .lg-nav { transition: none !important; }
   /* El puente NO lleva display:none aquí: ya se oculta por una declaración normal
