@@ -86,7 +86,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
   if (error) {
     return (
       <PageFrame>
-        <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ initials: me.user.initials, streak: me.stats.streak }} />
+        <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
         <div style={{ marginTop: 36 }}><ErrorPanel message={error} onRetry={load} /></div>
       </PageFrame>
     );
@@ -94,7 +94,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
   if (!lesson) {
     return (
       <PageFrame>
-        <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ initials: me.user.initials, streak: me.stats.streak }} />
+        <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
         <LoadingPanel />
       </PageFrame>
     );
@@ -157,7 +157,7 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
 
   return (
     <PageFrame>
-      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ initials: me.user.initials, streak: me.stats.streak }} />
+      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
       <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "36px 0 20px" }}>
         <IconButton label="Volver" onClick={onBack}><KIcon d={ICONS.back} /></IconButton>
         <span style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>{lesson.courseSubject} / {lesson.unitName.split(" · ")[0]}</span>
@@ -236,7 +236,7 @@ function CelebrationScreen({ data, onNext, onBack, me, tab, setTab }) {
 
   return (
     <PageFrame>
-      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ initials: me.user.initials, streak: me.stats.streak }} />
+      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
       <div style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div className="anim-condense anim-condense--delayed">
           <GlassPanel strength="strong" padding="var(--space-8)" radius="var(--radius-xl)" style={{ width: 460, textAlign: "center" }}>

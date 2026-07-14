@@ -40,7 +40,7 @@ function ReviewScreen({ me, tab, setTab, onBack, refreshMe }) {
 
   const wrap = (children) => (
     <PageFrame>
-      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ initials: me.user.initials, streak: me.stats.streak }} />
+      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
       {children}
     </PageFrame>
   );

@@ -47,7 +47,7 @@ function CourseScreen({ me, courseId, onBack, onOpenLesson, tab, setTab }) {
 
   return (
     <PageFrame>
-      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ initials: me.user.initials, streak: me.stats.streak }} />
+      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
       <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "36px 0 20px" }}>
         <IconButton label="Volver" onClick={onBack}><KIcon d={ICONS.back} /></IconButton>
         <span style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>

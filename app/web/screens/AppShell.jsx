@@ -14,6 +14,7 @@ const ICONS = {
   book: "M2.5 3.5h4.2c.7 0 1.3.6 1.3 1.3V13c0-.7-.6-1.3-1.3-1.3H2.5V3.5zM13.5 3.5H9.3c-.7 0-1.3.6-1.3 1.3V13c0-.7.6-1.3 1.3-1.3h4.2V3.5z",
   sound: "M2.5 6v4h2.5L8.5 13V3L5 6H2.5zM10.5 5.5a3.5 3.5 0 010 5M12 3.5a6 6 0 010 9",
   soundOff: "M2.5 6v4h2.5L8.5 13V3L5 6H2.5zM10.5 6.5l3 3M13.5 6.5l-3 3",
+  logout: "M6.5 3.5H3.5v9h3M10 5.5L12.5 8 10 10.5M12.5 8H6.5",
 };
 
 function SoundToggle() {
@@ -30,6 +31,50 @@ function SoundToggle() {
 // El blur del vidrio: SIEMPRE en una capa aria-hidden aparte, jamás sobre un elemento con texto.
 function NavGlass() {
   return <span aria-hidden className="lg-nav__glass"></span>;
+}
+
+// El avatar abre el menú de perfil: cae como una gota y se evapora al cerrarse (usePhase retiene
+// el contenido durante los 160ms de salida). Se cierra al tocar fuera o con Escape.
+function AvatarMenu({ user, onLogout }) {
+  const [open, setOpen] = React.useState(false);
+  const { shown, phase } = usePhase(open ? true : null, 160);
+  const rootRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const outside = (e) => { if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false); };
+    const escape = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [open]);
+
+  return (
+    <div ref={rootRef} style={{ position: "relative", display: "flex" }}>
+      <button aria-haspopup="menu" aria-expanded={open} aria-label="Tu perfil" onClick={() => setOpen(!open)}
+        style={{ width: 36, height: 36, padding: 0, borderRadius: 99, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg, #6FA0E0, #4E86D6)", border: "1px solid rgba(255,255,255,0.4)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 14px rgba(94,151,230,0.35)", fontFamily: "inherit", fontSize: 13, fontWeight: 700, color: "var(--text-on-accent)", cursor: "pointer" }}>
+        {user.initials}
+      </button>
+      {shown ? (
+        <div role="menu" className={"lg-menu " + (phase === "out" ? "anim-evaporate" : "lg-menu--in")}
+          style={{ pointerEvents: phase === "out" ? "none" : "auto" }}>
+          <span aria-hidden className="lg-menu__glass"></span>
+          <div style={{ padding: "8px 12px 10px" }}>
+            <div style={{ fontSize: "var(--text-base)", fontWeight: 700, color: "var(--text-primary)" }}>{user.name}</div>
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", marginTop: 2, wordBreak: "break-all" }}>{user.email}</div>
+          </div>
+          <div className="lg-menu__sep"></div>
+          <button role="menuitem" className="lg-menu__item lg-menu__item--danger" onClick={() => { setOpen(false); onLogout(); }}>
+            <KIcon d={ICONS.logout} size={14} />
+            Cerrar sesión
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 function NavBar({ onHome, tab, setTab, user }) {
@@ -85,7 +130,7 @@ function NavBar({ onHome, tab, setTab, user }) {
         <SoundToggle />
         <IconButton label="Buscar" size="sm" variant="ghost"><KIcon d={ICONS.search} /></IconButton>
         <Badge tone="amber" dot>{user.streak} {user.streak === 1 ? "día" : "días"}</Badge>
-        <div style={{ width: 36, height: 36, borderRadius: 99, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg, #6FA0E0, #4E86D6)", border: "1px solid rgba(255,255,255,0.4)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 14px rgba(94,151,230,0.35)", fontSize: 13, fontWeight: 700, color: "var(--text-on-accent)" }}>{user.initials}</div>
+        <AvatarMenu user={user} onLogout={() => API.logout()} />
       </div>
     </div>
   );

@@ -199,6 +199,58 @@
   70% { scale: 1.01 0.98; } /* rebota al revés */
 }
 
+/* ---------- Menú del avatar: una gota que cae del perfil ---------- */
+.lg-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  min-width: 230px;
+  padding: 6px;
+  z-index: 10;
+  border-radius: var(--radius-md);
+  background: rgba(16, 23, 44, 0.72);
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--refraction-edge), var(--shadow-float);
+  transform-origin: top right; /* cuelga del avatar: de ahí cae y ahí se evapora */
+}
+/* El blur, en su capa aparte: jamás sobre un elemento con texto. */
+.lg-menu__glass {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--saturate-glass));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--saturate-glass));
+}
+/* Cae como una gota: estirada en el eje de la caída, se pasa del destino y se aplasta al
+   aterrizar (escalas inversas = conservación de volumen), y recién entonces reposa. */
+.lg-menu--in { animation: lg-menu-drop 320ms var(--ease-out) both; }
+@keyframes lg-menu-drop {
+  0% { opacity: 0; transform: translateY(-10px) scaleY(1.12) scaleX(0.94); }
+  58% { opacity: 1; transform: translateY(3px) scaleY(0.96) scaleX(1.04); }
+  100% { opacity: 1; transform: none; }
+}
+.lg-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-glass), color var(--duration-fast) var(--ease-glass);
+}
+.lg-menu__item:hover { background: var(--glass-bg-strong); color: var(--text-primary); }
+.lg-menu__item--danger:hover { background: rgba(230, 121, 132, 0.14); color: var(--danger); }
+.lg-menu__sep { height: 1px; margin: 6px 4px; background: var(--glass-stroke); }
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */
@@ -209,6 +261,10 @@
   .lg-nav__glass { transition: none !important; }
   .lg-nav { transition: none !important; }
   .lg-nav [role="tablist"] > div { transition: none !important; animation: none !important; }
+  /* El menú no lleva display:none: su estado en reposo ES visible, y usePhase intercambia al
+     instante bajo reduced motion, así que la fase de salida ni siquiera llega a ocurrir. */
+  .lg-menu--in { animation: none !important; }
+  .lg-menu__item { transition: none !important; }
   /* El puente NO lleva display:none aquí: ya se oculta por una declaración normal
      (.lg-nav--split .lg-nav__bridge { transform: scaleY(0) scaleX(1.1); opacity: 0; }), que sigue
      aplicándose bajo reduced motion. transition: none solo quita la interpolación, así que el

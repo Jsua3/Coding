@@ -61,7 +61,7 @@ function DashboardScreen({ me, onOpenCourse, onOpenLesson, onOpenReview, tab, se
 
   return (
     <PageFrame>
-      <NavBar onHome={() => {}} tab={tab} setTab={setTab} user={{ initials: me.user.initials, streak: stats.streak }} />
+      <NavBar onHome={() => {}} tab={tab} setTab={setTab} user={{ ...me.user, streak: stats.streak }} />
       <div ref={rootRef}>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, margin: "44px 4px 24px" }}>
           <div>

@@ -6,6 +6,12 @@ const API = {
     else localStorage.removeItem("coding-token");
   },
   onUnauthorized: null,
+  // Cierre de sesión voluntario. Acaba en el mismo sitio que un 401 (de vuelta al login), pero es
+  // otro camino: aquí el token era válido y lo tiramos a propósito.
+  logout() {
+    this.setToken(null);
+    if (this.onUnauthorized) this.onUnauthorized();
+  },
   async request(path, { method = "GET", body } = {}) {
     const headers = { "Content-Type": "application/json" };
     if (this.token) headers.Authorization = "Bearer " + this.token;
