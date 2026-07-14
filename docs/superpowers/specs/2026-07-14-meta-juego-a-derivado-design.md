@@ -147,8 +147,10 @@ Casos borde que la función debe cubrir (y que tendrán test): `xp = 0` → Apre
 
 | id | Nombre | Descripción | Regla |
 |---|---|---|---|
-| `madrugador` | Madrugador | Terminaste una lección antes de las 7 de la mañana | `earlyBird` |
-| `nocturno` | Turno de noche | Terminaste una lección de madrugada | `nightOwl` (00:00–04:59) |
+| `madrugador` | Madrugador | Terminaste una lección entre las 5 y las 7 de la mañana | `earlyBird` (05:00–06:59) |
+| `nocturno` | Turno de noche | Terminaste una lección de madrugada, antes de las 5 | `nightOwl` (00:00–04:59) |
+
+**Los dos secretos de horario son disjuntos a propósito.** Si `madrugador` fuera "antes de las 7" a secas, terminar una lección a las 3 de la mañana caería los dos de golpe — dos secretos por un solo acto. Con el corte en las 5, cada uno premia un hábito distinto: el que se levanta temprano y el que aún no se ha acostado.
 | `resucitado` | Segunda oportunidad | Acertaste en repaso un ejercicio que habías fallado tres veces | `resurrected` |
 | `impecable` | Racha impecable | Cinco lecciones perfectas seguidas | `perfectRun >= 5` |
 
