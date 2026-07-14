@@ -29,15 +29,23 @@ function SoundToggle() {
 
 // El blur del vidrio: SIEMPRE en una capa aria-hidden aparte, jamás sobre un elemento con texto.
 function NavGlass() {
-  return <span aria-hidden style={{ position: "absolute", inset: 0, zIndex: -1, borderRadius: "inherit", WebkitBackdropFilter: "blur(var(--blur-lg)) saturate(var(--saturate-glass))", backdropFilter: "blur(var(--blur-lg)) saturate(var(--saturate-glass))" }}></span>;
+  return <span aria-hidden className="lg-nav__glass"></span>;
 }
 
 function NavBar({ onHome, tab, setTab, user }) {
   const { Tabs, IconButton, Badge } = KIT;
   const split = useScrolled(32);
-  const [hasSplit, setHasSplit] = React.useState(false);
-  React.useEffect(() => { if (split) setHasSplit(true); }, [split]);
-  const cls = "lg-nav" + (split ? " lg-nav--split" : hasSplit ? " lg-nav--merged" : "");
+  // Solo animamos tras un cambio real de estado: si la página monta ya scrolleada, la navbar
+  // aparece partida pero sin reproducir la partición (nada se anima en el montaje).
+  const [animate, setAnimate] = React.useState(false);
+  const first = React.useRef(true);
+  React.useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    setAnimate(true);
+  }, [split]);
+  const cls = "lg-nav"
+    + (split ? " lg-nav--split" : (animate ? " lg-nav--merged" : ""))
+    + (animate ? " lg-nav--anim" : "");
   return (
     <div className={cls}>
       <div className="lg-nav__pill lg-nav__pill--logo" onClick={onHome}>
@@ -45,7 +53,7 @@ function NavBar({ onHome, tab, setTab, user }) {
         <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: "var(--weight-heavy)", letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>Coding</span>
         <span style={{ width: 4, height: 18, borderRadius: 3, background: "var(--accent-cyan)", boxShadow: "0 0 10px var(--accent-cyan)" }}></span>
       </div>
-      <span className="lg-nav__bridge"><NavGlass /></span>
+      <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
       <div className="lg-nav__pill lg-nav__pill--tabs">
         <NavGlass />
         <Tabs size="sm" value={tab} onChange={setTab} style={{ width: 380 }} items={[
@@ -54,7 +62,7 @@ function NavBar({ onHome, tab, setTab, user }) {
           { id: "progreso", label: "Progreso" },
         ]} />
       </div>
-      <span className="lg-nav__bridge"><NavGlass /></span>
+      <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
       <div className="lg-nav__pill lg-nav__pill--actions">
         <NavGlass />
         <SoundToggle />
@@ -121,8 +129,11 @@ function usePhase(value, outMs) {
 
 // true cuando la página bajó más de `px`. Sin listener de scroll: un centinela invisible al tope
 // + IntersectionObserver = cero trabajo por frame.
+// Debe llamarse UNA sola vez: cada llamada inyecta su propio centinela en el DOM.
 function useScrolled(px) {
-  const [scrolled, setScrolled] = React.useState(false);
+  // Estado inicial sembrado con scrollY: si la página monta ya desplazada (restauración de scroll
+  // del navegador al recargar), evita pintar fusionada un frame y reproducir la partición entera.
+  const [scrolled, setScrolled] = React.useState(() => window.scrollY > px);
   React.useEffect(() => {
     if (!("IntersectionObserver" in window)) return;
     const sentinel = document.createElement("div");

@@ -50,11 +50,31 @@
   z-index: 40;
   display: flex;
   align-items: stretch; /* píldoras y puentes con la misma altura: es UNA superficie */
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-glass); /* proyección de TODA la superficie fusionada, casteada una sola vez */
+  transition: box-shadow 380ms var(--ease-glass);
 }
+.lg-nav--split { box-shadow: none; } /* al partirse, cada píldora recupera la suya */
+
+/* La capa de vidrio: blur + biseles. inset: -1px es EXACTAMENTE la caja de borde (el borde mide
+   siempre 1px), así el vidrio de dos piezas contiguas se toca sin hueco ni solape: con inset: 0
+   quedaba una franja de 2px sin blur ni saturación en cada unión, y el bisel superior se cortaba. */
+.lg-nav__glass {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--saturate-glass));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--saturate-glass));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.09);
+  transition: box-shadow 380ms var(--ease-glass);
+}
+.lg-nav--split .lg-nav__pill > .lg-nav__glass { box-shadow: var(--refraction-edge); }
 
 /* Píldoras y puentes comparten el material. Borde SIEMPRE de 1px (el ancho nunca cambia ⇒ nunca hay
    layout); lo que cambia es el COLOR: los cantos internos son transparentes en estado fusionado, y
-   así las piezas se tocan sin costura. */
+   así las piezas se tocan sin costura. Sin box-shadow propio: la sombra de proyección la casta
+   `.lg-nav` una sola vez en fusionado (ver arriba), y los insets viven en `.lg-nav__glass`. */
 .lg-nav__pill,
 .lg-nav__bridge {
   position: relative;
@@ -62,7 +82,6 @@
   border: 1px solid transparent;
   border-top-color: var(--glass-stroke);
   border-bottom-color: var(--glass-stroke);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.09), var(--shadow-glass);
 }
 
 .lg-nav__pill {
@@ -109,20 +128,21 @@
 .lg-nav--split .lg-nav__pill {
   border-color: var(--glass-stroke);
   border-radius: var(--radius-pill);
-  box-shadow: var(--refraction-edge), var(--shadow-glass);
+  box-shadow: var(--shadow-glass); /* --refraction-edge ya lo pone .lg-nav__glass; no lo dupliques */
 }
 .lg-nav--split .lg-nav__pill--logo { transform: translateX(-10px); }
 .lg-nav--split .lg-nav__pill--actions { transform: translateX(10px); }
 
 /* Squash & stretch, en la propiedad individual `scale` para no pelear con el translate del rebote.
    Escalas siempre inversas = conservación de volumen: es lo que el ojo lee como materia blanda.
-   `--merged` solo se aplica tras la primera partida, así nada se anima al cargar la página.
+   `--anim` solo se aplica tras un cambio REAL de estado (ver NavBar en AppShell.jsx), así nada se
+   anima al cargar la página aunque monte ya partida.
 
    Dos nombres distintos a propósito: una animación CSS solo re-arranca si el animation-name
    resuelto cambia de valor. Con un único nombre, alternar --split/--merged la dejaría muda
    después de la primera partida. */
-.lg-nav--split .lg-nav__pill { animation: lg-nav-squash-split 520ms var(--ease-glass); }
-.lg-nav--merged .lg-nav__pill { animation: lg-nav-squash-merge 520ms var(--ease-glass); }
+.lg-nav--anim.lg-nav--split .lg-nav__pill { animation: lg-nav-squash-split 520ms var(--ease-glass); }
+.lg-nav--anim.lg-nav--merged .lg-nav__pill { animation: lg-nav-squash-merge 520ms var(--ease-glass); }
 @keyframes lg-nav-squash-split {
   0%, 100% { scale: 1 1; }
   40% { scale: 1.02 0.95; } /* estirada en X, chata en Y */
@@ -130,8 +150,8 @@
 }
 @keyframes lg-nav-squash-merge {
   0%, 100% { scale: 1 1; }
-  40% { scale: 1.02 0.95; }
-  70% { scale: 0.99 1.02; }
+  40% { scale: 0.98 1.04; } /* al reencontrarse se comprime en X y se estira en Y */
+  70% { scale: 1.01 0.98; } /* rebota al revés */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -140,7 +160,13 @@
   .lg-ripple { display: none !important; }
   .lg-reveal { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
   .lg-nav__pill, .lg-nav__bridge { transition: none !important; animation: none !important; }
-  /* display:none y NO animation:none — el estado base del puente es visible, y con animation:none
-     quedaría a scaleY(1) en estado partido: la navbar se vería fusionada y rota a la vez. */
-  .lg-nav--split .lg-nav__bridge { display: none !important; }
+  .lg-nav__glass { transition: none !important; }
+  .lg-nav { transition: none !important; }
+  /* El puente NO lleva display:none aquí: ya se oculta por una declaración normal
+     (.lg-nav--split .lg-nav__bridge { transform: scaleY(0) scaleX(1.1); opacity: 0; }), que sigue
+     aplicándose bajo reduced motion. transition: none solo quita la interpolación, así que el
+     puente salta directo a invisible conservando su caja flex (flex: 1). Si le pusiéramos
+     display:none, desaparecería de la línea flex y las tres píldoras se apelotonarían a la
+     izquierda — el precedente del fx-bead NO aplica aquí: aquel se ocultaba por un keyframe, y
+     animation:none lo congelaba visible; este puente se oculta por CSS normal. */
 }

@@ -51,9 +51,11 @@ El workaround habitual (silueta gooificada detrás + contenido nítido encima) d
 ```
 
 - `.lg-nav` conserva el comportamiento actual del contenedor: `position: sticky; top: 20px; z-index: 40; display: flex; align-items: center`. Los puentes son `flex: 1` (ocupan el espacio vacío que hoy reparte `justify-content: space-between`).
-- Cada `.lg-nav__pill` es una superficie de vidrio idéntica a la navbar de hoy: `background: rgba(16,23,44,0.6)`, `border: 1px solid var(--glass-stroke)`, `box-shadow: var(--refraction-edge), var(--shadow-glass)`, y su **blur en un `<span aria-hidden>` interno absoluto con `zIndex: -1`** (regla de oro del DS: `backdrop-filter` jamás sobre un elemento con texto).
-- Cada `.lg-nav__bridge` tiene el mismo `background` y bordes superior/inferior que las píldoras, sin bordes laterales ni radio: es la **masa conectiva**. Su propio blur va en su capa, igual que las píldoras.
+- Cada `.lg-nav__pill` es una superficie de vidrio idéntica a la navbar de hoy: `background: rgba(16,23,44,0.6)`, `border: 1px solid var(--glass-stroke)`, y su **blur en un `<span aria-hidden className="lg-nav__glass">` interno absoluto con `zIndex: -1`** (regla de oro del DS: `backdrop-filter` jamás sobre un elemento con texto).
+- Cada `.lg-nav__bridge` tiene el mismo `background` y bordes superior/inferior que las píldoras, sin bordes laterales ni radio: es la **masa conectiva**. Su propio blur va en su capa `.lg-nav__glass`, igual que las píldoras.
 - El contenido interno de los tres grupos es **exactamente el de hoy** (mismos componentes, mismos handlers). Solo cambia el envoltorio.
+- **`.lg-nav__glass` cubre la caja de BORDE, no la de padding**: `inset: -1px` (el borde de la píldora mide siempre 1px, así que `-1px` es exacto). Con `inset: 0` el vidrio queda 1px dentro por cada lado, y en cada unión entre piezas contiguas se abre una franja de 2px sin `backdrop-filter` ni `saturate()` — una línea desaturada visible que rompe la ilusión de superficie continua. Los biseles (`box-shadow: inset 0 1px 0 …` arriba, `inset 0 -1px 0 …` abajo) viven en esta capa, no en la píldora: así el filo superior no se corta en cada unión.
+- **La sombra de proyección (`var(--shadow-glass)`) la casta `.lg-nav` una sola vez**, cuando está fusionada — no cada píldora/puente por separado. Si las cinco piezas proyectaran su propia sombra, pintarían en orden de DOM y dejarían cuatro manchones oscuros verticales en las uniones. Al partirse (`.lg-nav--split`), `.lg-nav` pierde su sombra (`box-shadow: none`) y cada píldora recupera la suya propia.
 
 ### Los dos estados
 
@@ -131,17 +133,18 @@ El lenguaje manda animar **solo `transform`/`opacity`/`filter`**. Aquí hacemos 
 
 ### Dónde va (y dónde NO)
 
-**Sí** — superficies interactivas cuyo DOM es nuestro y sin transform de hover:
+**Sí** — superficies interactivas cuyo DOM es nuestro, sin transform de hover, y **cuyo nodo host sobrevive al tap**:
 
 | Archivo | Elementos |
 |---|---|
-| `screens/exercises.jsx` | opciones de `choice`, `TokenChip` del banco de `blanks`, líneas de `order` (secuencia y disponibles), celdas de `match` |
+| `screens/exercises.jsx` | opciones de `choice`, celdas de `match`, `TokenChip` del banco de `blanks` |
 | `screens/CourseScreen.jsx` | `LessonRow` (filas del temario) |
 
 **No** — y esto es una decisión, no un olvido:
 
 - **Botones del KIT** (`Button`, `IconButton`): son del design system, intocable. Envolverlos en un host con `overflow: hidden` sería frágil (acoplaría el radio del wrapper al del botón).
 - **`CourseCard` del dashboard**: usa el `Card` del DS, que en hover hace `translateY(-4px) scale(1.01)` en su div externo. Un wrapper con `overflow: hidden` **recortaría ese lift**. Las tarjetas ganan vida por los reveals, no por el ripple.
+- **Líneas de `order`** (tanto en "tu secuencia" como en "disponibles") **y la ficha colocada de `blanks`** (la que va dentro del código, con `onClick={() => remove(idx)}`): al tocarlas, React **desmonta** ese nodo de un contenedor y monta otro nuevo en el otro (la línea/ficha se muda de lista). El nodo host muere y la onda muere con él — verificado en vivo: cero ripples vivos tras el click, cuando debería haber uno durante 600ms; una onda que muere al ~15% de su recorrido se lee como un glitch, no como feedback. Ahí el propio **movimiento del elemento** (saltar de una lista a la otra, o desaparecer del código) ES el feedback. Esto no aplica a la ficha del **banco** de `blanks` (`onClick={() => place(token)}`): ese chip se vuelve fantasma (`ghost`) pero permanece montado en el mismo lugar, así que sí lleva ripple.
 
 ---
 
@@ -225,8 +228,8 @@ React.useEffect(() => Liquid.ripple(ref.current), []);   // el cleanup se devuel
 - **JS** (`FX.reducedMotion`): `Liquid.ripple` es no-op; `Liquid.reveal` marca todo visible al instante.
 - **CSS** (`@media (prefers-reduced-motion: reduce)` en `liquid.css`):
   - `.lg-ripple` → `display: none`. **Su estado base es visible**: solo `animation: none` dejaría un círculo blanco fijo dentro del elemento. (Exactamente el bug del `fx-bead` que el review final cazó en la iteración anterior — no lo repetimos.)
-  - `.lg-nav__bridge` → `transition: none; animation: none`, **y `.lg-nav--split .lg-nav__bridge { display: none }`**. Mismo razonamiento: sin la regla de `display`, el puente quedaría a `scaleY(1)` visible en estado partido, y la navbar se vería fusionada y rota a la vez.
-  - `.lg-nav__pill` → `transition: none; animation: none` (la navbar cambia de estado al instante, sin squash ni rebote; el estado sigue siendo correcto).
+  - `.lg-nav__pill`, `.lg-nav__bridge`, `.lg-nav__glass`, `.lg-nav` → `transition: none; animation: none` (la navbar cambia de estado al instante, sin squash ni rebote; el estado sigue siendo correcto).
+  - **El puente NO lleva `display: none`.** El precedente del `fx-bead` no se transfiere aquí: aquel círculo se ocultaba por un **keyframe**, así que `animation: none` lo congelaba visible a medio camino — de ahí que necesitara `display: none`. El puente, en cambio, se oculta por una **declaración normal** (`.lg-nav--split .lg-nav__bridge { transform: scaleY(0) scaleX(1.1); opacity: 0; }`), que sigue aplicándose intacta bajo reduced motion; `transition: none` solo quita la interpolación, así que el puente salta directo a invisible **conservando su caja flex** (`flex: 1`). Si le añadiéramos `display: none`, desaparecería de la línea flex y las tres píldoras se apelotonarían a la izquierda — la píldora de acciones quedaría cientos de píxeles corta del borde derecho. Es además la única forma de provocar *layout* en todo el diff, violando la regla de rendimiento del plan.
   - `.lg-reveal` → `opacity: 1; transform: none; filter: none; transition: none` (contenido siempre visible).
   - `.lg-noise` → **se conserva** (es textura estática, no movimiento).
 
