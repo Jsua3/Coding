@@ -30,6 +30,7 @@ test("usuario nuevo: stats en cero y continue apunta a bd1/l1", async () => {
   assert.equal(res.body.user.name, "Ana Prueba");
   assert.deepEqual(res.body.stats, {
     xp: 0, xpWeek: 0, streak: 0, bestStreak: 0,
+    level: { n: 1, name: "Aprendiz", progress: 0 },
     activeCourses: 0, completedCourses: 0, lockedCourses: 1,
     reviewCount: 0,
   });
@@ -66,4 +67,13 @@ test("token de usuario borrado responde 401", async () => {
   await query("SET FOREIGN_KEY_CHECKS = 1");
   const res = await me();
   assert.equal(res.status, 401);
+});
+
+test("/me trae el nivel derivado del XP", async () => {
+  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 50)", [userId]);
+  const res = await me();
+  assert.equal(res.status, 200);
+  assert.equal(res.body.stats.level.n, 2);
+  assert.equal(res.body.stats.level.name, "Practicante");
+  assert.equal(res.body.stats.level.progress, 0);
 });
