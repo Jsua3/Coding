@@ -9,6 +9,14 @@ import { unlockedFor } from "./achievements.js";
 export async function achievementStats(userId) {
   // Desempate por lesson_id: completed_at es DATETIME (precisión de segundo), así que dos lecciones
   // del mismo segundo tendrían orden no determinista — y perfectRun depende del orden.
+  // OJO: este es el único contador que no es estrictamente monótono. `completed_at` es un DATETIME
+  // de precisión de segundo y `lesson_completions` no tiene id autoincremental (su PK es
+  // (user_id, lesson_id)), así que no hay clave de orden de inserción. El desempate por `lesson_id`
+  // da determinismo, no cronología: tres lecciones completadas dentro del mismo segundo, con una
+  // imperfecta cuyo id ordene ENTRE dos perfectas, convertirían una racha de 2 en una de 1.
+  // Es prácticamente inalcanzable (cada completación son varios viajes HTTP) y solo afecta al
+  // secreto `impecable`. Cerrarlo exige una columna de orden en el esquema: la Iteración B, que sí
+  // toca el esquema, es el sitio.
   const completions = await query(
     "SELECT lesson_id, completed_at FROM lesson_completions WHERE user_id = ? ORDER BY completed_at, lesson_id",
     [userId]

@@ -66,8 +66,26 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
   const { shown: shownStep, phase: stepPhase } = usePhase(step, 160);
   const orbTimer = React.useRef(null);
   const panelTimer = React.useRef(null);
+  // Los logros de una lección completada NO se sueltan al responder: la celebración no se abre
+  // hasta que el usuario pulsa Continuar, y hasta entonces el toast caería sobre el ejercicio y
+  // la celebración se montaría encima. Los guardamos y los soltamos cuando la celebración existe.
+  const achPendientes = React.useRef(null);
 
   React.useEffect(() => () => { clearTimeout(orbTimer.current); clearTimeout(panelTimer.current); }, []);
+
+  React.useEffect(() => {
+    if (celebration && achPendientes.current && showAchievements) {
+      showAchievements(achPendientes.current, true);
+      achPendientes.current = null;
+    }
+  }, [celebration]);
+
+  React.useEffect(() => () => {
+    if (achPendientes.current && showAchievements) {
+      showAchievements(achPendientes.current, false);
+      achPendientes.current = null;
+    }
+  }, []);
 
   const orbReact = (mood, ms) => {
     setOrbMood(mood);
@@ -123,7 +141,8 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
       panelTimer.current = setTimeout(() => setPanelAnim(""), 400);
       if (r.xpAwarded > 0) refreshMe();
       if (r.achievementsUnlocked && r.achievementsUnlocked.length && showAchievements) {
-        showAchievements(r.achievementsUnlocked, r.lessonCompleted);
+        if (r.lessonCompleted) achPendientes.current = r.achievementsUnlocked;
+        else showAchievements(r.achievementsUnlocked, false);
       }
     } catch (e) {
       setError(e.message);

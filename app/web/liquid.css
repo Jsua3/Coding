@@ -328,4 +328,5 @@
      display:none, desaparecería de la línea flex y las tres píldoras se apelotonarían a la
      izquierda — el precedente del fx-bead NO aplica aquí: aquel se ocultaba por un keyframe, y
      animation:none lo congelaba visible; este puente se oculta por CSS normal. */
+  .lg-bars__bar { transition: none !important; }
 }
