@@ -34,6 +34,20 @@ const FX = {
     }
   },
 
+  bloom(x, y) {
+    if (FX.reducedMotion) return;
+    const s = document.createElement("span");
+    s.className = "fx-bloom";
+    const d = Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.6);
+    s.style.width = d + "px";
+    s.style.height = d + "px";
+    s.style.left = (x - d / 2) + "px";
+    s.style.top = (y - d / 2) + "px";
+    document.body.appendChild(s);
+    s.addEventListener("animationend", () => s.remove());
+    setTimeout(() => s.remove(), 1200);
+  },
+
   sound: {
     ctx: null,
     get enabled() { return localStorage.getItem("coding-sound") !== "off"; },
