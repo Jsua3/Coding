@@ -238,35 +238,37 @@ function CelebrationScreen({ data, onNext, onBack, me, tab, setTab }) {
     <PageFrame>
       <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ initials: me.user.initials, streak: me.stats.streak }} />
       <div style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <GlassPanel strength="strong" padding="var(--space-8)" radius="var(--radius-xl)" style={{ width: 460, textAlign: "center" }}>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
-            <Orb size={120} mood="celebrate" />
-          </div>
-          <h1 style={{ margin: "0 0 6px", fontFamily: "var(--font-display)", fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>¡Lección completada!</h1>
-          <p style={{ margin: "0 0 22px", fontSize: "var(--text-md)", color: "var(--text-secondary)" }}>{data.lessonTitle}</p>
-
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 44, fontWeight: 800, color: "var(--accent-cyan)", fontVariantNumeric: "tabular-nums" }}>
-            +<span ref={xpRef}>0</span> XP
-          </div>
-          {showPerfect ? (
-            <div className="anim-pop" style={{ marginTop: 6, fontSize: "var(--text-md)", fontWeight: 700, color: "var(--accent-amber)" }}>Perfecto +{data.perfectBonus}</div>
-          ) : null}
-          {showStreak ? (
-            <div className="anim-pop" style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 8, color: "var(--accent-amber)", fontSize: "var(--text-md)", fontWeight: 600 }}>
-              <span className="anim-pulse-glow" style={{ display: "inline-flex" }}><KIcon d={ICONS.flame} size={18} /></span>
-              Racha: {data.streak.value} {data.streak.value === 1 ? "día" : "días"}
+        <div className="anim-condense anim-condense--delayed">
+          <GlassPanel strength="strong" padding="var(--space-8)" radius="var(--radius-xl)" style={{ width: 460, textAlign: "center" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+              <Orb size={120} mood="celebrate" />
             </div>
-          ) : null}
+            <h1 style={{ margin: "0 0 6px", fontFamily: "var(--font-display)", fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>¡Lección completada!</h1>
+            <p style={{ margin: "0 0 22px", fontSize: "var(--text-md)", color: "var(--text-secondary)" }}>{data.lessonTitle}</p>
 
-          <div style={{ display: "flex", justifyContent: "center", margin: "24px 0 26px" }}>
-            <Progress value={ring} shape="ring" tone="cyan" size="lg" showLabel />
-          </div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 44, fontWeight: 800, color: "var(--accent-cyan)", fontVariantNumeric: "tabular-nums" }}>
+              +<span ref={xpRef}>0</span> XP
+            </div>
+            {showPerfect ? (
+              <div className="anim-pop" style={{ marginTop: 6, fontSize: "var(--text-md)", fontWeight: 700, color: "var(--accent-amber)" }}>Perfecto +{data.perfectBonus}</div>
+            ) : null}
+            {showStreak ? (
+              <div className="anim-pop" style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 8, color: "var(--accent-amber)", fontSize: "var(--text-md)", fontWeight: 600 }}>
+                <span className="anim-pulse-glow" style={{ display: "inline-flex" }}><KIcon d={ICONS.flame} size={18} /></span>
+                Racha: {data.streak.value} {data.streak.value === 1 ? "día" : "días"}
+              </div>
+            ) : null}
 
-          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-            <Button variant="secondary" onClick={onBack}>Volver al temario</Button>
-            {onNext ? <Button size="lg" iconLeft={<KIcon d={ICONS.play} />} onClick={onNext}>Siguiente lección</Button> : null}
-          </div>
-        </GlassPanel>
+            <div style={{ display: "flex", justifyContent: "center", margin: "24px 0 26px" }}>
+              <Progress value={ring} shape="ring" tone="cyan" size="lg" showLabel />
+            </div>
+
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <Button variant="secondary" onClick={onBack}>Volver al temario</Button>
+              {onNext ? <Button size="lg" iconLeft={<KIcon d={ICONS.play} />} onClick={onNext}>Siguiente lección</Button> : null}
+            </div>
+          </GlassPanel>
+        </div>
       </div>
     </PageFrame>
   );
