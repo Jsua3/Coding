@@ -5,6 +5,8 @@ import { validateResponse } from "../services/exercises.js";
 import { currentStreak, toDayString } from "../services/gamification.js";
 import { isPendingReview } from "../services/review.js";
 import { XP_LESSON, XP_PERFECT, XP_REVIEW } from "../services/xp.js";
+import { unlockedIds } from "../services/metagame.js";
+import { achievementInfo } from "../services/achievements.js";
 
 const router = Router();
 
@@ -37,6 +39,11 @@ router.post("/:id/answer", async (req, res, next) => {
       req.body && req.body.response
     );
     if (!valid) return res.status(400).json({ error: "Tu respuesta no tiene el formato esperado" });
+
+    // El conjunto ANTES de tocar nada. Solo hace falta si la respuesta es correcta: los contadores
+    // de los logros son monótonos y ninguno crece al fallar, así que una respuesta incorrecta no
+    // puede desbloquear nada. Va antes del INSERT del intento porque "resucitado" mira los intentos.
+    const antes = correct ? await unlockedIds(req.userId) : null;
 
     const context = req.body && req.body.context === "review" ? "review" : "lesson";
     let reviewCleared = false;
@@ -116,6 +123,15 @@ router.post("/:id/answer", async (req, res, next) => {
     const idx = all.findIndex((l) => l.id === ex.lesson_id);
     const nextLesson = lessonCompleted && all[idx + 1] ? all[idx + 1].id : null;
 
+    let achievementsUnlocked = [];
+    if (antes) {
+      const despues = await unlockedIds(req.userId);
+      achievementsUnlocked = [...despues]
+        .filter((id) => !antes.has(id))
+        .map(achievementInfo)
+        .filter(Boolean);
+    }
+
     res.json({
       correct,
       explanation: correct ? ex.explain_ok : ex.explain_bad,
@@ -126,6 +142,7 @@ router.post("/:id/answer", async (req, res, next) => {
       courseProgress: detail.progress,
       nextLessonId: nextLesson,
       reviewCleared,
+      achievementsUnlocked,
     });
   } catch (e) {
     next(e);
