@@ -46,6 +46,20 @@ function NavBar({ onHome, tab, setTab, user }) {
   const cls = "lg-nav"
     + (split ? " lg-nav--split" : (animate ? " lg-nav--merged" : ""))
     + (animate ? " lg-nav--anim" : "");
+
+  // Al cambiar de pestaña, el indicador se estira en el eje del viaje mientras se desliza (la clase
+  // dura lo que la animación). El rebote duro del componente Tabs se anula en liquid.css.
+  const [sliding, setSliding] = React.useState(false);
+  const slideTimer = React.useRef(null);
+  React.useEffect(() => () => clearTimeout(slideTimer.current), []);
+  const changeTab = (id) => {
+    if (id === tab) return;
+    setTab(id);
+    setSliding(true);
+    clearTimeout(slideTimer.current);
+    slideTimer.current = setTimeout(() => setSliding(false), 420);
+  };
+
   return (
     <div className={cls}>
       <div className="lg-nav__pill lg-nav__pill--logo" onClick={onHome}>
@@ -54,13 +68,16 @@ function NavBar({ onHome, tab, setTab, user }) {
         <span style={{ width: 4, height: 18, borderRadius: 3, background: "var(--accent-cyan)", boxShadow: "0 0 10px var(--accent-cyan)" }}></span>
       </div>
       <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
-      <div className="lg-nav__pill lg-nav__pill--tabs">
+      <div className={"lg-nav__pill lg-nav__pill--tabs" + (sliding ? " is-sliding" : "")}>
         <NavGlass />
-        <Tabs size="sm" value={tab} onChange={setTab} style={{ width: 380 }} items={[
+        {/* Sin vidrio propio: las pestañas son texto sobre la superficie de la navbar, no una
+            cápsula dentro de otra. El borde se queda en 1px pero transparente, así el layout no
+            se mueve. El indicador de la pestaña activa sí se conserva. */}
+        <Tabs size="sm" value={tab} onChange={changeTab} items={[
           { id: "inicio", label: "Inicio" },
           { id: "materias", label: "Materias" },
           { id: "progreso", label: "Progreso" },
-        ]} />
+        ]} style={{ width: "100%", minWidth: 0, background: "transparent", borderColor: "transparent", boxShadow: "none" }} />
       </div>
       <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
       <div className="lg-nav__pill lg-nav__pill--actions">

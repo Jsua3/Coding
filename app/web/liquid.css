@@ -123,6 +123,38 @@
   border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
 }
 
+/* Quién cede ancho cuando la ventana se estrecha. Sin esto, los puentes tocaban su mínimo y las
+   píldoras desbordaban: el avatar y la racha se salían del cristal por la derecha. Los extremos
+   no encogen (iconos, racha y avatar tienen tamaño propio); la del centro cede primero, y la lista
+   de pestañas recorta antes que empujar, así la navbar nunca desborda por muy estrecha que sea. */
+.lg-nav__pill--logo,
+.lg-nav__pill--actions { flex: 0 0 auto; }
+.lg-nav__pill--tabs { flex: 0 1 auto; min-width: 0; }
+.lg-nav [role="tablist"] { min-width: 0; overflow: hidden; }
+
+/* Las pestañas son TEXTO sobre el vidrio de la navbar, no una cápsula dentro de otra. El fondo y
+   el borde propios del componente Tabs se anulan por prop (ver NavBar); su capa de blur interna,
+   aquí — si no, la zona de las pestañas quedaría con doble blur y se vería más esmerilada. */
+.lg-nav [role="tablist"] > span[aria-hidden] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* El indicador de la pestaña activa viajaba con --ease-spring (rebote de 1.56) a lo largo de
+   ~250px: se pasaba del destino y volvía de golpe. Nuestro propio lenguaje lo prohíbe — el rebote
+   es solo para piezas pequeñas. Ahora se desliza con la curva estándar y, mientras viaja, se
+   ESTIRA en el eje del movimiento y adelgaza en el otro: conservación de volumen, como una gota. */
+.lg-nav [role="tablist"] > div {
+  transition: transform 420ms var(--ease-glass) !important;
+}
+.lg-nav__pill--tabs.is-sliding [role="tablist"] > div {
+  animation: lg-tab-slide 420ms var(--ease-glass);
+}
+@keyframes lg-tab-slide {
+  0%, 100% { scale: 1 1; }
+  45% { scale: 1.14 0.9; }
+}
+
 /* El puente: la masa conectiva. Al partirse adelgaza en Y mientras se estira en X
    (conservación de volumen) y SOLO DESPUÉS se desvanece — por eso la opacidad va con 120ms de
    retardo: el cuello se ve romperse, no apagarse. */
@@ -176,6 +208,7 @@
   .lg-nav__pill::after, .lg-nav__bridge::after { transition: none !important; }
   .lg-nav__glass { transition: none !important; }
   .lg-nav { transition: none !important; }
+  .lg-nav [role="tablist"] > div { transition: none !important; animation: none !important; }
   /* El puente NO lleva display:none aquí: ya se oculta por una declaración normal
      (.lg-nav--split .lg-nav__bridge { transform: scaleY(0) scaleX(1.1); opacity: 0; }), que sigue
      aplicándose bajo reduced motion. transition: none solo quita la interpolación, así que el
