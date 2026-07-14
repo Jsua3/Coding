@@ -28,6 +28,8 @@ export function levelFor(xp) {
   const xpInLevel = total - current.xp;
   const xpToNext = next ? next.xp - total : 0;
   const span = next ? next.xp - current.xp : 0;
-  const progress = next ? Math.round((xpInLevel / span) * 100) : 100;
+  // Math.floor y no Math.round: con round, los ultimos XP de un tramo largo redondean
+  // a 100 y la barra se llena antes de que subas de nivel. El 100 se reserva al ultimo nivel.
+  const progress = next ? Math.floor((xpInLevel / span) * 100) : 100;
   return { n: current.n, name: current.name, xp: total, xpInLevel, xpToNext, progress, next };
 }

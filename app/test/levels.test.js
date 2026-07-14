@@ -12,6 +12,10 @@ test("la curva es ascendente, sin huecos ni retrocesos", () => {
   // El último nivel se alcanza justo al terminar el temario: 64 lecciones x 50 XP.
   assert.equal(LEVELS[11].xp, 3200);
   assert.equal(LEVELS[11].name, "Maestro");
+  assert.deepEqual(LEVELS.map((l) => l.name), [
+    "Aprendiz", "Practicante", "Junior", "Desarrollador", "Semi-senior", "Senior",
+    "Especialista", "Tech lead", "Referente", "Principal", "Arquitecto", "Maestro",
+  ]);
 });
 
 test("sin XP eres Aprendiz al 0%", () => {
@@ -60,4 +64,14 @@ test("en el ultimo nivel no hay siguiente y el progreso es 100", () => {
 test("XP invalido o negativo no rompe: eres Aprendiz", () => {
   assert.equal(levelFor(-10).n, 1);
   assert.equal(levelFor(undefined).n, 1);
+});
+
+test("el progreso nunca llega a 100 si todavia falta XP para el siguiente nivel", () => {
+  // Con Math.round, 3199 XP daba progress: 100 aunque faltara 1 XP para Maestro.
+  for (const xp of [49, 149, 299, 499, 749, 1049, 1399, 1799, 2249, 2699, 3199]) {
+    const l = levelFor(xp);
+    assert.ok(l.next !== null, `${xp} XP deberia tener nivel siguiente`);
+    assert.ok(l.xpToNext > 0, `${xp} XP deberia tener XP pendiente`);
+    assert.ok(l.progress < 100, `${xp} XP: progress ${l.progress} no puede ser 100 si faltan ${l.xpToNext} XP`);
+  }
 });
