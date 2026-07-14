@@ -41,11 +41,12 @@ export function achievementsFor(stats) {
   const unlocked = unlockedFor(stats);
   return ACHIEVEMENTS.map((a) => {
     const on = unlocked.has(a.id);
-    // Un secreto bloqueado no revela nada: ni su nombre, ni su pista, ni su progreso. Un secreto
-    // que se puede leer en la pestaña de red no es un secreto.
+    // Un secreto que se puede leer en la pestaña de red no es un secreto.
     if (a.secret) {
+      // Desbloqueado ya no es secreto: muestra su progreso real, como cualquier otro.
+      // Bloqueado no revela NADA: ni nombre, ni pista, ni progreso (un "3 de 5" delataría la regla).
       return on
-        ? { id: a.id, name: a.name, description: a.description, secret: true, unlocked: true, current: 1, target: 1 }
+        ? { id: a.id, name: a.name, description: a.description, secret: true, unlocked: true, current: Math.min(value(stats, a.metric), a.target), target: a.target }
         : { id: a.id, name: "???", description: "Un logro secreto", secret: true, unlocked: false, current: 0, target: 1 };
     }
     return {

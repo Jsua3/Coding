@@ -84,3 +84,23 @@ test("achievementInfo devuelve el nombre REAL, tambien el de un secreto", () => 
   assert.equal(achievementInfo("madrugador").name, "Madrugador");
   assert.equal(achievementInfo("no-existe"), null);
 });
+
+test("un secreto desbloqueado con objetivo distinto de 1 reporta su progreso REAL", () => {
+  // 'impecable' tiene target 5. Antes reportaba "1 de 1" al desbloquearse.
+  const lista = achievementsFor({ ...VACIO, perfectRun: 5 });
+  const impecable = lista.find((a) => a.id === "impecable");
+  assert.equal(impecable.unlocked, true);
+  assert.equal(impecable.name, "Racha impecable");
+  assert.equal(impecable.current, 5);
+  assert.equal(impecable.target, 5);
+});
+
+test("un secreto BLOQUEADO sigue sin revelar su progreso ni su objetivo real", () => {
+  // Con perfectRun 4 (a uno de caer), no debe filtrarse ni el 4 ni el 5.
+  const lista = achievementsFor({ ...VACIO, perfectRun: 4 });
+  const impecable = lista.find((a) => a.id === "impecable");
+  assert.equal(impecable.unlocked, false);
+  assert.equal(impecable.name, "???");
+  assert.equal(impecable.current, 0);   // un "4 de 5" delataria la regla
+  assert.equal(impecable.target, 1);
+});
