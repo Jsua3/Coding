@@ -39,7 +39,7 @@ export function bestStreak(days) {
 export function weeklyXp(events, now = new Date()) {
   const cutoff = now.getTime() - 7 * DAY_MS;
   return events
-    .filter((e) => new Date(e.created_at).getTime() >= cutoff)
+    .filter((e) => e.amount > 0 && new Date(e.created_at).getTime() >= cutoff)
     .reduce((sum, e) => sum + e.amount, 0);
 }
 

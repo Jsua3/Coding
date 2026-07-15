@@ -31,6 +31,7 @@ test("usuario nuevo: stats en cero y continue apunta a bd1/l1", async () => {
   assert.deepEqual(res.body.stats, {
     xp: 0, xpWeek: 0, streak: 0, bestStreak: 0,
     level: { n: 1, name: "Aprendiz", progress: 0 },
+    dailyGoal: 50, xpToday: 0, balance: 0,
     activeCourses: 0, completedCourses: 0, lockedCourses: 1,
     reviewCount: 0,
   });
@@ -76,4 +77,14 @@ test("/me trae el nivel derivado del XP", async () => {
   assert.equal(res.body.stats.level.n, 2);
   assert.equal(res.body.stats.level.name, "Practicante");
   assert.equal(res.body.stats.level.progress, 0);
+});
+
+test("gastar XP baja el saldo pero NO el nivel ni el xp ganado", async () => {
+  // 60 XP ganados -> nivel 2 (Practicante). Luego un gasto de 50 (escudo).
+  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 60), (?, NULL, -50)", [userId, userId]);
+  const res = await me();
+  assert.equal(res.body.stats.xp, 60);          // ganado, no toca el gasto
+  assert.equal(res.body.stats.balance, 10);      // saldo: 60 - 50
+  assert.equal(res.body.stats.level.n, 2);       // el nivel NO baja
+  assert.equal(res.body.stats.level.name, "Practicante");
 });
