@@ -1,5 +1,29 @@
 const KITI = window.CodingDesignSystem_2ecb3a;
 
+function MetaDiaria({ xpToday, dailyGoal }) {
+  const { GlassPanel, Progress } = KITI;
+  const pct = dailyGoal > 0 ? Math.min(100, Math.round((xpToday / dailyGoal) * 100)) : 0;
+  const cumplida = xpToday >= dailyGoal;
+  const ref = React.useRef(null);
+  React.useEffect(() => { FX.countUp(ref.current, 0, xpToday, 640); }, [xpToday]);
+  return (
+    <GlassPanel tint="cyan" padding="var(--space-5)" style={{ marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
+        <Progress value={pct} shape="ring" tone="cyan" size="lg" showLabel />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: "var(--text-xs)", fontWeight: 600, letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--text-tertiary)" }}>Meta diaria</div>
+          <div style={{ margin: "4px 0 2px", fontFamily: "var(--font-display)", fontSize: "var(--text-2xl)", fontWeight: 800, color: "var(--text-primary)", fontVariantNumeric: "tabular-nums" }}>
+            <span ref={ref}>0</span> / {dailyGoal} XP
+          </div>
+          <div style={{ fontSize: "var(--text-sm)", color: cumplida ? "var(--accent-cyan)" : "var(--text-secondary)" }}>
+            {cumplida ? "¡Meta cumplida! Sigue así." : "XP ganado hoy. Ajústala en tu perfil."}
+          </div>
+        </div>
+      </div>
+    </GlassPanel>
+  );
+}
+
 function StatPanel({ label, value, sub, tone }) {
   const { GlassPanel } = KITI;
   return (
@@ -81,6 +105,27 @@ function InicioScreen({ me, onOpenLesson, onOpenReview, tab, setTab }) {
             </Button>
           ) : null}
         </div>
+
+        <div className="lg-reveal">
+          <MetaDiaria xpToday={stats.xpToday} dailyGoal={stats.dailyGoal} />
+        </div>
+
+        {progress && progress.streak && progress.streak.repairable ? (
+          <div className="lg-reveal">
+            <KITI.GlassPanel padding="var(--space-5)" style={{ marginBottom: 28, border: "1px solid rgba(230,175,107,0.45)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+                <span aria-hidden style={{ fontSize: 28 }}><KIcon d={ICONS.flame} size={26} /></span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--text-primary)" }}>Tu racha se rompió</div>
+                  <div style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)" }}>
+                    Recupérala por {progress.streak.repairable.totalCost} XP antes de que sea tarde.
+                  </div>
+                </div>
+                <Button variant="secondary" onClick={() => setTab("perfil")}>Ir a proteger</Button>
+              </div>
+            </KITI.GlassPanel>
+          </div>
+        ) : null}
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
           <div className="lg-reveal">
