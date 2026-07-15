@@ -62,3 +62,18 @@ test("el repaso legitimo sigue funcionando: fallar en leccion, luego acertar en 
   assert.equal(r.body.reviewCleared, true);
   assert.equal(r.body.xpAwarded, 5);
 });
+
+test("re-responder 'review' un ejercicio ya limpiado (no pendiente) se degrada a 'lesson'", async () => {
+  const { token, id } = await registrar();
+  const ejercicios = await ejerciciosDe("l1");
+  const ex = ejercicios[0].id;
+  await responder(token, ex, { response: await wrongResponseFor(ex) });                          // falla en lección
+  await responder(token, ex, { response: await correctResponseFor(ex), context: "review" });     // limpia en repaso
+  // Ya no está pendiente: un nuevo intento con 'review' debe registrarse como 'lesson'.
+  await responder(token, ex, { response: await correctResponseFor(ex), context: "review" });
+  const rows = await query(
+    "SELECT context FROM answer_attempts WHERE user_id = ? AND exercise_id = ? ORDER BY id",
+    [id, ex]
+  );
+  assert.deepEqual(rows.map((r) => r.context), ["lesson", "review", "lesson"]);
+});
