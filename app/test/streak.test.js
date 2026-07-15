@@ -74,3 +74,43 @@ test("un día protegido cuenta para bestStreak (y por tanto para los logros de c
   const s = await achievementStats(id);
   assert.equal(s.bestStreak, 3); // los 3 días consecutivos, con el del medio protegido
 });
+
+test("protege un hueco de 2 días: dos escudos y un solo cobro, en una transacción", async () => {
+  const id = await crearUsuario();
+  // Activo hace 3 días y hoy; faltan hace(2) y hace(1) -> hueco de 2 días (ambos dentro de la ventana).
+  await query("INSERT INTO lesson_completions (user_id, lesson_id, completed_at) VALUES (?, 'l1', ?), (?, 'l2', ?)",
+    [id, hace(3) + " 10:00:00", id, hace(0) + " 10:00:00"]);
+  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 100), (?, 'l2', 100)", [id, id]);
+
+  const antes = await streakStateFor(id);
+  assert.equal(antes.repairable.totalCost, 100); // 2 días x 50
+
+  const r = await protectStreak(id);
+  assert.equal(r.streak.current, 4);            // hoy + los 2 protegidos + el de hace 3
+  assert.equal(r.streak.repairable, null);
+  assert.equal(r.balance, 100);                 // 200 ganados - 100 gastados
+  // Se insertaron LOS DOS escudos y UN SOLO evento de gasto.
+  assert.deepEqual((await protectedDaysFor(id)).sort(), [hace(2), hace(1)].sort());
+  const gastos = await query("SELECT amount FROM xp_events WHERE user_id = ? AND amount < 0", [id]);
+  assert.equal(gastos.length, 1);
+  assert.equal(gastos[0].amount, -100);
+});
+
+test("si un escudo del hueco ya existe, la transacción revierte entera: no cobra dos veces", async () => {
+  const id = await crearUsuario();
+  // Hueco de 1 día (hace(1)) reparable.
+  await query("INSERT INTO lesson_completions (user_id, lesson_id, completed_at) VALUES (?, 'l1', ?), (?, 'l2', ?)",
+    [id, hace(2) + " 10:00:00", id, hace(0) + " 10:00:00"]);
+  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 50), (?, 'l2', 50)", [id, id]);
+  // Una petición concurrente ya protegió ese mismo día (simulamos su escudo ya insertado).
+  await query("INSERT INTO streak_shields (user_id, protected_day) VALUES (?, ?)", [id, hace(1)]);
+  const saldoAntes = await balanceXpFor(id); // 100
+
+  // protectStreak recalcula: con el escudo ya puesto, hace(1) YA es crédito, así que el hueco es null.
+  // Debe rechazar con 400 (no reparable) SIN cobrar. (Si tu streakStateFor ya no ve hueco, este es el
+  // camino esperado — verifica que NO se creó ningún evento de gasto.)
+  await assert.rejects(() => protectStreak(id), (e) => e.status === 400);
+  const gastos = await query("SELECT amount FROM xp_events WHERE user_id = ? AND amount < 0", [id]);
+  assert.equal(gastos.length, 0, "no debe haber ningún cobro");
+  assert.equal(await balanceXpFor(id), saldoAntes);
+});
