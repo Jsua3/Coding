@@ -8,6 +8,21 @@ import { levelFor } from "../services/levels.js";
 
 const router = Router();
 
+export const DAILY_GOAL_OPTIONS = [20, 50, 100, 150];
+
+router.put("/daily-goal", async (req, res, next) => {
+  try {
+    const goal = req.body && req.body.goal;
+    if (!DAILY_GOAL_OPTIONS.includes(goal)) {
+      return res.status(400).json({ error: "Esa meta no es válida" });
+    }
+    await query("UPDATE users SET daily_goal = ? WHERE id = ?", [goal, req.userId]);
+    res.json({ dailyGoal: goal });
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.get("/", async (req, res, next) => {
   try {
     const users = await query("SELECT id, name, email FROM users WHERE id = ?", [req.userId]);
