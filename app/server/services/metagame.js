@@ -87,7 +87,7 @@ export async function activityByDay(userId) {
     return byDay.get(day);
   };
   for (const c of completions) cell(toDayString(c.completed_at)).lessons += 1;
-  for (const e of events) cell(toDayString(e.created_at)).xp += e.amount;
+  for (const e of events) if (e.amount > 0) cell(toDayString(e.created_at)).xp += e.amount;
   return byDay;
 }
 

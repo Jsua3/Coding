@@ -64,3 +64,22 @@ test("el XP y los logros se reflejan en /progress", async () => {
   const primer = r.body.achievements.find((a) => a.id === "primera-leccion");
   assert.equal(primer.unlocked, true);
 });
+
+test("/progress trae el estado de racha", async () => {
+  const token = await registrar();
+  const r = await request(app).get("/api/progress").set("Authorization", "Bearer " + token);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.streak.current, 0);
+  assert.equal(r.body.streak.best, 0);
+  assert.equal(r.body.streak.repairable, null);
+});
+
+test("el nivel de /progress se deriva del XP GANADO, no del saldo", async () => {
+  const token = await registrar();
+  const [u] = await query("SELECT id FROM users WHERE email = 'ana@test.dev'");
+  // 60 ganados -> nivel 2. Un gasto de 50 no debe bajar el nivel.
+  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 60), (?, NULL, -50)", [u.id, u.id]);
+  const r = await request(app).get("/api/progress").set("Authorization", "Bearer " + token);
+  assert.equal(r.body.level.n, 2);
+  assert.equal(r.body.level.name, "Practicante");
+});
