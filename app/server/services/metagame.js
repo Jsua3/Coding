@@ -3,6 +3,7 @@ import { toDayString, bestStreak } from "./gamification.js";
 import { XP_PERFECT, XP_REVIEW } from "./xp.js";
 import { coursesForUser } from "./progress.js";
 import { unlockedFor } from "./achievements.js";
+import { protectedDaysFor } from "./streak.js";
 
 // Los contadores de los que dependen los logros. TODOS son monótonos (solo crecen), y por eso es
 // seguro derivar los logros en vez de guardarlos: el conjunto de desbloqueados nunca encoge.
@@ -60,7 +61,7 @@ export async function achievementStats(userId) {
 
   return {
     lessonsDone: completions.length,
-    bestStreak: bestStreak(completions.map((c) => toDayString(c.completed_at))),
+    bestStreak: bestStreak([...completions.map((c) => toDayString(c.completed_at)), ...(await protectedDaysFor(userId))]),
     perfectLessons: perfectIds.size,
     coursesCompleted: courses.filter((c) => c.status === "COMPLETADO").length,
     reviewCleared: events.filter((e) => e.amount === XP_REVIEW).length,
