@@ -8,7 +8,7 @@ const META_NIVELES = [
 ];
 
 function ProfileScreen({ me, tab, setTab, refreshMe }) {
-  const { GlassPanel, Button, Badge } = KITF;
+  const { GlassPanel, Button } = KITF;
   const [data, setData] = React.useState(null); // /progress: para el estado de racha
   const [goal, setGoal] = React.useState(me.stats.dailyGoal);
   const [saving, setSaving] = React.useState(false);
