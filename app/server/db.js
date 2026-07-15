@@ -41,6 +41,10 @@ export async function initDb({ seed = true } = {}) {
   for (const stmt of schema.split(";").map((s) => s.trim()).filter(Boolean)) {
     await getPool().query(stmt);
   }
+  // Migraciones idempotentes: CREATE TABLE IF NOT EXISTS no añade columnas a tablas que ya existen,
+  // así que la BD dev que ya tiene `users` no recibiría daily_goal sin esto. MariaDB 12 soporta
+  // ADD COLUMN IF NOT EXISTS, que es un no-op tanto en BD nueva como existente.
+  await getPool().query("ALTER TABLE users ADD COLUMN IF NOT EXISTS daily_goal INT NOT NULL DEFAULT 50");
   if (seed) {
     const rows = await query("SELECT COUNT(*) AS n FROM courses");
     if (rows[0].n === 0) {

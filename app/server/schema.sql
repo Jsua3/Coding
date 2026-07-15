@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
   name VARCHAR(80) NOT NULL,
   email VARCHAR(120) NOT NULL UNIQUE,
   password_hash VARCHAR(100) NOT NULL,
+  daily_goal INT NOT NULL DEFAULT 50,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -79,3 +80,12 @@ CREATE TABLE IF NOT EXISTS answer_attempts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS quiz_questions;
+
+CREATE TABLE IF NOT EXISTS streak_shields (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  protected_day DATE NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_shield (user_id, protected_day),
+  CONSTRAINT fk_shield_user FOREIGN KEY (user_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

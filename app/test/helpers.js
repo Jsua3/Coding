@@ -15,6 +15,7 @@ export async function resetUserData() {
   await query("TRUNCATE TABLE answer_attempts");
   await query("TRUNCATE TABLE xp_events");
   await query("TRUNCATE TABLE lesson_completions");
+  await query("TRUNCATE TABLE streak_shields");
   await query("TRUNCATE TABLE users");
   await query("SET FOREIGN_KEY_CHECKS = 1");
 }
