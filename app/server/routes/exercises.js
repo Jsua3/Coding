@@ -45,11 +45,14 @@ router.post("/:id/answer", async (req, res, next) => {
     // puede desbloquear nada. Va antes del INSERT del intento porque "resucitado" mira los intentos.
     const antes = correct ? await unlockedIds(req.userId) : null;
 
-    const context = req.body && req.body.context === "review" ? "review" : "lesson";
-    let reviewCleared = false;
-    if (context === "review" && correct) {
-      reviewCleared = await isPendingReview(req.userId, ex.id);
-    }
+    // El cliente dice en qué pantalla está, pero solo puede reclamar "review" para un ejercicio que
+    // de verdad está pendiente de repaso. Si miente (pide review sobre algo no pendiente, p. ej. para
+    // esconder un fallo de lección), lo degradamos a 'lesson': el servidor decide la verdad, igual
+    // que con `answer`. isPendingReview mira los intentos ANTERIORES, así que va antes del INSERT.
+    const claimsReview = Boolean(req.body && req.body.context === "review");
+    const pending = claimsReview ? await isPendingReview(req.userId, ex.id) : false;
+    const context = pending ? "review" : "lesson";
+    const reviewCleared = pending && correct;
 
     await query(
       "INSERT INTO answer_attempts (user_id, exercise_id, context, correct) VALUES (?, ?, ?, ?)",
