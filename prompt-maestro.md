@@ -1,7 +1,7 @@
 # PROMPT MAESTRO — Coding
 
 > Documento de contexto total del proyecto. **Léelo completo antes de trabajar en él desde una conversación nueva.**
-> Última actualización: **2026-07-14**, tras fusionar la 5ª iteración ("El meta-juego A") a `master` (commit `641278f`).
+> Última actualización: **2026-07-15**, tras fusionar la 6ª iteración ("El meta-juego B — la economía") y el fix del `context` a `master` (código en `0df7fb3`).
 
 ---
 
@@ -17,7 +17,7 @@
 
 ---
 
-## 2. Estado actual: cinco iteraciones fusionadas a `master`
+## 2. Estado actual: seis iteraciones + un fix, todo fusionado a `master`
 
 | # | Iteración | Qué añadió |
 |---|---|---|
@@ -26,18 +26,14 @@
 | 3 | **La coreografía de gota** (`2026-07-13-coreografia-de-gota`) | Las **transiciones** hablan el lenguaje: la banda de feedback cae con squash & stretch y se evapora; el stepper hace *melt* entre ejercicios; la celebración se abre con un *bloom* desde el tap. Primitiva `usePhase`. |
 | 4 | **El vidrio vivo** (`2026-07-14-vidrio-vivo`) | El **material** se comporta como materia: la navbar se parte en tres por tensión superficial al hacer scroll; *ripple* que nace donde tocas; ruido fractal sobre la aurora; elementos que se condensan al entrar. `window.Liquid`. + menú de perfil en el avatar y **cierre de sesión** (antes no existía). |
 | 5 | **El meta-juego A** (`2026-07-14-meta-juego-a`) | **Niveles** (12, Aprendiz→Maestro) y **17 logros** (4 secretos), ambos **derivados**; página de **Progreso** (heatmap de 365 días, gráfica semanal, colección); **toast de logro**; y las tres **pestañas de la navbar por fin navegan** (nunca lo hicieron). |
+| 6 | **El meta-juego B — la economía** (`2026-07-15-meta-juego-b`) | **Meta diaria de XP** configurable (anillo en Inicio); **protector de racha** canjeable con XP (reparación retroactiva); página de **Perfil**. El **split de XP**: nivel desde el XP ganado (nunca baja), saldo gastable desde el neto. **Primer cambio de esquema desde la iteración 2.** |
+| — | **Fix del `context`** (`fix/context-guard`) | Cerró un agujero de integridad preexistente: `POST /answer` confiaba en el `context` del cliente. Ahora el servidor lo degrada a `'lesson'` salvo que el ejercicio esté genuinamente pendiente de repaso. |
 
-**Tests: 102/102** (empezó en 57).
+**Tests: 137/137** (empezó en 57). **El sub-proyecto 3 "El meta-juego" está entero** (A derivado + B economía).
 
-### Lo siguiente acordado: "El meta-juego, Iteración B — la economía"
+### Lo siguiente: no hay una iteración grande acordada
 
-Es lo único del meta-juego que **exige tocar el esquema**, y por eso se separó:
-
-- **Meta diaria de XP configurable.** Es una preferencia del usuario: no se deriva de nada. Exige columna nueva en `users`.
-- **Protector de racha canjeable con XP.** Obliga a cambiar `currentStreak`, la función pura más delicada de la app (tendría que saber qué huecos cubrió un escudo). El XP se gasta como un `xp_events` con **importe negativo** — la tabla ya lo permite y `xp = SUM(amount)` sigue siendo cierto.
-- **Página de Perfil.** En la Iteración A no se hizo **a propósito**: no tendría contenido propio (el menú del avatar ya da nombre, email y cerrar sesión). En B nace con una razón real: ser el sitio de los ajustes.
-
----
+El roadmap del meta-juego está completo. El siguiente paso natural del **lenguaje visual** es el **cursor como fuente de luz** (`docs/liquid-glass.md` §10, paso 3) — el brillo especular que sigue al puntero + tilt 3D sutil; el usuario lo dejó fuera de la iteración 4 conscientemente. Ver §11 para la deuda abierta.
 
 ## 3. Stack y decisiones técnicas (todas acordadas con el usuario)
 
@@ -85,14 +81,15 @@ coding/                                  (repo git, rama master; remoto: github.
     ├── server/
     │   ├── index.js                     ← createApp(): API en /api/*, estáticos /ds y web/, error middleware
     │   ├── db.js                        ← pool mysql2 lazy; initDb() crea BD, aplica schema, siembra si vacía
-    │   ├── schema.sql                   ← DDL (8 tablas). SIN CAMBIOS desde la iteración 2
+    │   ├── schema.sql                   ← DDL (9 tablas). users.daily_goal + streak_shields desde la iteración 6
     │   ├── seed.js                      ← upsert idempotente por ids estables; CLI: npm run seed
     │   ├── auth.js                      ← register/login, requireAuth (Bearer JWT → req.userId)
-    │   ├── routes/                      ← me, courses, lessons, exercises, review, progress
+    │   ├── routes/                      ← me, courses, lessons, exercises, review, progress, streak
     │   ├── services/
-    │   │   ├── xp.js                    ← XP_LESSON=50, XP_PERFECT=10, XP_REVIEW=5 (se ESCRIBEN y se LEEN)
+    │   │   ├── xp.js                    ← importes (LESSON=50, PERFECT=10, REVIEW=5, SHIELD_COST=50) + earnedXp/balanceXp
     │   │   ├── progress.js              ← progressPercent, courseStatus, coursesForUser, courseDetail
-    │   │   ├── gamification.js          ← toDayString, currentStreak, bestStreak, weeklyXp (puras)
+    │   │   ├── gamification.js          ← toDayString, currentStreak, bestStreak, weeklyXp, repairableGap (puras)
+    │   │   ├── streak.js                ← protectedDaysFor, streakStateFor, balanceXpFor, protectStreak (async + tx)
     │   │   ├── exercises.js             ← validateResponse (pura)
     │   │   ├── review.js                ← cola de repaso derivada (orden por id de intento)
     │   │   ├── levels.js                ← LEVELS (12) + levelFor(xp) (pura)
@@ -106,27 +103,32 @@ coding/                                  (repo git, rama master; remoto: github.
     │   ├── liquid.js, liquid.css        ← window.Liquid: ripple(), reveal() + el CSS del vidrio vivo
     │   ├── app.jsx                      ← router (lee `tab`), toast global, COLA DE LOGROS
     │   └── screens/                     ← Orb, AppShell, Login, Inicio, Materias, Course,
-    │                                      exercises, Lesson (+Celebration +FeedbackBand), Review, Progress
-    ├── test/                            ← 102 tests: node:test + supertest contra MariaDB real (BD coding_test)
+    │                                      exercises, Lesson (+Celebration +FeedbackBand), Review, Progress, Profile
+    ├── test/                            ← 137 tests: node:test + supertest contra MariaDB real (BD coding_test)
     └── README.md
 ```
 
 ---
 
-## 5. Modelo de datos (MariaDB, InnoDB, utf8mb4) — **8 tablas, sin cambios desde la iteración 2**
+## 5. Modelo de datos (MariaDB, InnoDB, utf8mb4) — **9 tablas**
+
+> El esquema fue estable de la iteración 2 a la 5. La iteración 6 (la economía) fue el **primer cambio**: la columna `users.daily_goal` y la tabla `streak_shields`. `initDb` aplica `schema.sql` con `CREATE TABLE IF NOT EXISTS` + un paso de **migración idempotente** (`ALTER TABLE … ADD COLUMN IF NOT EXISTS`) para la columna nueva en la BD dev existente.
 
 | Tabla | Claves/campos esenciales |
 |---|---|
-| `users` | id AI, name, email UNIQUE, password_hash, created_at |
+| `users` | id AI, name, email UNIQUE, password_hash, **daily_goal INT DEFAULT 50**, created_at |
 | `courses` | id VARCHAR ('bd1','prog2','algo','bd2','prog1','web' — ese es el orden del catálogo), subject, subject_tone ENUM(blue,cyan,violet,amber), title, description, prereq_course_id (SOLO bd2→bd1) |
 | `units` | id VARCHAR, course_id FK, name, order_index |
 | `lessons` | id VARCHAR, unit_id FK, title, mins, order_index, **content JSON** (bloques `p`/`code`/`note`) |
 | `exercises` | id VARCHAR `"<lessonId>-ex1\|ex2"`, lesson_id FK, order_index, type ENUM(choice,blanks,order,match), prompt, **payload JSON** (lo que ve el cliente), **answer JSON** (solo servidor), explain_ok, explain_bad |
 | `answer_attempts` | id AI, user_id, exercise_id, context ENUM(lesson,review), correct, created_at DATETIME(3). **El orden de eventos se deriva del `id`, NUNCA del timestamp** |
 | `lesson_completions` | PK compuesta (user_id, lesson_id), completed_at. **Sin id autoincremental** — ver §11 |
-| `xp_events` | id AI, user_id, lesson_id NULL, **amount INT (puede ser NEGATIVO)**, created_at |
+| `xp_events` | id AI, user_id, lesson_id NULL, **amount INT (puede ser NEGATIVO** — el gasto del protector de racha es un evento negativo), created_at |
+| `streak_shields` | id AI, user_id FK, protected_day DATE, created_at, **UNIQUE(user_id, protected_day)**. Un día protegido por fila |
 
 Sembrado: 6 cursos, 18 unidades, **64 lecciones**, **128 ejercicios** (2 por lección).
+
+**El split de XP** (derivado, sin columnas): **XP ganado** = `SUM(amount>0)` → alimenta el nivel (nunca baja) y todo lo de "actividad" (meta diaria, gráfica semanal, heatmap). **Saldo** = `SUM(amount)` (con negativos) → lo gastable. Helpers `earnedXp`/`balanceXp` en `services/xp.js`.
 
 ---
 
@@ -136,13 +138,15 @@ Sembrado: 6 cursos, 18 unidades, **64 lecciones**, **128 ejercicios** (2 por lec
 |---|---|
 | `POST /auth/register` | `201 {token, user}`. 400 validación, 409 email duplicado |
 | `POST /auth/login` | `{token, user}`; 401 credenciales malas; `remember` → 30d |
-| `GET /me` | `{user, stats:{xp, **level:{n,name,progress}**, xpWeek, streak, bestStreak, activeCourses, completedCourses, lockedCourses, reviewCount}, continue}` |
+| `GET /me` | `{user:{…, **createdAt**}, stats:{xp (ganado), **level:{n,name,progress}**, xpWeek, streak, bestStreak, **dailyGoal, xpToday, balance**, activeCourses, completedCourses, lockedCourses, reviewCount}, continue}` |
 | `GET /courses` | catálogo con progreso y status (NUEVO/EN CURSO/COMPLETADO/**BLOQUEADO**) |
 | `GET /courses/:id` | detalle + unidades + lecciones; **403** si bloqueado; 404 si no existe |
 | `GET /lessons/:id` | contenido + ejercicios **sin answers**; 403 si curso bloqueado |
-| `POST /exercises/:id/answer` | `{correct, explanation, lessonCompleted, xpAwarded, perfectBonus, streak, courseProgress, nextLessonId, reviewCleared, **achievementsUnlocked**}` |
+| `POST /exercises/:id/answer` | `{correct, explanation, lessonCompleted, xpAwarded, perfectBonus, streak, courseProgress, nextLessonId, reviewCleared, achievementsUnlocked}`. **El servidor decide el `context`** (§7.10) |
 | `GET /review` | cola de repaso (máx 10) |
-| **`GET /progress`** | `{level, achievements[17], heatmap[365], weekXp[7]}` — todo derivado |
+| **`GET /progress`** | `{level, **streak:{current,best,repairable}**, achievements[17], heatmap[365], weekXp[7]}` — todo derivado |
+| **`PUT /me/daily-goal`** `{goal}` | guarda la meta; `goal` ∈ [20,50,100,150] o 400 |
+| **`POST /streak/protect`** | repara el hueco (recalculado en el servidor), cobra en transacción → `{streak, balance}`; 400 si no reparable o falta saldo |
 
 Errores: middleware central, `{error}` en español con tuteo, 500 genérico sin stack.
 
@@ -151,12 +155,15 @@ Errores: middleware central, `{error}` en español con tuteo, 500 genérico sin 
 ## 7. Reglas de negocio (la "lógica del programa")
 
 1. **Completar lección** = todos sus ejercicios con ≥1 intento correcto. Al acertar el último: transacción con `lesson_completions` + `xp_events(+50)` (+`+10` si **perfecto** = cero fallos con context='lesson'). `ER_DUP_ENTRY` tolerado. Solo context='lesson' completa lecciones.
-2. **Racha**: días-calendario consecutivos con ≥1 completación, hacia atrás desde hoy (si hoy no hay actividad, cuenta desde ayer). El "día" sale SIEMPRE del reloj de Node (`toDayString`), **nunca** de `CURDATE()`.
+2. **Racha**: días-calendario consecutivos **con crédito** (≥1 completación **o** un día protegido), hacia atrás desde hoy (si hoy no hay actividad, cuenta desde ayer). El "día" sale SIEMPRE del reloj de Node (`toDayString`), **nunca** de `CURDATE()`. Un día protegido cuenta en `currentStreak`, `bestStreak` y los logros de constancia — de forma consistente (se pasa la unión `activos ∪ protegidos` a las funciones puras, que no cambian por dentro).
 3. **Repaso**: un ejercicio queda pendiente si tiene un fallo sin acierto posterior con context='review' (**comparación por id de intento**). Acertar en lección NO desencola (refuerzo tipo Duolingo); acertar en repaso desencola y da **+5 XP una sola vez**.
 4. **Desbloqueo**: `bd2` exige `bd1` al 100%. Se aplica en el SERVIDOR (403), no solo en la UI.
 5. **Niveles**: 12, de Aprendiz (0 XP) a **Maestro (3.200 XP = las 64 lecciones)**. La curva está anclada al techo real del juego: terminar el temario te hace Maestro. `progress` usa `Math.floor` — **nunca puede decir 100% si aún falta XP**.
 6. **Logros**: 17 (13 visibles + **4 secretos**). Se derivan de contadores **monótonos** (solo crecen) — por eso es seguro derivarlos: el conjunto de desbloqueados nunca encoge. La constancia se mide contra `bestStreak` (la MEJOR racha), no la actual: perder la racha no te quita el logro.
 7. **El toast** solo puede dispararse en `POST /answer` (la única acción que muta el juego), sale de un diff antes/después, y **se ancla al montaje de la celebración**, no al momento de responder (si no, caería sobre el ejercicio y la celebración se abriría encima).
+8. **Meta diaria**: preferencia guardada (`users.daily_goal`, escala [20,50,100,150]). Es un objetivo APARTE de la racha (no la afecta): la racha sigue siendo "≥1 día con crédito". El anillo mide XP **ganado** hoy.
+9. **Protector de racha** (reparación retroactiva): si tu racha se rompió por un hueco reciente, pagas XP para rellenarlo. `repairableGap` (pura, `gamification.js`) decide qué es reparable con **tres guardas de honestidad**: (a) sin actividad hoy ni ayer → nada que proteger; (b) solo dentro de una ventana de **2 días**; (c) solo si el hueco topa con un ancla (racha previa a la que reconectar) — **no se puede fabricar** una racha de la nada. Coste **50 XP/día** (`SHIELD_COST`). El servidor **recalcula** el hueco (jamás confía en el cliente), valida saldo, y cobra en una transacción (escudo(s) + `xp_events` negativo). **Gastar baja el saldo pero NO el nivel** (el nivel sale del XP ganado).
+10. **El servidor decide el `context`** de un intento (`answer_attempts`): degrada `'review'` a `'lesson'` salvo que el ejercicio esté genuinamente pendiente de repaso (`isPendingReview`, mirado antes del INSERT). El cliente dice en qué pantalla está, pero no puede reclamar "review" para algo no pendiente — así el primer fallo de cualquier ejercicio siempre cuenta como fallo de lección y es imposible forjar una lección perfecta.
 
 ### Tipos de ejercicio (contratos exactos)
 
@@ -184,7 +191,7 @@ Errores: middleware central, `{error}` en español con tuteo, 500 genérico sin 
 ## 9. Entorno local y comandos (Windows del usuario)
 
 - **BD**: lo que corre en `localhost:3306` es **MariaDB 12.0.2** (servicio de Windows), no MySQL. Credenciales reales en `app/.env` (git-ignorado; usuario root). **Nunca adivinar contraseñas: si `.env` falta o falla, pedírselas al usuario.** BD dev `coding`; BD de tests `coding_test` (se crea/trunca sola).
-- **Comandos** (desde `app/`): `npm start` (:3000), `npm test` (**102/102**), `npm run seed` (refresca contenido sin tocar usuarios ni progreso).
+- **Comandos** (desde `app/`): `npm start` (:3000), `npm test` (**137/137**), `npm run seed` (refresca contenido sin tocar usuarios ni progreso).
 - **El dev server suele quedar corriendo entre sesiones**. Guarda el backend **en memoria**: si sus respuestas `/api` parecen viejas, **mátalo y relanza** `npm start`. Los estáticos (`web/`) sí se sirven frescos del disco.
 - Cuenta de pruebas: `juan@test.dev` / `secreto1`.
 - Frontend con CDN (React/Babel de unpkg con SRI): requiere internet la primera carga. **Vendorizarlos sigue pendiente.**
@@ -218,22 +225,22 @@ Para cualquier trabajo no trivial, el flujo **superpowers** de principio a fin:
 
 ## 11. Lo que falta y lo que hay que mejorar
 
-### Lo siguiente grande
-- **Meta-juego, Iteración B (la economía)** — ver §2. Es la única parte que toca el esquema.
+### El siguiente paso natural del lenguaje visual
+`docs/liquid-glass.md` §10 define un orden de adopción. Ya están hechos los pasos 1 y 2 (coreografía de gota, ripple/reveals/textura). **Falta el paso 3: el cursor como fuente de luz** — el brillo especular que sigue al puntero sobre cada superficie de vidrio, más el tilt 3D sutil (máx 6°) con retardo de intención de 90ms. El usuario lo dejó fuera de la iteración 4 conscientemente. Es la pieza que más "vida" añadiría, y no hay ninguna iteración grande más acordada, así que es el candidato más claro.
 
 ### Deuda real, ordenada por importancia
 
-1. **AGUJERO DE INTEGRIDAD (preexistente, y su radio creció con la iteración 5).** `POST /exercises/:id/answer` deja que **el cliente dicte el `context`** (`'lesson'|'review'`) y lo registra en `answer_attempts` sin comprobar `isPendingReview`. Un cliente que mande `context: "review"` en sus respuestas **falladas** durante una lección deja cero fallos de contexto lección ⇒ la lección se marca **perfecta** ⇒ se escribe el bonus de 10 XP ⇒ se inflan `perfectLessons` y `perfectRun` ⇒ **se forjan tres logros, uno de ellos secreto**. Es un usuario local haciéndose trampas a sí mismo, pero está mal. **Fix de raíz:** validar el `context` contra `isPendingReview` en la ruta antes del INSERT. Tiene una decisión de diseño detrás: ¿degradar en silencio a `'lesson'`, o rechazar con 400?
-2. **`perfectRun` es el único contador NO estrictamente monótono.** `lesson_completions` no tiene id autoincremental (su PK es compuesta), así que no hay clave de orden de inserción; el desempate por `lesson_id` da determinismo, no cronología. Prácticamente inalcanzable, pero solo se cierra con una **columna de orden en el esquema** — la Iteración B es el sitio.
-3. **`.lg-bars__bar` transiciona `height`** (propiedad de layout), contra la regla del proyecto. Ya está cubierto por reduced motion, pero re-arquitecturarlo a `transform: scaleY()` queda pendiente.
-4. **`diez-repasos` cuenta eventos de XP, no ejercicios distintos**: fallar y limpiar el mismo ejercicio 10 veces lo desbloquea, aunque el copy diga "Corrige 10 ejercicios en repaso".
-5. **El `try/catch` que contiene el fallo del cálculo de logros no tiene test.** No existe costura limpia sin mockeo de ESM (namespaces sellados; `t.mock.module` no afecta a imports estáticos ya enlazados). Ambos caminos alternativos se evaluaron y se rechazaron con razón. Verificado por lectura.
-6. **Vendorizar React/ReactDOM/Babel** a `app/web/vendor/` para funcionar offline.
-7. **Verificación humana pendiente**: el *feel* de la navbar líquida, el toast, el heatmap y los reveals necesita un navegador en **primer plano** — el tooling congela `rAF` y el `IntersectionObserver`.
-8. Menores aceptados con razón documentada en el ledger (`.superpowers/sdd/progress.md`) — **consúltalo antes de "redescubrir" issues**.
+1. **`perfectRun` es el único contador NO estrictamente monótono.** `lesson_completions` no tiene id autoincremental (su PK es compuesta), así que no hay clave de orden de inserción; el desempate por `lesson_id` da determinismo, no cronología. Prácticamente inalcanzable (exige 3 completaciones en el mismo segundo). Solo se cierra con una **columna de orden en el esquema**. (La iteración 6 tocó el esquema pero no lo abordó — no era su alcance.)
+2. **`.lg-bars__bar` (gráfica semanal) transiciona `height`** (propiedad de layout), contra la regla del proyecto. Ya está cubierto por reduced motion, pero re-arquitecturarlo a `transform: scaleY()` queda pendiente.
+3. **`diez-repasos` cuenta eventos de XP, no ejercicios distintos**: fallar y limpiar el mismo ejercicio 10 veces lo desbloquea, aunque el copy diga "Corrige 10 ejercicios en repaso".
+4. **Dos `try/catch` sin test directo, ambos con razón documentada:** (a) el que contiene el fallo del cálculo de logros en `POST /answer`; (b) el `ER_DUP_ENTRY` dentro de la transacción de `protectStreak` (inalcanzable en una conexión: el pre-check lee la misma tabla cuyo UNIQUE chocaría). Ninguno tiene costura limpia sin mockeo de ESM o una carrera de dos conexiones. Verificados por lectura.
+5. **Dos lecturas independientes de `new Date()` por petición** en `/me` y `/progress` podrían discrepar en el límite exacto de medianoche. Astronómicamente raro y autocorregible; pasar un único `now` a todo el response lo cierra.
+6. **`FX.countUp` no cancela su `rAF`**: un re-disparo con una animación en vuelo puede parpadear. Patrón preexistente en varias pantallas.
+7. **Vendorizar React/ReactDOM/Babel** a `app/web/vendor/` para funcionar offline.
+8. **Verificación humana pendiente**: el *feel* de la navbar líquida, el toast de logro, el heatmap, los reveals, y **las chispas al proteger la racha** necesita un navegador en **primer plano** — el tooling congela `rAF` y el `IntersectionObserver`.
+9. Menores aceptados con razón documentada en el ledger (`.superpowers/sdd/progress.md`) — **consúltalo antes de "redescubrir" issues**.
 
-### El siguiente paso natural del lenguaje visual
-`docs/liquid-glass.md` §10 define un orden de adopción. Ya están hechos los pasos 1 y 2 (coreografía de gota, ripple/reveals/textura). **Falta el paso 3: el cursor como fuente de luz** — el brillo especular que sigue al puntero sobre cada superficie de vidrio, más el tilt 3D sutil (máx 6°) con retardo de intención de 90ms. El usuario lo dejó fuera de la iteración 4 conscientemente. Es la pieza que más "vida" añadiría.
+> **Cerrado ya:** el agujero de integridad del `context` (un cliente podía forjar lecciones perfectas mandando `context:"review"` en sus fallos) — resuelto en `fix/context-guard`: el servidor decide el `context` (§7.10).
 
 ### Fuera de alcance decidido
 Ejecución de código libre, drag & drop, vidas/corazones, leaderboard, recuperación de contraseña, migración a Vite (el backend en capas lo permite después).
@@ -242,4 +249,4 @@ Ejecución de código libre, drag & drop, vidas/corazones, leaderboard, recupera
 
 ## 12. Resumen en una frase
 
-Coding es un Duolingo de Ingeniería de Software, local y en español, con estética Liquid Glass: Express + MariaDB con **toda la lógica derivada** (progreso, racha, repaso, niveles, logros — cero columnas de estado) y validación server-side; frontend React sin build donde el vidrio se comporta como materia (se parte por tensión superficial, responde al tacto, se condensa); 128 ejercicios, celebraciones, rachas, repaso, 12 niveles y 17 logros — construido y revisado tarea a tarea con el flujo superpowers, con "la economía" (meta diaria y protector de racha) como siguiente iteración acordada.
+Coding es un Duolingo de Ingeniería de Software, local y en español, con estética Liquid Glass: Express + MariaDB con **toda la lógica derivada** (progreso, racha, repaso, niveles, logros, saldo, hueco reparable — cero columnas de estado salvo la meta diaria) y validación server-side; frontend React sin build donde el vidrio se comporta como materia (se parte por tensión superficial, responde al tacto, se condensa); 128 ejercicios, celebraciones, rachas, repaso, 12 niveles, 17 logros, meta diaria y protector de racha — construido y revisado tarea a tarea con el flujo superpowers, con el meta-juego ya completo y el "cursor como fuente de luz" como siguiente paso natural sin agendar.
