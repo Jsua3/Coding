@@ -35,7 +35,7 @@ function NavGlass() {
 
 // El avatar abre el menú de perfil: cae como una gota y se evapora al cerrarse (usePhase retiene
 // el contenido durante los 160ms de salida). Se cierra al tocar fuera o con Escape.
-function AvatarMenu({ user, onLogout, onProgress }) {
+function AvatarMenu({ user, onLogout, onProgress, onProfile }) {
   const [open, setOpen] = React.useState(false);
   const { shown, phase } = usePhase(open ? true : null, 160);
   const rootRef = React.useRef(null);
@@ -67,6 +67,10 @@ function AvatarMenu({ user, onLogout, onProgress }) {
             <div style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", marginTop: 2, wordBreak: "break-all" }}>{user.email}</div>
           </div>
           <div className="lg-menu__sep"></div>
+          <button role="menuitem" className="lg-menu__item" onClick={() => { setOpen(false); onProfile(); }}>
+            <KIcon d={ICONS.book} size={14} />
+            Tu perfil
+          </button>
           <button role="menuitem" className="lg-menu__item" onClick={() => { setOpen(false); onProgress(); }}>
             <KIcon d={ICONS.book} size={14} />
             Tu progreso
@@ -135,7 +139,7 @@ function NavBar({ onHome, tab, setTab, user }) {
         <SoundToggle />
         <IconButton label="Buscar" size="sm" variant="ghost"><KIcon d={ICONS.search} /></IconButton>
         <Badge tone="amber" dot>{user.streak} {user.streak === 1 ? "día" : "días"}</Badge>
-        <AvatarMenu user={user} onLogout={() => API.logout()} onProgress={() => setTab("progreso")} />
+        <AvatarMenu user={user} onLogout={() => API.logout()} onProgress={() => setTab("progreso")} onProfile={() => setTab("perfil")} />
       </div>
     </div>
   );

@@ -108,6 +108,8 @@ function App() {
       ? <MateriasScreen {...comun} onOpenCourse={(id) => go.course(id)} />
       : tab === "progreso"
       ? <ProgressScreen {...comun} />
+      : tab === "perfil"
+      ? <ProfileScreen {...comun} refreshMe={loadMe} />
       : <InicioScreen {...comun}
           onOpenLesson={(courseId, lessonId) => go.lesson(courseId, lessonId)}
           onOpenReview={go.review} />;

@@ -32,5 +32,6 @@ const API = {
   },
   get(path) { return this.request(path); },
   post(path, body) { return this.request(path, { method: "POST", body }); },
+  put(path, body) { return this.request(path, { method: "PUT", body }); },
 };
 window.API = API;
