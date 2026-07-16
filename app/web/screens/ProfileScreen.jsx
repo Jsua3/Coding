@@ -53,9 +53,7 @@ function ProfileScreen({ me, tab, setTab, refreshMe }) {
   const streak = data && data.streak ? data.streak : null;
 
   return (
-    <PageFrame>
-      <NavBar onHome={() => setTab("inicio")} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
-      <div ref={rootRef}>
+    <div ref={rootRef}>
         <h1 style={{ margin: "44px 4px 24px", fontFamily: "var(--font-display)", fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>Tu perfil</h1>
 
         {/* Identidad */}
@@ -125,7 +123,6 @@ function ProfileScreen({ me, tab, setTab, refreshMe }) {
           <Button variant="ghost" iconLeft={<KIcon d={ICONS.logout} size={14} />} onClick={() => API.logout()}>Cerrar sesión</Button>
         </div>
       </div>
-    </PageFrame>
   );
 }
 Object.assign(window, { ProfileScreen });

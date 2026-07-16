@@ -46,8 +46,7 @@ function CourseScreen({ me, courseId, onBack, onOpenLesson, tab, setTab }) {
   const current = course ? course.units.flatMap((u) => u.lessons).find((l) => l.current) : null;
 
   return (
-    <PageFrame>
-      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
+    <React.Fragment>
       <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "36px 0 20px" }}>
         <IconButton label="Volver" onClick={onBack}><KIcon d={ICONS.back} /></IconButton>
         <span style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>
@@ -95,7 +94,7 @@ function CourseScreen({ me, courseId, onBack, onOpenLesson, tab, setTab }) {
           </div>
         </React.Fragment>
       )}
-    </PageFrame>
+    </React.Fragment>
   );
 }
 Object.assign(window, { CourseScreen });

@@ -45,9 +45,7 @@ function MateriasScreen({ me, onOpenCourse, tab, setTab }) {
   React.useEffect(() => Liquid.reveal(rootRef.current), [courses]);
 
   return (
-    <PageFrame>
-      <NavBar onHome={() => setTab("inicio")} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
-      <div ref={rootRef}>
+    <div ref={rootRef}>
         <div style={{ margin: "44px 4px 24px" }}>
           <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>Tus materias</h1>
           <p style={{ margin: "6px 0 0", fontSize: "var(--text-md)", color: "var(--text-secondary)" }}>
@@ -74,7 +72,6 @@ function MateriasScreen({ me, onOpenCourse, tab, setTab }) {
           </div>
         )}
       </div>
-    </PageFrame>
   );
 }
 Object.assign(window, { MateriasScreen, CourseCard });

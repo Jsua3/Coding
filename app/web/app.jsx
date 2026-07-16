@@ -115,12 +115,25 @@ function App() {
           onOpenReview={go.review} />;
   }
 
+  // La NavBar vive AQUÍ, fuera del div keyado que remonta el contenido en cada navegación: es la
+  // única forma de que el indicador de pestañas pueda viajar (un componente que muere no desliza).
+  // El sticky sigue funcionando porque su contenedor es la página entera, no un wrapper corto.
+  const conSesion = route.screen !== "login" && route.screen !== "loading" && me;
+  const contenido = (
+    <div key={route.screen + ":" + tab + ":" + (route.lessonId || route.courseId || "")} className="anim-screen-in">
+      {screen}
+    </div>
+  );
+
   return (
     <React.Fragment>
       <span aria-hidden className="lg-noise"></span>
-      <div key={route.screen + ":" + tab + ":" + (route.lessonId || route.courseId || "")} className="anim-screen-in">
-        {screen}
-      </div>
+      {conSesion ? (
+        <PageFrame>
+          <NavBar user={{ ...me.user, streak: me.stats.streak }} tab={tab} setTab={goTab} onHome={() => goTab("inicio")} />
+          {contenido}
+        </PageFrame>
+      ) : contenido}
       {toast ? (
         <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 90 }}>
           <Toast tone={toast.tone} title={toast.title} description={toast.description} onClose={() => setToast(null)} />

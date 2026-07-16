@@ -87,9 +87,7 @@ function InicioScreen({ me, onOpenLesson, onOpenReview, tab, setTab }) {
   const lvl = stats.level;
 
   return (
-    <PageFrame>
-      <NavBar onHome={() => setTab("inicio")} tab={tab} setTab={setTab} user={{ ...me.user, streak: stats.streak }} />
-      <div ref={rootRef}>
+    <div ref={rootRef}>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 24, margin: "44px 4px 24px" }}>
           <div>
             <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: "var(--text-3xl)", fontWeight: 800, letterSpacing: "var(--tracking-display)", color: "var(--text-primary)" }}>
@@ -166,7 +164,6 @@ function InicioScreen({ me, onOpenLesson, onOpenReview, tab, setTab }) {
 
         <CercaDeCaer achievements={progress ? progress.achievements : null} />
       </div>
-    </PageFrame>
   );
 }
 Object.assign(window, { InicioScreen });

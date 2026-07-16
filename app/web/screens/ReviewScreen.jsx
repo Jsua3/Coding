@@ -38,12 +38,7 @@ function ReviewScreen({ me, tab, setTab, onBack, showAchievements, refreshMe }) 
     }
   }, [done]);
 
-  const wrap = (children) => (
-    <PageFrame>
-      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
-      {children}
-    </PageFrame>
-  );
+  const wrap = (children) => children; // App pone el marco (PageFrame + NavBar)
 
   if (error) return wrap(<div style={{ marginTop: 36 }}><ErrorPanel message={error} onRetry={load} /></div>);
   if (!queue) return wrap(<LoadingPanel />);

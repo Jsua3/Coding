@@ -108,18 +108,12 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
 
   if (error) {
     return (
-      <PageFrame>
-        <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
-        <div style={{ marginTop: 36 }}><ErrorPanel message={error} onRetry={load} /></div>
-      </PageFrame>
+      <div style={{ marginTop: 36 }}><ErrorPanel message={error} onRetry={load} /></div>
     );
   }
   if (!lesson) {
     return (
-      <PageFrame>
-        <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
-        <LoadingPanel />
-      </PageFrame>
+      <LoadingPanel />
     );
   }
 
@@ -179,12 +173,11 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
   };
 
   if (celebration) {
-    return <CelebrationScreen data={celebration} onNext={celebration.nextLessonId ? () => onOpenLesson(celebration.nextLessonId) : null} onBack={onBack} me={me} tab={tab} setTab={setTab} />;
+    return <CelebrationScreen data={celebration} onNext={celebration.nextLessonId ? () => onOpenLesson(celebration.nextLessonId) : null} onBack={onBack} />;
   }
 
   return (
-    <PageFrame>
-      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
+    <React.Fragment>
       <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "36px 0 20px" }}>
         <IconButton label="Volver" onClick={onBack}><KIcon d={ICONS.back} /></IconButton>
         <span style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>{lesson.courseSubject} / {lesson.unitName.split(" · ")[0]}</span>
@@ -229,10 +222,10 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
       )}
 
       <FeedbackBand result={result} onContinue={continueNext} onRetry={() => { setResult(null); }} />
-    </PageFrame>
+    </React.Fragment>
   );
 }
-function CelebrationScreen({ data, onNext, onBack, me, tab, setTab }) {
+function CelebrationScreen({ data, onNext, onBack }) {
   const { GlassPanel, Button, Progress } = KITX;
   const xpRef = React.useRef(null);
   const [ring, setRing] = React.useState(data.prevProgress);
@@ -264,9 +257,7 @@ function CelebrationScreen({ data, onNext, onBack, me, tab, setTab }) {
   }, []);
 
   return (
-    <PageFrame>
-      <NavBar onHome={onBack} tab={tab} setTab={setTab} user={{ ...me.user, streak: me.stats.streak }} />
-      <div style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div className="anim-condense anim-condense--delayed">
           <GlassPanel strength="strong" padding="var(--space-8)" radius="var(--radius-xl)" style={{ width: 460, textAlign: "center" }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
@@ -299,7 +290,6 @@ function CelebrationScreen({ data, onNext, onBack, me, tab, setTab }) {
           </GlassPanel>
         </div>
       </div>
-    </PageFrame>
   );
 }
 Object.assign(window, { LessonScreen, CelebrationScreen, FeedbackBand });
