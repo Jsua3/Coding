@@ -370,6 +370,27 @@
 }
 .lg-navtabs__tab.is-active { color: var(--text-primary); }
 
+/* ---------- El fondo vivo: aurora un paso más luminosa + papel de cuaderno ---------- */
+/* Override en cascada del body del DS (que queda intocado): mismas 3 auroras + degradado,
+   base #0A0F1E -> #0E1526 y acentos ~40% más presentes. El carácter nocturno no cambia. */
+body {
+  background:
+    radial-gradient(52% 42% at 12% 8%, rgba(94, 151, 230, 0.17), transparent 70%),
+    radial-gradient(44% 38% at 88% 18%, rgba(146, 137, 227, 0.14), transparent 70%),
+    radial-gradient(50% 46% at 78% 92%, rgba(82, 201, 184, 0.11), transparent 70%),
+    linear-gradient(180deg, #0E1526 0%, #080D1A 100%);
+  background-attachment: fixed;
+}
+
+/* La cuadrícula: detrás del contenido, delante del body, refractada por el vidrio
+   (mismo patrón de capa que .lg-noise). El dibujo lo hace Liquid.grid (canvas 2D). */
+.lg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */

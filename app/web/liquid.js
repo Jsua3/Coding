@@ -114,5 +114,123 @@ const Liquid = {
       if (rafId) cancelAnimationFrame(rafId);
     };
   },
+  // El fondo vivo: papel de cuaderno que se curva bajo el cursor como bajo una gota-lente.
+  // Canvas 2D inmediato: la cuadrícula son polilíneas cuyos puntos se desplazan hacia el
+  // centro de la lente con caída smoothstep. La lente PERSIGUE al cursor con amortiguación
+  // (gota pesada, no imán) y el rAF solo corre mientras hay algo que animar: en reposo, cero CPU.
+  // Bajo reduced motion o puntero no-fino la cuadrícula se dibuja UNA vez, estática.
+  grid(canvas) {
+    if (!canvas) return () => {};
+    const ctx = canvas.getContext("2d");
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const animated = !(window.FX && FX.reducedMotion) && finePointer;
+
+    const STEP = 48;      // paso de la cuadrícula (px)
+    const RADIUS = 180;   // radio de la lente (px)
+    const PULL = 10;      // desplazamiento máximo hacia el centro (px)
+    const FOLLOW = 0.12;  // persecución amortiguada por frame
+    const FADE = 0.08;    // crecimiento/decaimiento de la fuerza por frame
+    const SEG = 24;       // longitud de segmento de las polilíneas (px)
+
+    let w = 0, h = 0;
+    const lens = { x: -9999, y: -9999, power: 0 }; // la gota: posición + fuerza 0..1
+    const target = { x: -9999, y: -9999, inside: false };
+    let rafId = 0;
+
+    // smoothstep: 1 en el centro, 0 en el borde, sin costuras.
+    const falloff = (d) => {
+      const t = 1 - d / RADIUS;
+      return t * t * (3 - 2 * t);
+    };
+
+    // Refracción de gota: el punto se desplaza HACIA el centro de la lente.
+    const warp = (x, y) => {
+      if (lens.power <= 0) return { x, y };
+      const dx = lens.x - x, dy = lens.y - y;
+      const d = Math.hypot(dx, dy);
+      if (d === 0 || d >= RADIUS) return { x, y };
+      const k = (falloff(d) * PULL * lens.power) / d;
+      return { x: x + dx * k, y: y + dy * k };
+    };
+
+    const drawLine = (x0, y0, x1, y1) => {
+      ctx.beginPath();
+      const steps = Math.ceil(Math.hypot(x1 - x0, y1 - y0) / SEG);
+      for (let i = 0; i <= steps; i++) {
+        const p = warp(x0 + ((x1 - x0) * i) / steps, y0 + ((y1 - y0) * i) / steps);
+        if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = "rgba(226, 236, 255, 0.045)";
+      ctx.lineWidth = 1;
+      for (let x = STEP; x < w; x += STEP) drawLine(x, 0, x, h);
+      for (let y = STEP; y < h; y += STEP) drawLine(0, y, w, y);
+    };
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    };
+
+    const tick = () => {
+      rafId = 0;
+      lens.x += (target.x - lens.x) * FOLLOW;
+      lens.y += (target.y - lens.y) * FOLLOW;
+      const goal = target.inside ? 1 : 0;
+      lens.power += (goal - lens.power) * FADE;
+      // ¿Ya no hay nada que animar? Estado final exacto, un último dibujo, y a dormir.
+      const settled =
+        Math.abs(target.x - lens.x) < 0.2 &&
+        Math.abs(target.y - lens.y) < 0.2 &&
+        Math.abs(goal - lens.power) < 0.01;
+      if (settled) {
+        lens.power = goal;
+        lens.x = target.x;
+        lens.y = target.y;
+        draw();
+        return;
+      }
+      draw();
+      schedule();
+    };
+    const schedule = () => { if (!rafId) rafId = requestAnimationFrame(tick); };
+
+    const onMove = (e) => {
+      target.x = e.clientX;
+      target.y = e.clientY;
+      target.inside = true;
+      // Si la gota está dormida (fuerza 0), se CONDENSA donde está el cursor — sin esto,
+      // perseguiría desde su última posición (o desde fuera de pantalla en el primer movimiento)
+      // y se vería un barrido extraño cruzando el fondo.
+      if (lens.power === 0) { lens.x = target.x; lens.y = target.y; }
+      schedule();
+    };
+    const onLeave = () => { target.inside = false; schedule(); }; // la lente se desvanece y las líneas vuelven
+
+    window.addEventListener("resize", resize);
+    resize(); // el primer dibujo: la cuadrícula estática (también en reduced motion / táctil)
+    if (animated) {
+      window.addEventListener("pointermove", onMove);
+      document.documentElement.addEventListener("mouseleave", onLeave);
+    }
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      if (animated) {
+        window.removeEventListener("pointermove", onMove);
+        document.documentElement.removeEventListener("mouseleave", onLeave);
+      }
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  },
 };
 window.Liquid = Liquid;
