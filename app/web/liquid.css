@@ -132,14 +132,6 @@
 .lg-nav__pill--tabs { flex: 0 1 auto; min-width: 0; }
 .lg-nav [role="tablist"] { min-width: 0; overflow: hidden; }
 
-/* Las pestañas son TEXTO sobre el vidrio de la navbar, no una cápsula dentro de otra. El fondo y
-   el borde propios del componente Tabs se anulan por prop (ver NavBar); su capa de blur interna,
-   aquí — si no, la zona de las pestañas quedaría con doble blur y se vería más esmerilada. */
-.lg-nav [role="tablist"] > span[aria-hidden] {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-
 /* El puente: la masa conectiva. Al partirse adelgaza en Y mientras se estira en X
    (conservación de volumen) y SOLO DESPUÉS se desvanece — por eso la opacidad va con 120ms de
    retardo: el cuello se ve romperse, no apagarse. */
