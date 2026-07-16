@@ -1,7 +1,7 @@
 # PROMPT MAESTRO — Coding
 
 > Documento de contexto total del proyecto. **Léelo completo antes de trabajar en él desde una conversación nueva.**
-> Última actualización: **2026-07-16**, tras fusionar la 8ª iteración ("La navbar que viaja") a `master` (código en `5bfe8ea`).
+> Última actualización: **2026-07-16**, tras fusionar la 9ª iteración ("El fondo vivo") a `master` (código en `98ecf3f`).
 
 ---
 
@@ -17,7 +17,7 @@
 
 ---
 
-## 2. Estado actual: ocho iteraciones + los fixes, todo fusionado a `master`
+## 2. Estado actual: nueve iteraciones + los fixes, todo fusionado a `master`
 
 | # | Iteración | Qué añadió |
 |---|---|---|
@@ -29,14 +29,15 @@
 | 6 | **El meta-juego B — la economía** (`2026-07-15-meta-juego-b`) | **Meta diaria de XP** configurable (anillo en Inicio); **protector de racha** canjeable con XP (reparación retroactiva); página de **Perfil**. El **split de XP**: nivel desde el XP ganado (nunca baja), saldo gastable desde el neto. **Primer cambio de esquema desde la iteración 2.** |
 | 7 | **El cursor como fuente de luz** (`2026-07-15-cursor-luz`) | Paso 3 (y último) del lenguaje visual: `Liquid.pointer` publica 5 variables CSS y `.lg-tilt` las vuelve **tilt 3D** (máx 6°) + **brillo especular teñido** que sigue al cursor (retardo de intención 90ms, `mix-blend-mode: screen`). `TiltCard` envuelve las tarjetas de Inicio y Materias sin tocar el DS. |
 | 8 | **La navbar que viaja** (`2026-07-16-navbar-viaja`) | **NavBar persistente**: `app.jsx` es el dueño del marco (PageFrame + NavBar fuera del div `key`ado; las 8 vistas son content-only) — antes cada pantalla montaba la suya y el indicador no podía deslizar. **`NavTabs`** reemplaza al Tabs del DS en la navbar: píldora **medida al texto** que viaja con **FLIP** (solo `transform`, se estira como gota). El logo lleva siempre a Inicio. |
+| 9 | **El fondo vivo** (`2026-07-16-fondo-vivo`) | El fondo deja de ser un telón: **aurora un paso más luminosa** (override en cascada del `body`; DS intocado) + **papel de cuaderno** — `Liquid.grid`, un canvas 2D cuya cuadrícula (48px) se curva hacia el cursor como bajo una **gota-lente** (radio 180, smoothstep), perseguido con amortiguación, refractado por el vidrio, y que **duerme a cero CPU** en reposo. Primera iteración con CERO fixes de review. |
 | — | **Fix del `context`** (`fix/context-guard`) | Cerró un agujero de integridad preexistente: `POST /answer` confiaba en el `context` del cliente. Ahora el servidor lo degrada a `'lesson'` salvo que el ejercicio esté genuinamente pendiente de repaso. |
 | — | **Fixes visuales** (directos a master, con systematic-debugging) | (a) Las tarjetas de logros desbordaban su celda 42px (`GlassPanel` es **content-box** y `height:100%` + padding se salía; fix: `boxSizing: border-box` vía el `style` prop). (b) La banda de feedback pisaba el botón Comprobar en pantallas bajas (fix: reservar 120px al fondo de lección y repaso). |
 
 **Tests: 137/137** (empezó en 57). **El sub-proyecto 3 "El meta-juego" está entero** y **los 3 pasos del lenguaje visual (`docs/liquid-glass.md` §10) están hechos.**
 
-### Lo siguiente acordado: el fondo vivo
+### Lo siguiente: no hay una iteración grande acordada
 
-El usuario lo pidió explícitamente: el fondo actual "es muy aburrido" — quiere uno **un poco más claro**, con una **cuadrícula tipo cuaderno que se deforma al paso del cursor** (evolución natural del cursor-como-luz: el cursor ya ilumina las tarjetas; ahora curvaría el espacio del fondo). Pendiente de brainstorm → spec → plan. Ver §11 para la deuda abierta.
+El lenguaje visual está completo (los 3 pasos de `docs/liquid-glass.md` §10 + el fondo vivo como vocabulario nuevo). Ver §11 para la deuda abierta y los candidatos.
 
 ## 3. Stack y decisiones técnicas (todas acordadas con el usuario)
 
@@ -103,7 +104,8 @@ coding/                                  (repo git, rama master; remoto: github.
     │   ├── index.html                   ← ORDEN DE SCRIPTS CRÍTICO (= resolución de dependencias)
     │   ├── api.js                       ← window.API (fetch + token; logout(); 401 → onUnauthorized)
     │   ├── fx.js, motion.css            ← motion core (§7)
-    │   ├── liquid.js, liquid.css        ← window.Liquid: ripple(), reveal(), pointer() + el CSS del vidrio vivo
+    │   ├── liquid.js, liquid.css        ← window.Liquid: ripple(), reveal(), pointer(), grid() + el CSS del vidrio
+    │   │                                  vivo (incl. el override del body: aurora aclarada, en cascada sobre el DS)
     │   ├── app.jsx                      ← router (lee `tab`), DUEÑO DEL MARCO (PageFrame + NavBar persistente
     │   │                                  fuera del div keyado), toast global, COLA DE LOGROS
     │   └── screens/                     ← Orb, AppShell (NavBar, NavTabs, TiltCard, PageFrame, hooks), Login,
@@ -190,7 +192,7 @@ Errores: middleware central, `{error}` en español con tuteo, 500 genérico sin 
 - **Motion**: solo se animan `transform`, `opacity`, `filter` (y `scale`/`translate` individuales). Excepciones declaradas y justificadas: `border-color`/`border-radius`/`box-shadow` en la navbar (repintado, nunca layout, y solo en cambio de estado).
 - **Reduced motion, doble cinturón**: gate JS (`FX.reducedMotion`) + bloque `@media (prefers-reduced-motion: reduce)`, que debe ser **el último** de `liquid.css`. **Todo elemento cuyo estado base sea visible se oculta con `display: none`, nunca con `animation: none`** (con `animation: none` quedaría congelado y visible — nos pasó dos veces).
 - **Higiene**: todo timer/rAF/observer en ref, limpiado en el `useEffect` de desmontaje. Los nodos inyectados se autodestruyen por `animationend` + `setTimeout` de seguridad.
-- **Globales disponibles**: `window.FX` (`sound.play`, `burst`, `bloom`, `countUp`, `reducedMotion`), `window.Liquid` (`ripple`, `reveal`, `pointer`), y de `AppShell.jsx`: `usePhase(value, outMs)`, `useScrolled(px)`, `TiltCard` (envuelve una tarjeta para que sienta el cursor: brillo + tilt; va DENTRO del `.lg-reveal`, nunca en el mismo div — ambos escriben `transform`) y `NavTabs`.
+- **Globales disponibles**: `window.FX` (`sound.play`, `burst`, `bloom`, `countUp`, `reducedMotion`), `window.Liquid` (`ripple`, `reveal`, `pointer`, `grid` — este último es el papel de cuaderno del fondo: canvas único montado en `App`, no lo montes en ningún otro sitio), y de `AppShell.jsx`: `usePhase(value, outMs)`, `useScrolled(px)`, `TiltCard` (envuelve una tarjeta para que sienta el cursor: brillo + tilt; va DENTRO del `.lg-reveal`, nunca en el mismo div — ambos escriben `transform`) y `NavTabs`.
 
 ---
 
@@ -231,8 +233,8 @@ Para cualquier trabajo no trivial, el flujo **superpowers** de principio a fin:
 
 ## 11. Lo que falta y lo que hay que mejorar
 
-### Lo siguiente acordado
-**El fondo vivo** (ver §2): más claro, cuadrícula tipo cuaderno que se deforma al paso del cursor. Pedido explícito del usuario; pendiente de brainstorm. Los 3 pasos del lenguaje visual de `docs/liquid-glass.md` §10 ya están hechos — esto sería vocabulario nuevo del lenguaje, no un paso pendiente.
+### Candidatos a lo siguiente (nada acordado)
+El lenguaje visual está completo. Los candidatos naturales, por valor: (a) **la pasada de verificación humana** de todos los pendientes de *feel* acumulados (ver punto 11 abajo) con sus micro-ajustes de una línea; (b) cerrar deuda técnica (los puntos 1-7); (c) contenido/mecánicas nuevas si el usuario las pide. No arrancar nada grande sin brainstorm con el usuario.
 
 ### Deuda real, ordenada por importancia
 
@@ -246,7 +248,7 @@ Para cualquier trabajo no trivial, el flujo **superpowers** de principio a fin:
 8. **`tab`/`setTab` quedaron como props muertas en 6 de 7 pantallas** tras el lift de la navbar (solo Inicio usa `setTab`; el plan mandó no tocar firmas para minimizar el diff). Candidatas a una pasada de limpieza.
 9. **El FLIP de `NavTabs` no maneja interrupción**: un click en cadena (cambiar de pestaña con la píldora aún en vuelo) salta al reposo intermedio antes de volar. Correctitud intacta; si el *feel* molesta, el fix es capturar el `transform` vivo (`getComputedStyle`) como origen.
 10. **`will-change: transform` permanente en `.lg-tilt`** (mandato del spec del cursor-luz): asumible con pocas tarjetas; si una pantalla futura tiene muchas, promover solo en hover.
-11. **Verificación humana pendiente** (el tooling congela `rAF`/transiciones/`IntersectionObserver`; necesita navegador en **primer plano**): el *feel* del tilt/brillo del cursor-luz (incl. el **doble-lift** de las tarjetas de curso: −4px del DS Card + −6px del wrapper = −10px; si molesta, `--lift: -3px` es fix de 1 línea), la refracción del `backdrop-filter` bajo el `TiltCard`, la legibilidad del botón de CourseCard en pico de brillo, y el viaje de la píldora de NavTabs (estiramiento de gota, 420ms).
+11. **Verificación humana pendiente** (el tooling congela `rAF`/transiciones/`IntersectionObserver`; necesita navegador en **primer plano**): el *feel* del tilt/brillo del cursor-luz (incl. el **doble-lift** de las tarjetas de curso: −4px del DS Card + −6px del wrapper = −10px; si molesta, `--lift: -3px` es fix de 1 línea), la refracción del `backdrop-filter` bajo el `TiltCard`, la legibilidad del botón de CourseCard en pico de brillo, el viaje de la píldora de NavTabs (estiramiento de gota, 420ms), y **la lente del fondo vivo** (persecución amortiguada, condensación, desvanecimiento ~400ms) junto al juicio estético del aclarado de la aurora.
 12. Menores aceptados con razón documentada en el ledger (`.superpowers/sdd/progress.md`) — **consúltalo antes de "redescubrir" issues**.
 
 > **Cerrado ya:** el agujero de integridad del `context` (un cliente podía forjar lecciones perfectas mandando `context:"review"` en sus fallos) — resuelto en `fix/context-guard`: el servidor decide el `context` (§7.10).
@@ -258,4 +260,4 @@ Ejecución de código libre, drag & drop, vidas/corazones, leaderboard, recupera
 
 ## 12. Resumen en una frase
 
-Coding es un Duolingo de Ingeniería de Software, local y en español, con estética Liquid Glass: Express + MariaDB con **toda la lógica derivada** (progreso, racha, repaso, niveles, logros, saldo, hueco reparable — cero columnas de estado salvo la meta diaria) y validación server-side; frontend React sin build donde el vidrio se comporta como materia (se parte por tensión superficial, responde al tacto, se condensa, **siente el cursor** — tilt + brillo especular — y su navbar persiste con una píldora que viaja midiendo el texto); 128 ejercicios, celebraciones, rachas, repaso, 12 niveles, 17 logros, meta diaria y protector de racha — construido y revisado tarea a tarea con el flujo superpowers, con el meta-juego y los 3 pasos del lenguaje visual completos, y **el fondo vivo** como siguiente iteración acordada.
+Coding es un Duolingo de Ingeniería de Software, local y en español, con estética Liquid Glass: Express + MariaDB con **toda la lógica derivada** (progreso, racha, repaso, niveles, logros, saldo, hueco reparable — cero columnas de estado salvo la meta diaria) y validación server-side; frontend React sin build donde el vidrio se comporta como materia (se parte por tensión superficial, responde al tacto, se condensa, **siente el cursor** — tilt + brillo especular — su navbar persiste con una píldora que viaja midiendo el texto, y **el fondo es papel de cuaderno que se curva bajo una gota-lente**); 128 ejercicios, celebraciones, rachas, repaso, 12 niveles, 17 logros, meta diaria y protector de racha — construido y revisado tarea a tarea con el flujo superpowers, con el meta-juego y el lenguaje visual completos y **sin próxima iteración acordada** (la pasada de verificación humana del *feel* es el candidato natural).
