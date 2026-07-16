@@ -40,8 +40,9 @@ function SemanaXp({ dias }) {
 
 function LogroCard({ a }) {
   const { GlassPanel, Progress, Badge } = KITP;
+  // boxSizing: el GlassPanel es content-box, y height:100% + padding desbordaría la celda de la grilla 42px (la fila de abajo lo pisaba).
   return (
-    <GlassPanel padding="var(--space-5)" strength={a.unlocked ? "strong" : "subtle"} style={{ opacity: a.unlocked ? 1 : 0.62, height: "100%" }}>
+    <GlassPanel padding="var(--space-5)" strength={a.unlocked ? "strong" : "subtle"} style={{ opacity: a.unlocked ? 1 : 0.62, height: "100%", boxSizing: "border-box" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
         <div style={{ flex: 1, fontSize: "var(--text-md)", fontWeight: 700, color: a.unlocked ? "var(--text-primary)" : "var(--text-secondary)" }}>{a.name}</div>
         {a.unlocked ? <Badge tone="success">Conseguido</Badge> : a.secret ? <Badge tone="neutral">Secreto</Badge> : null}
