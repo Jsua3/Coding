@@ -2,6 +2,9 @@
 
 > Documento de contexto total del proyecto. **Léelo completo antes de trabajar en él desde una conversación nueva.**
 > Última actualización: **2026-07-16**, tras fusionar la 9ª iteración ("El fondo vivo") a `master` (código en `98ecf3f`).
+>
+> **Qué cambió en la última tanda (15-16 de julio):** las iteraciones 7-9 completaron el lenguaje visual — el cursor como fuente de luz (tilt + brillo en las tarjetas), la navbar persistente con píldora que viaja midiendo el texto, y el fondo vivo (aurora más luminosa + papel de cuaderno con gota-lente) — más dos fixes visuales reportados por el usuario (solape de logros, banda sobre el botón Comprobar). Detalle en §2.
+> **Qué está pendiente:** ninguna iteración grande acordada; lo principal es la **pasada de verificación humana del *feel*** y la deuda técnica menor — todo en §11.
 
 ---
 
@@ -223,7 +226,7 @@ Para cualquier trabajo no trivial, el flujo **superpowers** de principio a fin:
 4. `superpowers:subagent-driven-development` — rama feature, un subagente implementador por tarea + revisor por tarea + fixes con re-review. **Ledger en `.superpowers/sdd/progress.md`.**
 5. Review final de toda la rama (modelo más capaz, con smoke test en vivo) → fixes → `superpowers:finishing-a-development-branch` (tests → merge → borrar rama).
 
-**Este proceso funciona: en las tres últimas iteraciones los reviews cazaron bugs reales que el tooling jamás habría visto** — casi todos defectos del *plan*, no de los implementadores. No lo saltes.
+**Este proceso funciona: los reviews han cazado bugs reales en casi todas las iteraciones** — casi todos defectos del *plan/spec*, no de los implementadores (en la 8ª un implementador cazó un defecto del propio spec — la píldora content-box — y en la 9ª la iteración salió limpia a la primera, señal de que las lecciones acumuladas ya viven en los specs). No lo saltes.
 
 **Convenciones:** commits en español (`feat:`/`fix:`/`docs:`/`chore:`/`refactor:`); TDD estricto en backend (RED→GREEN, con la evidencia en el reporte); copy en **español con tuteo**, sentence case, **sin emoji**, metadatos con "·". Colores por materia: Programación=blue, BD=cyan, Algoritmos=violet, Web=amber.
 
@@ -233,10 +236,20 @@ Para cualquier trabajo no trivial, el flujo **superpowers** de principio a fin:
 
 ## 11. Lo que falta y lo que hay que mejorar
 
-### Candidatos a lo siguiente (nada acordado)
-El lenguaje visual está completo. Los candidatos naturales, por valor: (a) **la pasada de verificación humana** de todos los pendientes de *feel* acumulados (ver punto 11 abajo) con sus micro-ajustes de una línea; (b) cerrar deuda técnica (los puntos 1-7); (c) contenido/mecánicas nuevas si el usuario las pide. No arrancar nada grande sin brainstorm con el usuario.
+### Lo primero: la pasada de verificación humana del *feel*
 
-### Deuda real, ordenada por importancia
+Es el pendiente principal y solo el usuario puede cerrarlo (el tooling congela `rAF`/transiciones/`IntersectionObserver`; se necesita un navegador en **primer plano**). Los ítems acumulados, cada uno con su ajuste preparado:
+
+- **El tilt/brillo del cursor-luz** en Inicio y Materias — incluido el **doble-lift** de las tarjetas de curso (−4px del DS Card + −6px del wrapper = −10px al hover; si molesta, `--lift: -3px` en `liquid.css` es fix de 1 línea).
+- **La refracción** del `backdrop-filter` bajo el `TiltCard` (por spec un transform ancestro no la rompe, pero solo los ojos lo confirman).
+- **La legibilidad** del botón Continuar/Empezar de la CourseCard en el pico de brillo.
+- **El viaje de la píldora** de NavTabs (estiramiento de gota, 420ms) — y el salto en clicks encadenados (fix futuro: capturar el `transform` vivo como origen del FLIP).
+- **La lente del fondo vivo** (persecución amortiguada, condensación donde aparece el cursor, desvanecimiento ~400ms) y el juicio estético del aclarado de la aurora.
+
+### Candidatos a lo siguiente (nada acordado)
+Tras la pasada de *feel*: (a) cerrar deuda técnica (lista de abajo); (b) contenido/mecánicas nuevas si el usuario las pide. No arrancar nada grande sin brainstorm con el usuario.
+
+### Deuda técnica, ordenada por importancia
 
 1. **`perfectRun` es el único contador NO estrictamente monótono.** `lesson_completions` no tiene id autoincremental (su PK es compuesta), así que no hay clave de orden de inserción; el desempate por `lesson_id` da determinismo, no cronología. Prácticamente inalcanzable (exige 3 completaciones en el mismo segundo). Solo se cierra con una **columna de orden en el esquema**. (La iteración 6 tocó el esquema pero no lo abordó — no era su alcance.)
 2. **`.lg-bars__bar` (gráfica semanal) transiciona `height`** (propiedad de layout), contra la regla del proyecto. Ya está cubierto por reduced motion, pero re-arquitecturarlo a `transform: scaleY()` queda pendiente.
@@ -248,10 +261,10 @@ El lenguaje visual está completo. Los candidatos naturales, por valor: (a) **la
 8. **`tab`/`setTab` quedaron como props muertas en 6 de 7 pantallas** tras el lift de la navbar (solo Inicio usa `setTab`; el plan mandó no tocar firmas para minimizar el diff). Candidatas a una pasada de limpieza.
 9. **El FLIP de `NavTabs` no maneja interrupción**: un click en cadena (cambiar de pestaña con la píldora aún en vuelo) salta al reposo intermedio antes de volar. Correctitud intacta; si el *feel* molesta, el fix es capturar el `transform` vivo (`getComputedStyle`) como origen.
 10. **`will-change: transform` permanente en `.lg-tilt`** (mandato del spec del cursor-luz): asumible con pocas tarjetas; si una pantalla futura tiene muchas, promover solo en hover.
-11. **Verificación humana pendiente** (el tooling congela `rAF`/transiciones/`IntersectionObserver`; necesita navegador en **primer plano**): el *feel* del tilt/brillo del cursor-luz (incl. el **doble-lift** de las tarjetas de curso: −4px del DS Card + −6px del wrapper = −10px; si molesta, `--lift: -3px` es fix de 1 línea), la refracción del `backdrop-filter` bajo el `TiltCard`, la legibilidad del botón de CourseCard en pico de brillo, el viaje de la píldora de NavTabs (estiramiento de gota, 420ms), y **la lente del fondo vivo** (persecución amortiguada, condensación, desvanecimiento ~400ms) junto al juicio estético del aclarado de la aurora.
+11. **Dos minors del fondo vivo, opcionales de bajo impacto**: el DPR no se re-lee al cambiar de monitor sin evento `resize` (cosmético, se auto-cura; fix futuro: `matchMedia` de `resolution`), y `warp` asigna ~3.500 objetos/frame solo durante el vuelo de la lente (GC despreciable; la legibilidad gana — dejar tal cual).
 12. Menores aceptados con razón documentada en el ledger (`.superpowers/sdd/progress.md`) — **consúltalo antes de "redescubrir" issues**.
 
-> **Cerrado ya:** el agujero de integridad del `context` (un cliente podía forjar lecciones perfectas mandando `context:"review"` en sus fallos) — resuelto en `fix/context-guard`: el servidor decide el `context` (§7.10).
+> **Cerrado ya:** el agujero de integridad del `context` (un cliente podía forjar lecciones perfectas mandando `context:"review"` en sus fallos) — resuelto en `fix/context-guard` (§7.10). También cerrados: el solape de las tarjetas de logros (content-box, §2) y la banda de feedback pisando el botón Comprobar (§2).
 
 ### Fuera de alcance decidido
 Ejecución de código libre, drag & drop, vidas/corazones, leaderboard, recuperación de contraseña, migración a Vite (el backend en capas lo permite después).
