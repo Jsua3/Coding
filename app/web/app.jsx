@@ -8,6 +8,10 @@ function App() {
   const [toast, setToast] = React.useState(null);
   const toastTimer = React.useRef(null);
 
+  // El fondo vivo: un solo canvas para toda la sesión, fuera del div keyado (jamás se remonta).
+  const gridRef = React.useRef(null);
+  React.useEffect(() => Liquid.grid(gridRef.current), []);
+
   const showToast = (t) => {
     setToast(t);
     clearTimeout(toastTimer.current);
@@ -127,6 +131,7 @@ function App() {
 
   return (
     <React.Fragment>
+      <canvas ref={gridRef} aria-hidden className="lg-grid"></canvas>
       <span aria-hidden className="lg-noise"></span>
       {conSesion ? (
         <PageFrame>
