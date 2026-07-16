@@ -205,7 +205,9 @@ function LessonScreen({ me, courseId, lessonId, onBack, onOpenLesson, tab, setTa
           </div>
         </GlassPanel>
       ) : (
-        <div style={{ display: "flex", gap: 18, alignItems: "flex-start", maxWidth: 820, margin: "0 auto" }}>
+        // paddingBottom: reserva el espacio de la FeedbackBand (fija al fondo del viewport, ~110px);
+        // sin él, en pantallas bajas la banda pisaba el botón Comprobar.
+        <div style={{ display: "flex", gap: 18, alignItems: "flex-start", maxWidth: 820, margin: "0 auto", paddingBottom: 120 }}>
           <Orb size={56} mood={orbMood} style={{ marginTop: 8 }} />
           <GlassPanel tint="blue" padding="var(--space-6)" radius="var(--radius-xl)" style={{ flex: 1 }}>
             <div className={meltClass}>

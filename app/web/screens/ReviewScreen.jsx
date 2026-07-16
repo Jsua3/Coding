@@ -113,7 +113,9 @@ function ReviewScreen({ me, tab, setTab, onBack, showAchievements, refreshMe }) 
       <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "36px 0 20px" }}>
         <span style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>Repaso · {shownI + 1} de {queue.length}</span>
       </div>
-      <div style={{ display: "flex", gap: 18, alignItems: "flex-start", maxWidth: 820, margin: "0 auto" }}>
+      {/* paddingBottom: reserva el espacio de la FeedbackBand (fija al fondo del viewport, ~110px);
+          sin él, en pantallas bajas la banda pisaba el botón Comprobar. */}
+      <div style={{ display: "flex", gap: 18, alignItems: "flex-start", maxWidth: 820, margin: "0 auto", paddingBottom: 120 }}>
         <Orb size={56} mood={orbMood} style={{ marginTop: 8 }} />
         <GlassPanel tint="none" padding="var(--space-6)" radius="var(--radius-xl)" style={{ flex: 1 }}>
           <div className={meltClass}>
