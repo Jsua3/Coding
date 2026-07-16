@@ -347,6 +347,7 @@
 }
 .lg-navtabs__pill {
   position: absolute;
+  box-sizing: border-box; /* se mide contra rects border-box del botón; sin esto queda 2px más ancha */
   top: 4px;
   bottom: 4px;
   border-radius: var(--radius-pill);
