@@ -251,4 +251,17 @@ function AchievementToast({ achievement, onDone }) {
   );
 }
 
-Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle, usePhase, useScrolled, AchievementToast });
+// Envuelve una tarjeta para que sienta el cursor (brillo + tilt). La clase .lg-tilt va en
+// ESTE div propio porque los componentes del DS no reenvian className. Liquid.pointer se
+// auto-gatea (reduced motion / tactil): en esos casos el div queda inerte, sin coste.
+function TiltCard({ accent, tilt, children }) {
+  const ref = React.useRef(null);
+  React.useEffect(() => Liquid.pointer(ref.current, { tilt: tilt == null ? 5 : tilt }), []);
+  return React.createElement(
+    "div",
+    { ref: ref, className: "lg-tilt", "data-accent": accent || null },
+    children
+  );
+}
+
+Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle, usePhase, useScrolled, AchievementToast, TiltCard });
