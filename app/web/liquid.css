@@ -307,6 +307,46 @@
   backdrop-filter: blur(var(--blur-lg)) saturate(var(--saturate-glass));
 }
 
+/* El cursor como fuente de luz. Las variables las escribe Liquid.pointer (liquid.js).
+   perspective por tarjeta: cada una tiene su propio punto de fuga. */
+.lg-tilt {
+  position: relative;
+  border-radius: var(--radius-lg);
+  transform:
+    perspective(900px)
+    rotateX(var(--rx, 0deg))
+    rotateY(var(--ry, 0deg))
+    translateY(var(--lift, 0px));
+  transform-style: preserve-3d;
+  transition: transform 240ms var(--ease-glass);
+  will-change: transform;
+}
+.lg-tilt:hover,
+.lg-tilt:focus-within { --lift: -6px; } /* el panel se eleva hacia la luz */
+
+/* La luz que sigue al cursor. Suma (screen), nunca oscurece. pointer-events:none: no roba clicks. */
+.lg-tilt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    300px circle at var(--mx, 74%) var(--my, 18%),
+    var(--lg-glow-tint, rgba(255, 255, 255, 0.10)),
+    rgba(255, 255, 255, 0.028) 26%,
+    transparent 54%);
+  opacity: var(--glow, 0);
+  mix-blend-mode: screen;
+  transition: opacity 200ms var(--ease-glass);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.lg-tilt[data-accent="blue"]   { --lg-glow-tint: rgba(90, 147, 255, 0.20); }
+.lg-tilt[data-accent="violet"] { --lg-glow-tint: rgba(162, 129, 255, 0.20); }
+.lg-tilt[data-accent="cyan"]   { --lg-glow-tint: rgba(55, 224, 212, 0.17); }
+.lg-tilt[data-accent="amber"]  { --lg-glow-tint: rgba(230, 175, 107, 0.18); }
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */
@@ -329,4 +369,6 @@
      izquierda — el precedente del fx-bead NO aplica aquí: aquel se ocultaba por un keyframe, y
      animation:none lo congelaba visible; este puente se oculta por CSS normal. */
   .lg-bars__bar { transition: none !important; }
+  .lg-tilt { transform: none; transition: none; }
+  .lg-tilt::after { display: none; }
 }
