@@ -49,23 +49,25 @@ function CercaDeCaer({ achievements }) {
   if (!cerca.length) return null;
   return (
     <div className="lg-reveal">
-      <GlassPanel padding="var(--space-5)" style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
-          <div style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--text-primary)" }}>Estás cerca de…</div>
-          <div style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>{ganados} de {achievements.length} logros</div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {cerca.map((a) => (
-            <div key={a.id}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--text-sm)", marginBottom: 5 }}>
-                <span style={{ color: "var(--text-primary)", fontWeight: 500 }}>{a.name}</span>
-                <span style={{ color: "var(--text-tertiary)", fontVariantNumeric: "tabular-nums" }}>{a.current} de {a.target}</span>
+      <TiltCard>
+        <GlassPanel padding="var(--space-5)" style={{ marginBottom: 28 }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
+            <div style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--text-primary)" }}>Estás cerca de…</div>
+            <div style={{ fontSize: "var(--text-sm)", color: "var(--text-tertiary)" }}>{ganados} de {achievements.length} logros</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {cerca.map((a) => (
+              <div key={a.id}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--text-sm)", marginBottom: 5 }}>
+                  <span style={{ color: "var(--text-primary)", fontWeight: 500 }}>{a.name}</span>
+                  <span style={{ color: "var(--text-tertiary)", fontVariantNumeric: "tabular-nums" }}>{a.current} de {a.target}</span>
+                </div>
+                <Progress value={Math.round((a.current / a.target) * 100)} tone="cyan" />
               </div>
-              <Progress value={Math.round((a.current / a.target) * 100)} tone="cyan" />
-            </div>
-          ))}
-        </div>
-      </GlassPanel>
+            ))}
+          </div>
+        </GlassPanel>
+      </TiltCard>
     </div>
   );
 }
@@ -107,7 +109,9 @@ function InicioScreen({ me, onOpenLesson, onOpenReview, tab, setTab }) {
         </div>
 
         <div className="lg-reveal">
-          <MetaDiaria xpToday={stats.xpToday} dailyGoal={stats.dailyGoal} />
+          <TiltCard accent="cyan">
+            <MetaDiaria xpToday={stats.xpToday} dailyGoal={stats.dailyGoal} />
+          </TiltCard>
         </div>
 
         {progress && progress.streak && progress.streak.repairable ? (
@@ -129,13 +133,19 @@ function InicioScreen({ me, onOpenLesson, onOpenReview, tab, setTab }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
           <div className="lg-reveal">
-            <StatPanel label="Nivel" value={lvl ? lvl.n + " · " + lvl.name : "—"} sub={lvl ? lvl.progress + "% hacia el siguiente" : ""} tone="violet" />
+            <TiltCard accent="violet">
+              <StatPanel label="Nivel" value={lvl ? lvl.n + " · " + lvl.name : "—"} sub={lvl ? lvl.progress + "% hacia el siguiente" : ""} tone="violet" />
+            </TiltCard>
           </div>
           <div className="lg-reveal">
-            <StatPanel label="Racha" value={stats.streak + (stats.streak === 1 ? " día" : " días")} sub={"Tu mejor racha: " + stats.bestStreak + (stats.bestStreak === 1 ? " día" : " días")} tone="none" />
+            <TiltCard>
+              <StatPanel label="Racha" value={stats.streak + (stats.streak === 1 ? " día" : " días")} sub={"Tu mejor racha: " + stats.bestStreak + (stats.bestStreak === 1 ? " día" : " días")} tone="none" />
+            </TiltCard>
           </div>
           <div className="lg-reveal">
-            <StatPanel label="XP total" value={stats.xp.toLocaleString("es")} sub={"+" + stats.xpWeek + " esta semana"} tone="blue" />
+            <TiltCard accent="blue">
+              <StatPanel label="XP total" value={stats.xp.toLocaleString("es")} sub={"+" + stats.xpWeek + " esta semana"} tone="blue" />
+            </TiltCard>
           </div>
         </div>
 
