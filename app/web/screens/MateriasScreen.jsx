@@ -62,7 +62,13 @@ function MateriasScreen({ me, onOpenCourse, tab, setTab }) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 18 }}>
             {courses.map((c) => (
               <div key={c.id} className="lg-reveal">
-                <CourseCard course={c} onOpen={onOpenCourse} />
+                {c.status === "BLOQUEADO" ? (
+                  <CourseCard course={c} onOpen={onOpenCourse} />
+                ) : (
+                  <TiltCard accent={c.subjectTone}>
+                    <CourseCard course={c} onOpen={onOpenCourse} />
+                  </TiltCard>
+                )}
               </div>
             ))}
           </div>
