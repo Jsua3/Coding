@@ -140,21 +140,6 @@
   backdrop-filter: none !important;
 }
 
-/* El indicador de la pestaña activa viajaba con --ease-spring (rebote de 1.56) a lo largo de
-   ~250px: se pasaba del destino y volvía de golpe. Nuestro propio lenguaje lo prohíbe — el rebote
-   es solo para piezas pequeñas. Ahora se desliza con la curva estándar y, mientras viaja, se
-   ESTIRA en el eje del movimiento y adelgaza en el otro: conservación de volumen, como una gota. */
-.lg-nav [role="tablist"] > div {
-  transition: transform 420ms var(--ease-glass) !important;
-}
-.lg-nav__pill--tabs.is-sliding [role="tablist"] > div {
-  animation: lg-tab-slide 420ms var(--ease-glass);
-}
-@keyframes lg-tab-slide {
-  0%, 100% { scale: 1 1; }
-  45% { scale: 1.14 0.9; }
-}
-
 /* El puente: la masa conectiva. Al partirse adelgaza en Y mientras se estira en X
    (conservación de volumen) y SOLO DESPUÉS se desvanece — por eso la opacidad va con 120ms de
    retardo: el cuello se ve romperse, no apagarse. */
@@ -347,6 +332,51 @@
 .lg-tilt[data-accent="cyan"]   { --lg-glow-tint: rgba(55, 224, 212, 0.17); }
 .lg-tilt[data-accent="amber"]  { --lg-glow-tint: rgba(230, 175, 107, 0.18); }
 
+/* Las pestañas de la navbar: texto sobre la superficie, píldora medida al texto.
+   El viaje es FLIP desde JS (NavTabs): aquí viven la piel y el transform-origin.
+   left/width los escribe el JS SIEMPRE con transition:none — solo transform se anima. */
+.lg-navtabs {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center; /* los botones abrazan su texto: el grupo se centra en la cápsula */
+  height: 36px;
+  padding: 4px;
+  width: 100%;
+  min-width: 0;
+}
+.lg-navtabs__pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg-pressed);
+  border: 1px solid var(--glass-stroke-strong);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 16px rgba(3,6,16,0.35);
+  transform-origin: left center;
+  pointer-events: none;
+}
+.lg-navtabs__tab {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+  padding: 0 18px;
+  white-space: nowrap;
+  transition: color var(--duration-fast) var(--ease-glass);
+  outline: none;
+}
+.lg-navtabs__tab.is-active { color: var(--text-primary); }
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */
@@ -356,7 +386,7 @@
   .lg-nav__pill::after, .lg-nav__bridge::after { transition: none !important; }
   .lg-nav__glass { transition: none !important; }
   .lg-nav { transition: none !important; }
-  .lg-nav [role="tablist"] > div { transition: none !important; animation: none !important; }
+  .lg-navtabs__pill { transition: none !important; transform: none !important; }
   /* El menú no lleva display:none: su estado en reposo ES visible, y usePhase intercambia al
      instante bajo reduced motion, así que la fase de salida ni siquiera llega a ocurrir. */
   .lg-menu--in { animation: none !important; }

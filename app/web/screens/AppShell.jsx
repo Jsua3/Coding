@@ -86,8 +86,69 @@ function AvatarMenu({ user, onLogout, onProgress, onProfile }) {
   );
 }
 
+// Las pestañas de la navbar. Reemplaza al Tabs del DS SOLO aquí: aquel mide tercios del
+// contenedor y esta píldora mide el TEXTO real. El viaje es FLIP: geometría de reposo directa
+// (left/width sin transición, jamás animados) y el vuelo solo con transform (translateX+scaleX),
+// que entre anchos distintos estira la píldora como una gota y la deja nítida al llegar.
+function NavTabs({ items, value, onChange }) {
+  const listRef = React.useRef(null);
+  const btnRefs = React.useRef({});
+  const pillRef = React.useRef(null);
+  const prevRect = React.useRef(null);
+  const [tick, setTick] = React.useState(0); // re-medición por resize/fuentes
+
+  React.useLayoutEffect(() => {
+    const list = listRef.current, btn = btnRefs.current[value], pill = pillRef.current;
+    if (!list || !btn || !pill) return;
+    const lr = list.getBoundingClientRect();
+    const br = btn.getBoundingClientRect();
+    const rect = { left: br.left - lr.left, width: br.width };
+
+    pill.style.transition = "none";
+    pill.style.left = rect.left + "px";
+    pill.style.width = rect.width + "px";
+
+    const prev = prevRect.current;
+    prevRect.current = rect;
+    const reduced = window.FX && FX.reducedMotion;
+    if (!prev || reduced || (prev.left === rect.left && prev.width === rect.width)) return;
+
+    // FLIP: arranca visualmente desde la geometría vieja y viaja a la nueva SOLO con transform.
+    const dx = prev.left - rect.left;
+    const sx = prev.width / rect.width;
+    pill.style.transform = "translateX(" + dx + "px) scaleX(" + sx + ")";
+    void pill.offsetWidth; // reflow: fija el punto de partida antes de encender la transición
+    pill.style.transition = "transform 420ms var(--ease-glass)";
+    pill.style.transform = "translateX(0) scaleX(1)";
+  }, [value, tick]);
+
+  // Las fuentes web y el resize cambian el ancho del texto: re-medir sin animar.
+  React.useEffect(() => {
+    const remeasure = () => { prevRect.current = null; setTick((t) => t + 1); };
+    window.addEventListener("resize", remeasure);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
+    return () => window.removeEventListener("resize", remeasure);
+  }, []);
+
+  return (
+    <div ref={listRef} role="tablist" className="lg-navtabs">
+      <span ref={pillRef} aria-hidden className="lg-navtabs__pill"></span>
+      {items.map((it) => (
+        <button
+          key={it.id}
+          ref={(el) => { btnRefs.current[it.id] = el; }}
+          role="tab"
+          aria-selected={it.id === value}
+          className={"lg-navtabs__tab" + (it.id === value ? " is-active" : "")}
+          onClick={() => onChange && onChange(it.id)}
+        >{it.label}</button>
+      ))}
+    </div>
+  );
+}
+
 function NavBar({ onHome, tab, setTab, user }) {
-  const { Tabs, IconButton, Badge } = KIT;
+  const { IconButton, Badge } = KIT;
   const split = useScrolled(32);
   // Solo animamos tras un cambio real de estado: si la página monta ya scrolleada, la navbar
   // aparece partida pero sin reproducir la partición (nada se anima en el montaje).
@@ -101,19 +162,6 @@ function NavBar({ onHome, tab, setTab, user }) {
     + (split ? " lg-nav--split" : (animate ? " lg-nav--merged" : ""))
     + (animate ? " lg-nav--anim" : "");
 
-  // Al cambiar de pestaña, el indicador se estira en el eje del viaje mientras se desliza (la clase
-  // dura lo que la animación). El rebote duro del componente Tabs se anula en liquid.css.
-  const [sliding, setSliding] = React.useState(false);
-  const slideTimer = React.useRef(null);
-  React.useEffect(() => () => clearTimeout(slideTimer.current), []);
-  const changeTab = (id) => {
-    if (id === tab) return;
-    setTab(id);
-    setSliding(true);
-    clearTimeout(slideTimer.current);
-    slideTimer.current = setTimeout(() => setSliding(false), 420);
-  };
-
   return (
     <div className={cls}>
       <div className="lg-nav__pill lg-nav__pill--logo" onClick={onHome}>
@@ -122,16 +170,15 @@ function NavBar({ onHome, tab, setTab, user }) {
         <span style={{ width: 4, height: 18, borderRadius: 3, background: "var(--accent-cyan)", boxShadow: "0 0 10px var(--accent-cyan)" }}></span>
       </div>
       <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
-      <div className={"lg-nav__pill lg-nav__pill--tabs" + (sliding ? " is-sliding" : "")}>
+      <div className="lg-nav__pill lg-nav__pill--tabs">
         <NavGlass />
-        {/* Sin vidrio propio: las pestañas son texto sobre la superficie de la navbar, no una
-            cápsula dentro de otra. El borde se queda en 1px pero transparente, así el layout no
-            se mueve. El indicador de la pestaña activa sí se conserva. */}
-        <Tabs size="sm" value={tab} onChange={changeTab} items={[
+        {/* Sin vidrio propio: las pestañas son texto sobre la superficie de la navbar. El
+            indicador es NavTabs: píldora medida al texto que viaja con FLIP. */}
+        <NavTabs value={tab} onChange={setTab} items={[
           { id: "inicio", label: "Inicio" },
           { id: "materias", label: "Materias" },
           { id: "progreso", label: "Progreso" },
-        ]} style={{ width: "100%", minWidth: 0, background: "transparent", borderColor: "transparent", boxShadow: "none" }} />
+        ]} />
       </div>
       <span aria-hidden className="lg-nav__bridge"><NavGlass /></span>
       <div className="lg-nav__pill lg-nav__pill--actions">
@@ -264,4 +311,4 @@ function TiltCard({ accent, tilt, children }) {
   );
 }
 
-Object.assign(window, { KIcon, ICONS, NavBar, PageFrame, LoadingPanel, ErrorPanel, SoundToggle, usePhase, useScrolled, AchievementToast, TiltCard });
+Object.assign(window, { KIcon, ICONS, NavBar, NavTabs, PageFrame, LoadingPanel, ErrorPanel, SoundToggle, usePhase, useScrolled, AchievementToast, TiltCard });
