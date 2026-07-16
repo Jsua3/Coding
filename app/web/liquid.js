@@ -49,5 +49,69 @@ const Liquid = {
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
   },
+  // El cursor como fuente de luz: publica 5 variables CSS (--mx/--my/--rx/--ry/--glow)
+  // que el CSS (.lg-tilt) convierte en tilt 3D + brillo especular. No anima nada por JS.
+  // Doble puerta: reduced motion (fuente única del proyecto) + puntero fino (en táctil no hay
+  // cursor que seguir). Coalescencia: máximo una escritura de estilos por frame.
+  pointer(el, opts = {}) {
+    if (!el) return () => {};
+    const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+    const strength = Math.min(Math.abs(opts.tilt ?? 4), 6); // tope duro: 6°
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const enabled = !(window.FX && FX.reducedMotion) && finePointer;
+    if (!enabled) return () => {};
+
+    let last = null, rafId = 0, glowTimer = 0;
+
+    const write = () => {
+      rafId = 0;
+      if (!last) return;
+      const rect = el.getBoundingClientRect();
+      const x = clamp((last.clientX - rect.left) / rect.width, 0, 1);
+      const y = clamp((last.clientY - rect.top) / rect.height, 0, 1);
+      el.style.setProperty("--mx", (x * 100).toFixed(1) + "%");
+      el.style.setProperty("--my", (y * 100).toFixed(1) + "%");
+      el.style.setProperty("--rx", ((y - 0.5) * -strength).toFixed(2) + "deg"); // mira al cursor
+      el.style.setProperty("--ry", ((x - 0.5) * strength).toFixed(2) + "deg");
+    };
+    const schedule = () => { if (!rafId) rafId = requestAnimationFrame(write); };
+    const recenter = () => {
+      el.style.setProperty("--mx", "74%");
+      el.style.setProperty("--my", "18%");
+      el.style.setProperty("--rx", "0deg");
+      el.style.setProperty("--ry", "0deg");
+    };
+
+    const onMove = (e) => { last = e; schedule(); };
+    const onEnter = () => {
+      clearTimeout(glowTimer);
+      glowTimer = setTimeout(() => el.style.setProperty("--glow", "1"), 90); // retardo de intención
+    };
+    const onLeave = () => {
+      clearTimeout(glowTimer);
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      last = null;
+      recenter();
+      el.style.setProperty("--glow", "0");
+    };
+    const onFocusIn = () => el.style.setProperty("--glow", "0.7"); // teclado: luz sin cursor
+    const onFocusOut = onLeave;
+
+    el.addEventListener("pointermove", onMove);
+    el.addEventListener("pointerenter", onEnter);
+    el.addEventListener("pointerleave", onLeave);
+    el.addEventListener("focusin", onFocusIn);
+    el.addEventListener("focusout", onFocusOut);
+
+    return () => {
+      el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerenter", onEnter);
+      el.removeEventListener("pointerleave", onLeave);
+      el.removeEventListener("focusin", onFocusIn);
+      el.removeEventListener("focusout", onFocusOut);
+      clearTimeout(glowTimer);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  },
 };
 window.Liquid = Liquid;
