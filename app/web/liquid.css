@@ -369,6 +369,6 @@
      izquierda — el precedente del fx-bead NO aplica aquí: aquel se ocultaba por un keyframe, y
      animation:none lo congelaba visible; este puente se oculta por CSS normal. */
   .lg-bars__bar { transition: none !important; }
-  .lg-tilt { transform: none; transition: none; }
-  .lg-tilt::after { display: none; }
+  .lg-tilt { transform: none !important; transition: none !important; }
+  .lg-tilt::after { display: none !important; }
 }

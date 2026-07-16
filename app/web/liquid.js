@@ -92,7 +92,8 @@ const Liquid = {
       if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
       last = null;
       recenter();
-      el.style.setProperty("--glow", "0");
+      // Si el teclado sigue dentro, la luz de foco se conserva; si no, se apaga.
+      el.style.setProperty("--glow", el.matches(":focus-within") ? "0.7" : "0");
     };
     const onFocusIn = () => el.style.setProperty("--glow", "0.7"); // teclado: luz sin cursor
     const onFocusOut = onLeave;
