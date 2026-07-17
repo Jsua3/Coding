@@ -30,6 +30,6 @@ Cada lección es un flujo: teoría → 2 ejercicios (opción múltiple, completa
 
 ## Estructura
 
-- `server/` — Express: `auth.js` (JWT), `routes/` (me, courses, lessons, exercises, review), `services/` (progreso, gamificación, validadores de ejercicios, repaso), `seed-data/` (contenido de las 6 materias: lecciones + 128 ejercicios)
+- `server/` — Express: `auth.js` (JWT), `routes/` (me, courses, lessons, exercises, review), `services/` (progreso, gamificación, validadores de ejercicios, repaso), `seed-data/` (contenido de las 7 materias: lecciones + 142 ejercicios)
 - `web/` — frontend sin build: React CDN + Babel + design system en `/ds`; `motion.css`/`fx.js` (animaciones y sonido), `screens/` (login, dashboard, curso, lección stepper, repaso)
 - `test/` — node:test + supertest
