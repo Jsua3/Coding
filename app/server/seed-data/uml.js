@@ -23,7 +23,7 @@ export default {
           content: [
             { type: "p", html: "<code>UML</code> (Unified Modeling Language) es un lenguaje VISUAL estándar para modelar software, mantenido por el <code>OMG</code> (Object Management Group). Ojo con la trampa: UML no es una metodología ni un proceso — no te dice EN QUÉ ORDEN trabajar ni cómo organizar tu equipo, como sí hacen Scrum o el modelo en cascada. Tampoco es un lenguaje de programación: un diagrama de clases no se ejecuta, describe la forma que después alguien traduce a código en Java, Python o el lenguaje que sea." },
             { type: "p", html: "¿Para qué sirve entonces dibujar? Para tres cosas que un párrafo de texto hace peor: <code>comunicar</code> una idea de diseño de un vistazo entre personas que no comparten el mismo vocabulario técnico, <code>razonar</code> sobre un problema ANTES de escribir una sola línea de código (un diagrama mal armado se corrige en un pizarrón; un diseño mal armado se corrige refactorizando), y <code>documentar</code> decisiones que de otro modo solo viven en la cabeza de quien las tomó." },
-            { type: "p", html: "UML ofrece nueve diagramas estándar, pero todos caen en dos familias. Los de <code>estructura</code> retratan el sistema QUIETO: sus piezas y cómo se relacionan — clases, objetos, componentes. Los de <code>comportamiento</code> retratan el sistema EN MOVIMIENTO: qué hace y cómo cambia — casos de uso, actividades, estados, secuencia, tiempo. La pregunta que separa ambas familias es simple: ¿el diagrama describe una foto o una película?" },
+            { type: "p", html: "UML 2.x define catorce tipos de diagramas, pero en este curso cubrimos nueve fundamentales, divididos en dos familias. Los de <code>estructura</code> retratan el sistema QUIETO: sus piezas y cómo se relacionan — clases, objetos, componentes. Los de <code>comportamiento</code> retratan el sistema EN MOVIMIENTO: qué hace y cómo cambia — casos de uso, actividades, estados, secuencia, tiempo. La pregunta que separa ambas familias es simple: ¿el diagrama describe una foto o una película?" },
             { type: "code", lines: [
               `<span style="${C}">── Las dos familias de UML ─────────────────────</span>`,
               `<span style="${K}">Estructura</span>      clases, objetos, componentes`,
@@ -324,7 +324,7 @@ export default {
           title: "El diagrama de contexto",
           mins: 14,
           content: [
-            { type: "p", html: "El diagrama de <code>contexto</code> nace de una tradición distinta a la del resto de UML: viene del análisis estructurado (el <code>DFD de nivel 0</code>, si alguna vez viste ese nombre) y hoy convive con UML sin ser uno de sus nueve diagramas oficiales — muchos equipos lo reemplazan con un diagrama de casos de uso a nivel de sistema. Vale la pena conocerlo igual: no hay notación más simple para responder una sola pregunta — ¿dónde termina MI sistema y empieza el mundo?" },
+            { type: "p", html: "El diagrama de <code>contexto</code> nace de una tradición distinta a la del resto de UML: viene del análisis estructurado (el <code>DFD de nivel 0</code>, si alguna vez viste ese nombre) y hoy convive con UML aunque no forma parte de los nueve diagramas que cubre este curso — muchos equipos lo reemplazan con un diagrama de casos de uso a nivel de sistema. Vale la pena conocerlo igual: no hay notación más simple para responder una sola pregunta — ¿dónde termina MI sistema y empieza el mundo?" },
             { type: "p", html: "La idea central es la <code>frontera</code>: el sistema entero se dibuja como UNA sola caja, sin abrir su interior — ni clases, ni módulos, ni cómo resuelve nada por dentro. Alrededor de esa caja aparecen los <code>actores</code> y <code>sistemas externos</code> con los que se comunica, y flechas etiquetadas que describen cada <code>flujo</code> de información que cruza la frontera. Puertas adentro, el sistema puede tener piezas como un <code>módulo de reservas</code> o un <code>catálogo</code> de títulos — pero nada de eso aparece en el diagrama: ahí conviven ocultas dentro de una sola caja opaca." },
             { type: "code", lines: [
               `<span style="${C}">── Contexto · SistemaBiblioteca ─────────────</span>`,
@@ -372,14 +372,14 @@ export default {
           title: "Diagramas de tiempo",
           mins: 15,
           content: [
-            { type: "p", html: "El diagrama de <code>tiempo</code> (timing) SÍ es uno de los nueve diagramas oficiales de UML — y el más ignorado. A diferencia del diagrama de estados, donde el tiempo no tiene escala (una transición \"tarda\" lo que tarde), aquí el <code>eje horizontal</code> ES el tiempo, con una escala real. El <code>eje vertical</code> muestra los <code>estados</code> por los que pasa UNA línea de vida, y cada cambio de estado se dibuja como un escalón — sube o baja en el momento exacto en que ocurre." },
+            { type: "p", html: "El diagrama de <code>tiempo</code> (timing) SÍ es uno de los nueve diagramas de este curso — y el más ignorado en la práctica. A diferencia del diagrama de estados, donde el tiempo no tiene escala (una transición \"tarda\" lo que tarde), aquí el <code>eje horizontal</code> ES el tiempo, con una escala real. El <code>eje vertical</code> muestra los <code>estados</code> por los que pasa UNA línea de vida, y cada cambio de estado se dibuja como un escalón — sube o baja en el momento exacto en que ocurre." },
             { type: "p", html: "Encima del escalón pueden aparecer <code>restricciones</code> entre llaves, como <code>{&lt; 2 s}</code>: una cota de tiempo que ese tramo del ciclo de vida debe respetar. Este diagrama brilla cuando el tiempo real — no solo el orden de los eventos — importa: sensores que deben reaccionar en milisegundos, timeouts de red, protocolos con plazos duros. Si tu problema es \"¿en qué orden pasan las cosas?\", usa un diagrama de estados; si es \"¿CUÁNTO tardan en pasar?\", usa uno de tiempo." },
             { type: "code", lines: [
               `<span style="${C}">── Timing · un Préstamo ──────────────────────</span>`,
               `Activo    ────────────┐`,
-              `                       │`,
+              `                      │`,
               `Vencido               └───────┐ <span style="${N}">{&lt; 2 días}</span>`,
-              `                               │`,
+              `                              │`,
               `Devuelto                      └──────────`,
               ``,
               `          día 0     día 14     día 15`,
@@ -421,12 +421,12 @@ export default {
           mins: 15,
           content: [
             { type: "p", html: "El diagrama de <code>componentes</code> describe el software como piezas REEMPLAZABLES — no clases sueltas, sino módulos con una frontera clara: puedes sacar una pieza y meter otra distinta, mientras respete el mismo contrato. Cada pieza se marca con el estereotipo <code>«component»</code> sobre su nombre." },
-            { type: "p", html: "El contrato se declara con dos símbolos. Una <code>interfaz provista</code> se dibuja como un <code>lollipop</code> — una línea que termina en círculo, <code>──○</code>: el componente dice \"yo OFREZCO esto\". Una <code>interfaz requerida</code> se dibuja como un <code>socket</code> — una muesca abierta, <code>──)</code>: el componente dice \"yo NECESITO esto para funcionar\". Cuando el lollipop de uno encaja en el socket de otro, los dos componentes quedan acoplados SOLO por ese contrato — ninguno conoce los detalles internos del otro. Un componente también puede tener una <code>dependencia</code> (flecha discontinua) hacia otro: un uso más suelto, sin comprometerse a una interfaz formal." },
+            { type: "p", html: "El contrato se declara con dos símbolos. Una <code>interfaz provista</code> se dibuja como un <code>lollipop</code> — una línea que termina en círculo, <code>──○</code>: el componente dice \"yo OFREZCO esto\". Una <code>interfaz requerida</code> se dibuja como un <code>socket</code> — una muesca cóncava, <code>──(</code>: el componente dice \"yo NECESITO esto para funcionar\". Cuando el lollipop de uno encaja en el socket de otro, los dos componentes quedan acoplados SOLO por ese contrato — ninguno conoce los detalles internos del otro. Un componente también puede tener una <code>dependencia</code> (flecha discontinua) hacia otro: un uso más suelto, sin comprometerse a una interfaz formal." },
             { type: "code", lines: [
               `<span style="${C}">── Componentes · contrato de pago ───────────</span>`,
               `┌───────────┐      ┌───────────────┐`,
               `│«component»│      │  «component»  │`,
-              `│ TiendaWeb <span style="${N}">├──)○──┤</span> PasarelaPagos │`,
+              `│ TiendaWeb <span style="${N}">├──(○──┤</span> PasarelaPagos │`,
               `└───────────┘      └───────────────┘`,
               `             IPagos`,
             ]},
