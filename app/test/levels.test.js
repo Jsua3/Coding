@@ -9,13 +9,19 @@ test("la curva es ascendente, sin huecos ni retrocesos", () => {
     assert.equal(LEVELS[i].n, i + 1);
     assert.ok(LEVELS[i].xp > LEVELS[i - 1].xp, `el nivel ${i + 1} no supera al anterior`);
   }
-  // El último nivel se alcanza justo al terminar el temario: 64 lecciones x 50 XP.
-  assert.equal(LEVELS[11].xp, 3200);
+  // El último nivel se alcanza justo al terminar el temario: 71 lecciones x 50 XP.
+  assert.equal(LEVELS[11].xp, 71 * 50);
   assert.equal(LEVELS[11].name, "Maestro");
   assert.deepEqual(LEVELS.map((l) => l.name), [
     "Aprendiz", "Practicante", "Junior", "Desarrollador", "Semi-senior", "Senior",
     "Especialista", "Tech lead", "Referente", "Principal", "Arquitecto", "Maestro",
   ]);
+});
+
+test("la curva exige de verdad: los umbrales son los acordados", () => {
+  // La vara nueva: cada título tiene ancla narrativa (Junior ≈ tu primer curso;
+  // Senior = la mitad del temario; Maestro = el temario entero).
+  assert.deepEqual(LEVELS.map((l) => l.xp), [0, 100, 400, 800, 1250, 1800, 2300, 2750, 3100, 3350, 3500, 3550]);
 });
 
 test("sin XP eres Aprendiz al 0%", () => {
@@ -24,7 +30,7 @@ test("sin XP eres Aprendiz al 0%", () => {
   assert.equal(l.name, "Aprendiz");
   assert.equal(l.progress, 0);
   assert.equal(l.xpInLevel, 0);
-  assert.equal(l.xpToNext, 50);
+  assert.equal(l.xpToNext, 100);
   assert.equal(l.next.name, "Practicante");
 });
 
@@ -37,18 +43,18 @@ test("cada umbral exacto entra en su nivel al 0%", () => {
 });
 
 test("justo debajo de un umbral sigues en el nivel anterior", () => {
-  assert.equal(levelFor(49).n, 1);
-  assert.equal(levelFor(50).n, 2);
-  assert.equal(levelFor(3199).n, 11);
-  assert.equal(levelFor(3200).n, 12);
+  assert.equal(levelFor(99).n, 1);
+  assert.equal(levelFor(100).n, 2);
+  assert.equal(levelFor(3549).n, 11);
+  assert.equal(levelFor(3550).n, 12);
 });
 
 test("el progreso dentro del nivel se calcula sobre el tramo", () => {
-  // Nivel 2 (Practicante) va de 50 a 150: 100 XP de tramo.
-  const l = levelFor(100);
+  // Nivel 2 (Practicante) va de 100 a 400: 300 XP de tramo.
+  const l = levelFor(250);
   assert.equal(l.n, 2);
-  assert.equal(l.xpInLevel, 50);
-  assert.equal(l.xpToNext, 50);
+  assert.equal(l.xpInLevel, 150);
+  assert.equal(l.xpToNext, 150);
   assert.equal(l.progress, 50);
 });
 
@@ -67,8 +73,7 @@ test("XP invalido o negativo no rompe: eres Aprendiz", () => {
 });
 
 test("el progreso nunca llega a 100 si todavia falta XP para el siguiente nivel", () => {
-  // Con Math.round, 3199 XP daba progress: 100 aunque faltara 1 XP para Maestro.
-  for (const xp of [49, 149, 299, 499, 749, 1049, 1399, 1799, 2249, 2699, 3199]) {
+  for (const xp of [99, 399, 799, 1249, 1799, 2299, 2749, 3099, 3349, 3499, 3549]) {
     const l = levelFor(xp);
     assert.ok(l.next !== null, `${xp} XP deberia tener nivel siguiente`);
     assert.ok(l.xpToNext > 0, `${xp} XP deberia tener XP pendiente`);

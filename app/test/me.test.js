@@ -71,20 +71,28 @@ test("token de usuario borrado responde 401", async () => {
 });
 
 test("/me trae el nivel derivado del XP", async () => {
+  // Con la vara nueva, Practicante exige 100 XP: 50 XP te deja a mitad del nivel 1 (Aprendiz).
   await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 50)", [userId]);
   const res = await me();
   assert.equal(res.status, 200);
-  assert.equal(res.body.stats.level.n, 2);
-  assert.equal(res.body.stats.level.name, "Practicante");
-  assert.equal(res.body.stats.level.progress, 0);
+  assert.equal(res.body.stats.level.n, 1);
+  assert.equal(res.body.stats.level.name, "Aprendiz");
+  assert.equal(res.body.stats.level.progress, 50);
 });
 
 test("gastar XP baja el saldo pero NO el nivel ni el xp ganado", async () => {
-  // 60 XP ganados -> nivel 2 (Practicante). Luego un gasto de 50 (escudo).
-  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 60), (?, NULL, -50)", [userId, userId]);
-  const res = await me();
-  assert.equal(res.body.stats.xp, 60);          // ganado, no toca el gasto
-  assert.equal(res.body.stats.balance, 10);      // saldo: 60 - 50
-  assert.equal(res.body.stats.level.n, 2);       // el nivel NO baja
-  assert.equal(res.body.stats.level.name, "Practicante");
+  // 110 XP ganados -> nivel 2 (Practicante), antes de gastar nada.
+  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 110)", [userId]);
+  const antes = await me();
+  assert.equal(antes.body.stats.level.n, 2);
+  assert.equal(antes.body.stats.level.name, "Practicante");
+
+  // Un gasto de 50 (escudo) no debe bajar el nivel ni el XP ganado: si el nivel saliera
+  // del saldo (110 - 50 = 60), volveria a Aprendiz.
+  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, NULL, -50)", [userId]);
+  const despues = await me();
+  assert.equal(despues.body.stats.xp, 110);      // ganado, no toca el gasto
+  assert.equal(despues.body.stats.balance, 60);  // saldo: 110 - 50
+  assert.equal(despues.body.stats.level.n, 2);   // el nivel NO baja
+  assert.equal(despues.body.stats.level.name, "Practicante");
 });

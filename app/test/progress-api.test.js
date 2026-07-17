@@ -59,8 +59,8 @@ test("el XP y los logros se reflejan en /progress", async () => {
   await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 50)", [u.id]);
 
   const r = await request(app).get("/api/progress").set("Authorization", "Bearer " + token);
-  assert.equal(r.body.level.n, 2); // 50 XP = Practicante
-  assert.equal(r.body.level.name, "Practicante");
+  assert.equal(r.body.level.n, 1); // 50 XP = Aprendiz (Practicante exige 100 con la vara nueva)
+  assert.equal(r.body.level.name, "Aprendiz");
   const primer = r.body.achievements.find((a) => a.id === "primera-leccion");
   assert.equal(primer.unlocked, true);
 });
@@ -77,8 +77,9 @@ test("/progress trae el estado de racha", async () => {
 test("el nivel de /progress se deriva del XP GANADO, no del saldo", async () => {
   const token = await registrar();
   const [u] = await query("SELECT id FROM users WHERE email = 'ana@test.dev'");
-  // 60 ganados -> nivel 2. Un gasto de 50 no debe bajar el nivel.
-  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 60), (?, NULL, -50)", [u.id, u.id]);
+  // 110 ganados -> nivel 2 (Practicante). Un gasto de 50 no debe bajar el nivel: si el nivel
+  // saliera del saldo (110 - 50 = 60), seguiria siendo Aprendiz con la vara nueva.
+  await query("INSERT INTO xp_events (user_id, lesson_id, amount) VALUES (?, 'l1', 110), (?, NULL, -50)", [u.id, u.id]);
   const r = await request(app).get("/api/progress").set("Authorization", "Bearer " + token);
   assert.equal(r.body.level.n, 2);
   assert.equal(r.body.level.name, "Practicante");

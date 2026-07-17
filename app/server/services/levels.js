@@ -1,20 +1,20 @@
 // Los niveles cuentan tu carrera en el oficio, y la curva está anclada al techo real del juego:
-// el último nivel se alcanza exactamente al terminar el temario (64 lecciones x 50 XP = 3200).
-// Los bonus de "Perfecto" solo te llevan allí antes; el repaso solo da XP si fallas, así que un
-// jugador impecable nunca lo necesita.
+// el último nivel se alcanza exactamente al terminar el temario (71 lecciones x 50 XP = 3550).
+// Los bonus de "Perfecto" solo te llevan allí antes. La vara es exigente a propósito (pedido del
+// usuario): cada título tiene ancla narrativa — lo llevas cuando de verdad estás ahí.
 export const LEVELS = [
   { n: 1, name: "Aprendiz", xp: 0 },
-  { n: 2, name: "Practicante", xp: 50 },
-  { n: 3, name: "Junior", xp: 150 },
-  { n: 4, name: "Desarrollador", xp: 300 },
-  { n: 5, name: "Semi-senior", xp: 500 },
-  { n: 6, name: "Senior", xp: 750 },
-  { n: 7, name: "Especialista", xp: 1050 },
-  { n: 8, name: "Tech lead", xp: 1400 },
-  { n: 9, name: "Referente", xp: 1800 },
-  { n: 10, name: "Principal", xp: 2250 },
-  { n: 11, name: "Arquitecto", xp: 2700 },
-  { n: 12, name: "Maestro", xp: 3200 },
+  { n: 2, name: "Practicante", xp: 100 },   // tus primeras 2 lecciones: el ding temprano se conserva
+  { n: 3, name: "Junior", xp: 400 },        // ≈ tu primer curso completo
+  { n: 4, name: "Desarrollador", xp: 800 }, // ≈ dos cursos
+  { n: 5, name: "Semi-senior", xp: 1250 },  // un tercio del temario
+  { n: 6, name: "Senior", xp: 1800 },       // la mitad del temario
+  { n: 7, name: "Especialista", xp: 2300 }, // dos tercios
+  { n: 8, name: "Tech lead", xp: 2750 },    // ~55 lecciones
+  { n: 9, name: "Referente", xp: 3100 },    // ~62 lecciones
+  { n: 10, name: "Principal", xp: 3350 },   // casi todo el catálogo
+  { n: 11, name: "Arquitecto", xp: 3500 },  // todo menos una lección
+  { n: 12, name: "Maestro", xp: 3550 },     // el temario entero: la última lección te corona
 ];
 
 export function levelFor(xp) {

@@ -7,7 +7,7 @@ export const ACHIEVEMENTS = [
   { id: "primera-leccion", name: "Primer paso", description: "Completa tu primera lección", secret: false, metric: "lessonsDone", target: 1 },
   { id: "diez-lecciones", name: "Tomando ritmo", description: "Completa 10 lecciones", secret: false, metric: "lessonsDone", target: 10 },
   { id: "veinticinco-lecciones", name: "Medio camino", description: "Completa 25 lecciones", secret: false, metric: "lessonsDone", target: 25 },
-  { id: "todas-las-lecciones", name: "Sin dejar una", description: "Completa las 64 lecciones", secret: false, metric: "lessonsDone", target: 64 },
+  { id: "todas-las-lecciones", name: "Sin dejar una", description: "Completa las 71 lecciones", secret: false, metric: "lessonsDone", target: 71 },
   // Constancia
   { id: "racha-3", name: "Tres días seguidos", description: "Estudia 3 días seguidos", secret: false, metric: "bestStreak", target: 3 },
   { id: "racha-7", name: "Una semana entera", description: "Estudia 7 días seguidos", secret: false, metric: "bestStreak", target: 7 },
@@ -17,7 +17,7 @@ export const ACHIEVEMENTS = [
   { id: "primera-perfecta", name: "Sin un error", description: "Termina una lección sin fallar ni una vez", secret: false, metric: "perfectLessons", target: 1 },
   { id: "cinco-perfectas", name: "Pulso firme", description: "Termina 5 lecciones perfectas", secret: false, metric: "perfectLessons", target: 5 },
   { id: "primer-curso", name: "Materia dominada", description: "Completa una materia entera", secret: false, metric: "coursesCompleted", target: 1 },
-  { id: "todos-los-cursos", name: "El plan completo", description: "Completa las 6 materias", secret: false, metric: "coursesCompleted", target: 6 },
+  { id: "todos-los-cursos", name: "El plan completo", description: "Completa las 7 materias", secret: false, metric: "coursesCompleted", target: 7 },
   // Repaso
   { id: "diez-repasos", name: "Nada se queda atrás", description: "Corrige 10 ejercicios en repaso", secret: false, metric: "reviewCleared", target: 10 },
   // Secretos — los dos de horario son disjuntos a propósito: si "madrugador" fuera "antes de las 7"
