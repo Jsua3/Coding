@@ -29,17 +29,19 @@ test("sin token responde 401", async () => {
   assert.equal(res.status, 401);
 });
 
-test("catálogo para usuario nuevo: 6 cursos, bd2 bloqueado, resto nuevo", async () => {
+test("catálogo para usuario nuevo: 7 cursos, bd2 bloqueado, resto nuevo", async () => {
   const res = await auth(request(app).get("/api/courses"));
   assert.equal(res.status, 200);
-  assert.equal(res.body.length, 6);
-  assert.deepEqual(res.body.map((c) => c.id), ["bd1", "prog2", "algo", "bd2", "prog1", "web"]);
+  assert.equal(res.body.length, 7);
+  assert.deepEqual(res.body.map((c) => c.id), ["bd1", "prog2", "algo", "bd2", "prog1", "web", "reqsw"]);
   const byId = Object.fromEntries(res.body.map((c) => [c.id, c]));
   assert.equal(byId.bd2.status, "BLOQUEADO");
   assert.equal(byId.bd1.status, "NUEVO");
   assert.equal(byId.bd1.progress, 0);
   assert.equal(byId.bd1.lessons, 10);
   assert.equal(byId.bd1.hours, 4);
+  assert.equal(byId.reqsw.status, "NUEVO");
+  assert.equal(byId.reqsw.lessons, 7);
 });
 
 test("detalle de curso con lección current", async () => {
