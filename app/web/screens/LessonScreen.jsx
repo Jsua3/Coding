@@ -2,7 +2,7 @@ const KITX = window.CodingDesignSystem_2ecb3a;
 
 function CodeBlock({ lines }) {
   return (
-    <div style={{ fontFamily: "var(--font-mono)", fontSize: 13.5, lineHeight: 1.7, background: "rgba(3,6,16,0.55)", border: "1px solid var(--glass-stroke)", borderRadius: "var(--radius-sm)", padding: "14px 18px", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}>
+    <div style={{ fontFamily: "var(--font-mono)", fontSize: 13.5, lineHeight: 1.7, whiteSpace: "pre", overflowX: "auto", background: "rgba(3,6,16,0.55)", border: "1px solid var(--glass-stroke)", borderRadius: "var(--radius-sm)", padding: "14px 18px", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}>
       {lines.map((l, i) => <div key={i} dangerouslySetInnerHTML={{ __html: l }}></div>)}
     </div>
   );

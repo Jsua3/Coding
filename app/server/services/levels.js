@@ -1,5 +1,5 @@
 // Los niveles cuentan tu carrera en el oficio, y la curva está anclada al techo real del juego:
-// el último nivel se alcanza exactamente al terminar el temario (71 lecciones x 50 XP = 3550).
+// el último nivel se alcanza exactamente al terminar el temario (80 lecciones x 50 XP = 4000).
 // Los bonus de "Perfecto" solo te llevan allí antes. La vara es exigente a propósito (pedido del
 // usuario): cada título tiene ancla narrativa — lo llevas cuando de verdad estás ahí.
 export const LEVELS = [
@@ -14,8 +14,12 @@ export const LEVELS = [
   { n: 9, name: "Referente", xp: 3100 },    // ~62 lecciones
   { n: 10, name: "Principal", xp: 3350 },   // casi todo el catálogo
   { n: 11, name: "Arquitecto", xp: 3500 },  // todo menos una lección
-  { n: 12, name: "Maestro", xp: 3550 },     // el temario entero: la última lección te corona
+  { n: 12, name: "Maestro", xp: 4000 },     // el temario entero (80 lecciones): el último curso entero te corona
 ];
+
+// Deuda consciente (decisión del usuario al añadir UML): solo se movió el techo, así que
+// Arquitecto (3500) ya no es "todo menos una lección" — el tramo final es el último curso
+// entero. Se re-anclará en una futura recalibración si el catálogo sigue creciendo.
 
 export function levelFor(xp) {
   const total = Math.max(0, Number(xp) || 0);
