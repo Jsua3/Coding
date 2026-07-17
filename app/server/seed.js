@@ -7,8 +7,9 @@ import prog2 from "./seed-data/prog2.js";
 import algo from "./seed-data/algo.js";
 import web from "./seed-data/web.js";
 import reqsw from "./seed-data/reqsw.js";
+import uml from "./seed-data/uml.js";
 
-export const COURSES = [bd1, bd2, prog1, prog2, algo, web, reqsw];
+export const COURSES = [bd1, bd2, prog1, prog2, algo, web, reqsw, uml];
 
 export async function runSeed() {
   for (const c of COURSES) {

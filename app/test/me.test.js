@@ -32,7 +32,7 @@ test("usuario nuevo: stats en cero y continue apunta a bd1/l1", async () => {
     xp: 0, xpWeek: 0, streak: 0, bestStreak: 0,
     level: { n: 1, name: "Aprendiz", progress: 0 },
     dailyGoal: 50, xpToday: 0, balance: 0,
-    activeCourses: 0, completedCourses: 0, lockedCourses: 1,
+    activeCourses: 0, completedCourses: 0, lockedCourses: 2,
     reviewCount: 0,
   });
   assert.deepEqual(res.body.continue, { courseId: "bd1", lessonId: "l1", lessonTitle: "Qué es un SGBD" });

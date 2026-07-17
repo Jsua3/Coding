@@ -49,19 +49,19 @@ test("el seed es idempotente (upsert por id)", async () => {
   assert.ok(rows[0].n >= 2);
 });
 
-test("seed completo: 7 cursos, 71 lecciones, 142 ejercicios", async () => {
+test("seed completo: 8 cursos, 80 lecciones, 160 ejercicios", async () => {
   await setupTestDb();
   const courses = await query("SELECT id FROM courses");
-  assert.equal(courses.length, 7);
+  assert.equal(courses.length, 8);
   const lessons = await query("SELECT COUNT(*) AS n FROM lessons");
-  assert.equal(lessons[0].n, 71);
+  assert.equal(lessons[0].n, 80);
   const exercises = await query("SELECT COUNT(*) AS n FROM exercises");
-  assert.equal(exercises[0].n, 142);
+  assert.equal(exercises[0].n, 160);
   const perCourse = await query(
     `SELECT u.course_id, COUNT(l.id) AS n FROM lessons l JOIN units u ON u.id = l.unit_id GROUP BY u.course_id`
   );
   const counts = Object.fromEntries(perCourse.map((r) => [r.course_id, r.n]));
-  assert.deepEqual(counts, { bd1: 10, bd2: 9, prog1: 12, prog2: 9, algo: 12, web: 12, reqsw: 7 });
+  assert.deepEqual(counts, { bd1: 10, bd2: 9, prog1: 12, prog2: 9, algo: 12, web: 12, reqsw: 7, uml: 9 });
 });
 
 export function assertExerciseShape(row) {
@@ -192,17 +192,89 @@ test("reqsw: 7 lecciones en 2 unidades, 2 ejercicios por lección, bien formados
   }
 });
 
-test("global: 142 ejercicios, 2 por lección, todos bien formados", async () => {
+test("uml: 9 lecciones en 2 unidades, 2 ejercicios por lección, bien formados", async () => {
   await setupTestDb();
-  const rows = await query("SELECT * FROM exercises ORDER BY lesson_id, order_index");
-  assert.equal(rows.length, 142);
+  const lessons = await query(
+    `SELECT l.id, l.content, u.id AS unit_id FROM lessons l JOIN units u ON u.id = l.unit_id
+     WHERE u.course_id = 'uml' ORDER BY u.order_index, l.order_index`
+  );
+  assert.equal(lessons.length, 9);
+  const byUnit = {};
+  for (const l of lessons) (byUnit[l.unit_id] = byUnit[l.unit_id] || []).push(l);
+  assert.equal(Object.keys(byUnit).length, 2, "uml debe tener 2 unidades");
+  const unitSizes = Object.values(byUnit).map((ls) => ls.length).sort((a, b) => a - b);
+  assert.deepEqual(unitSizes, [4, 5], "reparto 4 + 5 entre las unidades de uml");
+  for (const l of lessons) {
+    const content = typeof l.content === "string" ? JSON.parse(l.content) : l.content;
+    assert.ok(Array.isArray(content) && content.length > 0, `contenido vacío en ${l.id}`);
+  }
+
+  const rows = await query(
+    `SELECT e.* FROM exercises e
+     JOIN lessons l ON l.id = e.lesson_id JOIN units u ON u.id = l.unit_id
+     WHERE u.course_id = 'uml' ORDER BY e.lesson_id, e.order_index`
+  );
   const byLesson = {};
   for (const r of rows) (byLesson[r.lesson_id] = byLesson[r.lesson_id] || []).push(r);
-  assert.equal(Object.keys(byLesson).length, 71);
-  for (const exs of Object.values(byLesson)) {
+  assert.equal(Object.keys(byLesson).length, 9);
+  for (const [lessonId, exs] of Object.entries(byLesson)) {
+    assert.equal(exs.length, 2, `ejercicios en ${lessonId}`);
+    assert.equal(exs[0].id, lessonId + "-ex1");
+    assert.equal(exs[0].type, "choice");
+    assert.equal(exs[1].id, lessonId + "-ex2");
+    for (const e of exs) assertExerciseShape(e);
+  }
+
+  const byId = Object.fromEntries(rows.map((r) => [r.id, r]));
+
+  // ex2 declarado por tipo: um8 es la única lección con extra choice (lectura del diagrama)
+  const ex2Types = { um1: "match", um2: "match", um3: "order", um4: "match", um5: "match", um6: "order", um7: "match", um8: "choice", um9: "match" };
+  for (const [lessonId, type] of Object.entries(ex2Types)) {
+    assert.equal(byId[lessonId + "-ex2"].type, type, `${lessonId}-ex2 debe ser ${type}`);
+  }
+
+  // match: pares completos — left y right cubren los 4 índices sin repetir
+  for (const [lessonId, type] of Object.entries(ex2Types)) {
+    if (type !== "match") continue;
+    const row = byId[lessonId + "-ex2"];
+    const answer = typeof row.answer === "string" ? JSON.parse(row.answer) : row.answer;
+    const lefts = answer.pairs.map(([l]) => l).sort();
+    const rights = answer.pairs.map(([, r]) => r).sort();
+    assert.deepEqual(lefts, [0, 1, 2, 3], `pares left sin repetir en ${lessonId}-ex2`);
+    assert.deepEqual(rights, [0, 1, 2, 3], `pares right sin repetir en ${lessonId}-ex2`);
+  }
+
+  // order: answer.order es permutación de payload.lines, y el payload llega mezclado
+  for (const [lessonId, type] of Object.entries(ex2Types)) {
+    if (type !== "order") continue;
+    const row = byId[lessonId + "-ex2"];
+    const payload = typeof row.payload === "string" ? JSON.parse(row.payload) : row.payload;
+    const answer = typeof row.answer === "string" ? JSON.parse(row.answer) : row.answer;
+    const payloadIds = payload.lines.map((l) => l.id);
+    assert.deepEqual([...payloadIds].sort(), [...answer.order].sort(), `ids payload vs answer en ${lessonId}-ex2`);
+    assert.notDeepEqual(payloadIds, answer.order, `payload de ${lessonId}-ex2 debe llegar mezclado`);
+  }
+
+  // la vara del dibujo: um2..um9 tienen al menos un bloque {type:"code"} en su content
+  // (en la práctica las 9 lecciones dibujan, incluida um1)
+  for (const l of lessons) {
+    const content = typeof l.content === "string" ? JSON.parse(l.content) : l.content;
+    assert.ok(content.some((b) => b.type === "code"), `falta bloque code en ${l.id}`);
+  }
+});
+
+test("global: 160 ejercicios, 2 por lección, todos bien formados", async () => {
+  await setupTestDb();
+  const rows = await query("SELECT * FROM exercises ORDER BY lesson_id, order_index");
+  assert.equal(rows.length, 160);
+  const byLesson = {};
+  for (const r of rows) (byLesson[r.lesson_id] = byLesson[r.lesson_id] || []).push(r);
+  assert.equal(Object.keys(byLesson).length, 80);
+  for (const [lessonId, exs] of Object.entries(byLesson)) {
     assert.equal(exs.length, 2);
     assert.equal(exs[0].type, "choice");
-    assert.notEqual(exs[1].type, "choice");
+    // el extra de um8 es una lectura de diagrama, también choice — toda otra lección exige un ex2 estructurado
+    if (lessonId !== "um8") assert.notEqual(exs[1].type, "choice");
     for (const e of exs) assertExerciseShape(e);
   }
 });

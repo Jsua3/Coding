@@ -29,11 +29,11 @@ test("sin token responde 401", async () => {
   assert.equal(res.status, 401);
 });
 
-test("catálogo para usuario nuevo: 7 cursos, bd2 bloqueado, resto nuevo", async () => {
+test("catálogo para usuario nuevo: 8 cursos, bd2 y uml bloqueados, resto nuevo", async () => {
   const res = await auth(request(app).get("/api/courses"));
   assert.equal(res.status, 200);
-  assert.equal(res.body.length, 7);
-  assert.deepEqual(res.body.map((c) => c.id), ["bd1", "prog2", "algo", "bd2", "prog1", "web", "reqsw"]);
+  assert.equal(res.body.length, 8);
+  assert.deepEqual(res.body.map((c) => c.id), ["bd1", "prog2", "algo", "bd2", "prog1", "web", "reqsw", "uml"]);
   const byId = Object.fromEntries(res.body.map((c) => [c.id, c]));
   assert.equal(byId.bd2.status, "BLOQUEADO");
   assert.equal(byId.bd1.status, "NUEVO");
@@ -42,6 +42,8 @@ test("catálogo para usuario nuevo: 7 cursos, bd2 bloqueado, resto nuevo", async
   assert.equal(byId.bd1.hours, 4);
   assert.equal(byId.reqsw.status, "NUEVO");
   assert.equal(byId.reqsw.lessons, 7);
+  assert.equal(byId.uml.status, "BLOQUEADO");
+  assert.equal(byId.uml.lessons, 9);
 });
 
 test("detalle de curso con lección current", async () => {
@@ -70,6 +72,12 @@ test("curso bloqueado responde 403 con el prerequisito", async () => {
   const res = await auth(request(app).get("/api/courses/bd2"));
   assert.equal(res.status, 403);
   assert.match(res.body.error, /Bases de datos I/);
+});
+
+test("uml bloqueado responde 403 con su prerequisito para un usuario nuevo", async () => {
+  const res = await auth(request(app).get("/api/courses/uml"));
+  assert.equal(res.status, 403);
+  assert.match(res.body.error, /Ingeniería de software/);
 });
 
 test("curso inexistente responde 404", async () => {
