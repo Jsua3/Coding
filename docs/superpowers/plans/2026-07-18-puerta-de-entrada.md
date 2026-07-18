@@ -659,7 +659,7 @@ Sin token (`localStorage.clear()` + recarga), trap instalado:
 })
 ```
 
-Expected: `{ enLanding: true, gate: true, gateFueraDelKeyado: true, ctas: 2, tarjetas: true, errs: 0 }`.
+Expected: `{ enLanding: true, gate: true, gateFueraDelKeyado: true, ctas: 3, tarjetas: true, errs: 0 }`. (3 CTAs: dos del hero + el "Empieza a programar" del cierre — corregido durante la ejecución; la expectativa original decía 2 por error.)
 
 Después, la navegación completa de la puerta (clicks reales):
 1. "Empieza a programar" ⇒ login con campo "Nombre completo" visible (modo registro), `.lg-back` presente, `window.scrollY === 0`.
