@@ -1,16 +1,16 @@
 # PROMPT MAESTRO — Coding
 
 > Documento de contexto total del proyecto. **Léelo completo antes de trabajar en él desde una conversación nueva.**
-> Última actualización: **2026-07-17**, tras fusionar la 10ª iteración ("Ingeniería de requisitos + la vara nueva") a `master` (código en `5db093a`).
+> Última actualización: **2026-07-17**, tras fusionar la 11ª iteración ("Modelado con UML") a `master` (código en `cb186e1`).
 >
-> **Qué cambió en la última tanda:** la 10ª iteración trajo la **primera materia nueva desde la iteración 2** — Ingeniería de requisitos (7 lecciones, 14 ejercicios, contenido original desde el canon, nacido del material de la carrera del usuario) — y la **curva de niveles recalibrada** (2-2,7× más exigente, techo 3.550 = las 71 lecciones). Antes, las iteraciones 7-9 completaron el lenguaje visual. Detalle en §2.
-> **Qué está pendiente:** el **curso de UML** (segundo curso de la materia, acordado como futuro), la **pasada de verificación humana** (*feel* visual + leer el contenido de requisitos como estudiante) y la deuda técnica menor — todo en §11.
+> **Qué cambió en la última tanda:** las iteraciones 10-11 hicieron crecer el catálogo con el material de la carrera del usuario — **Ingeniería de requisitos** (7 lecciones) y **Modelado con UML** (9 lecciones donde los diagramas se DIBUJAN con caracteres de caja; candado tras requisitos) — más la curva exigente (Junior 400) y el techo en 4.000. Detalle en §2.
+> **Qué está pendiente:** la **pasada de verificación humana** (leer los dos cursos nuevos como estudiante + legibilidad de los diagramas + *feel* visual), el **fast-follow del font stack del CodeBlock** (drift de píxel en glifos de caja) y la deuda técnica menor — todo en §11.
 
 ---
 
 ## 1. Qué es Coding
 
-**Coding** es una aplicación web de aprendizaje de Ingeniería de Software (estilo Duolingo/Brilliant) para siete materias: Bases de datos I y II, Programación I y II, Algoritmos, Desarrollo web e **Ingeniería de software (requisitos)**. Es un proyecto personal/académico de **Juan Jose** (estudiante, hispanohablante), pensado para uso local en su máquina Windows.
+**Coding** es una aplicación web de aprendizaje de Ingeniería de Software (estilo Duolingo/Brilliant) con ocho cursos en seis materias: Bases de datos I y II, Programación I y II, Algoritmos, Desarrollo web, e **Ingeniería de software en dos cursos encadenados** (requisitos → UML, con candado). Es un proyecto personal/académico de **Juan Jose** (estudiante, hispanohablante), pensado para uso local en su máquina Windows.
 
 **Objetivo del producto:** que estudiar se sienta vivo y adictivo — lecciones cortas con teoría + ejercicios interactivos, feedback inmediato, XP, rachas, celebraciones, repaso de errores, niveles y logros. La referencia de calidad son "las mejores apps de aprendizaje actuales" (Duolingo, Brilliant, Mimo, Sololearn).
 
@@ -20,7 +20,7 @@
 
 ---
 
-## 2. Estado actual: diez iteraciones + los fixes, todo fusionado a `master`
+## 2. Estado actual: once iteraciones + los fixes, todo fusionado a `master`
 
 | # | Iteración | Qué añadió |
 |---|---|---|
@@ -34,14 +34,15 @@
 | 8 | **La navbar que viaja** (`2026-07-16-navbar-viaja`) | **NavBar persistente**: `app.jsx` es el dueño del marco (PageFrame + NavBar fuera del div `key`ado; las 8 vistas son content-only) — antes cada pantalla montaba la suya y el indicador no podía deslizar. **`NavTabs`** reemplaza al Tabs del DS en la navbar: píldora **medida al texto** que viaja con **FLIP** (solo `transform`, se estira como gota). El logo lleva siempre a Inicio. |
 | 9 | **El fondo vivo** (`2026-07-16-fondo-vivo`) | El fondo deja de ser un telón: **aurora un paso más luminosa** (override en cascada del `body`; DS intocado) + **papel de cuaderno** — `Liquid.grid`, un canvas 2D cuya cuadrícula (48px) se curva hacia el cursor como bajo una **gota-lente** (radio 180, smoothstep), perseguido con amortiguación, refractado por el vidrio, y que **duerme a cero CPU** en reposo. Primera iteración con CERO fixes de review. |
 | 10 | **Ingeniería de requisitos + la vara nueva** (`2026-07-17-curso-requisitos`) | La **primera materia nueva desde la iteración 2**: `reqsw` (violet, order 7, sin prereq) — 7 lecciones en 2 unidades y 14 ejercicios sobre elicitar, analizar, especificar, validar y gestionar requisitos. Contenido **100% original desde el canon** (Pressman/SWEBOK/IEEE 29148), con el temario del curso real del usuario marcando orden y énfasis; verificado "como profesor" en tres capas de review. Y la **curva de niveles recalibrada** (pedido del usuario: los títulos se ganan) + logros de catálogo a 71/7. |
+| 11 | **Modelado con UML** (`2026-07-17-curso-uml`) | El segundo curso de Ingeniería de software (`uml`, violet, order 8, **prereq reqsw** — el candado es puro dato): 9 lecciones en 2 unidades donde **los diagramas se DIBUJAN con caracteres de caja** dentro de bloques `code` (contrato de dibujo en el spec §3: ≤60 col, ≤12 líneas, notación canónica, color selectivo). Techo a **4.000** (solo Maestro — deuda del ancla de Arquitecto anotada), logros 80/8, y el `CodeBlock` con `white-space: pre` (único frontend; de regalo, la indentación del SQL viejo por fin se ve). |
 | — | **Fix del `context`** (`fix/context-guard`) | Cerró un agujero de integridad preexistente: `POST /answer` confiaba en el `context` del cliente. Ahora el servidor lo degrada a `'lesson'` salvo que el ejercicio esté genuinamente pendiente de repaso. |
 | — | **Fixes visuales** (directos a master, con systematic-debugging) | (a) Las tarjetas de logros desbordaban su celda 42px (`GlassPanel` es **content-box** y `height:100%` + padding se salía; fix: `boxSizing: border-box` vía el `style` prop). (b) La banda de feedback pisaba el botón Comprobar en pantallas bajas (fix: reservar 120px al fondo de lección y repaso). |
 
-**Tests: 139/139** (empezó en 57). **El meta-juego está entero, el lenguaje visual completo, y el catálogo empezó a crecer con material de la carrera del usuario.**
+**Tests: 141/141** (empezó en 57). **El meta-juego entero, el lenguaje visual completo, y la materia "Ingeniería de software" con sus dos cursos encadenados.**
 
-### Lo siguiente acordado: el curso de UML
+### Lo siguiente: no hay una iteración grande acordada
 
-Segundo curso de la materia "Ingeniería de software" (decidido con el usuario en el brainstorm de la 10ª): los 10 temas de diagramas de su corte 2 (casos de uso, actividades, estados, clases, secuencia, objetos, contexto, tiempo, componentes). Trae un reto propio: enseñar notación sin imágenes (bloques `code` en ASCII + ejercicios `match`). Su propio ciclo spec → plan cuando el usuario lo pida. Ver §11 para el resto.
+El material de la carrera del usuario que queda por convertir: **IA** (17 PDFs ya en secuencia — el candidato más armado), Java/POO, Python. Nada acordado; brainstorm con el usuario antes de arrancar. Ver §11 para pendientes y deuda.
 
 ## 3. Stack y decisiones técnicas (todas acordadas con el usuario)
 
@@ -103,7 +104,7 @@ coding/                                  (repo git, rama master; remoto: github.
     │   │   ├── levels.js                ← LEVELS (12) + levelFor(xp) (pura)
     │   │   ├── achievements.js          ← ACHIEVEMENTS (17) + unlockedFor/achievementsFor/achievementInfo
     │   │   └── metagame.js              ← contadores derivados, actividad por día, heatmap (puras + async)
-    │   └── seed-data/                   ← bd1, bd2, prog1, prog2, algo, web, reqsw (contenido completo)
+    │   └── seed-data/                   ← bd1, bd2, prog1, prog2, algo, web, reqsw, uml (contenido completo)
     ├── web/                             ← frontend sin build
     │   ├── index.html                   ← ORDEN DE SCRIPTS CRÍTICO (= resolución de dependencias)
     │   ├── api.js                       ← window.API (fetch + token; logout(); 401 → onUnauthorized)
@@ -115,7 +116,7 @@ coding/                                  (repo git, rama master; remoto: github.
     │   └── screens/                     ← Orb, AppShell (NavBar, NavTabs, TiltCard, PageFrame, hooks), Login,
     │                                      Inicio, Materias, Course, exercises, Lesson (+Celebration
     │                                      +FeedbackBand), Review, Progress, Profile — content-only (sin marco propio)
-    ├── test/                            ← 139 tests: node:test + supertest contra MariaDB real (BD coding_test)
+    ├── test/                            ← 141 tests: node:test + supertest contra MariaDB real (BD coding_test)
     └── README.md
 ```
 
@@ -128,7 +129,7 @@ coding/                                  (repo git, rama master; remoto: github.
 | Tabla | Claves/campos esenciales |
 |---|---|
 | `users` | id AI, name, email UNIQUE, password_hash, **daily_goal INT DEFAULT 50**, created_at |
-| `courses` | id VARCHAR ('bd1','prog2','algo','bd2','prog1','web' — ese es el orden del catálogo), subject, subject_tone ENUM(blue,cyan,violet,amber), title, description, prereq_course_id (SOLO bd2→bd1) |
+| `courses` | id VARCHAR (orden del catálogo: bd1, bd2, prog1, prog2, algo, web, reqsw, uml por `order_index`), subject, subject_tone ENUM(blue,cyan,violet,amber), title, description, prereq_course_id (bd2→bd1 y uml→reqsw; la lógica de candado es genérica) |
 | `units` | id VARCHAR, course_id FK, name, order_index |
 | `lessons` | id VARCHAR, unit_id FK, title, mins, order_index, **content JSON** (bloques `p`/`code`/`note`) |
 | `exercises` | id VARCHAR `"<lessonId>-ex1\|ex2"`, lesson_id FK, order_index, type ENUM(choice,blanks,order,match), prompt, **payload JSON** (lo que ve el cliente), **answer JSON** (solo servidor), explain_ok, explain_bad |
@@ -137,7 +138,7 @@ coding/                                  (repo git, rama master; remoto: github.
 | `xp_events` | id AI, user_id, lesson_id NULL, **amount INT (puede ser NEGATIVO** — el gasto del protector de racha es un evento negativo), created_at |
 | `streak_shields` | id AI, user_id FK, protected_day DATE, created_at, **UNIQUE(user_id, protected_day)**. Un día protegido por fila |
 
-Sembrado: 7 cursos, 20 unidades, **71 lecciones**, **142 ejercicios** (2 por lección).
+Sembrado: 8 cursos, 22 unidades, **80 lecciones**, **160 ejercicios** (2 por lección).
 
 **El split de XP** (derivado, sin columnas): **XP ganado** = `SUM(amount>0)` → alimenta el nivel (nunca baja) y todo lo de "actividad" (meta diaria, gráfica semanal, heatmap). **Saldo** = `SUM(amount)` (con negativos) → lo gastable. Helpers `earnedXp`/`balanceXp` en `services/xp.js`.
 
@@ -169,7 +170,7 @@ Errores: middleware central, `{error}` en español con tuteo, 500 genérico sin 
 2. **Racha**: días-calendario consecutivos **con crédito** (≥1 completación **o** un día protegido), hacia atrás desde hoy (si hoy no hay actividad, cuenta desde ayer). El "día" sale SIEMPRE del reloj de Node (`toDayString`), **nunca** de `CURDATE()`. Un día protegido cuenta en `currentStreak`, `bestStreak` y los logros de constancia — de forma consistente (se pasa la unión `activos ∪ protegidos` a las funciones puras, que no cambian por dentro).
 3. **Repaso**: un ejercicio queda pendiente si tiene un fallo sin acierto posterior con context='review' (**comparación por id de intento**). Acertar en lección NO desencola (refuerzo tipo Duolingo); acertar en repaso desencola y da **+5 XP una sola vez**.
 4. **Desbloqueo**: `bd2` exige `bd1` al 100%. Se aplica en el SERVIDOR (403), no solo en la UI.
-5. **Niveles**: 12, de Aprendiz (0 XP) a **Maestro (3.550 XP = las 71 lecciones)**. La curva está anclada al techo real del juego (terminar el temario te hace Maestro) y desde la iteración 10 es **exigente a propósito** (pedido del usuario: los títulos se ganan) — cada uno con ancla narrativa: Practicante 100 (tus primeras 2 lecciones), **Junior 400** (≈ tu primer curso), Desarrollador 800, Semi-senior 1.250, **Senior 1.800** (la mitad del temario), Especialista 2.300, Tech lead 2.750, Referente 3.100, Principal 3.350, **Arquitecto 3.500** (todo menos una lección), Maestro 3.550. `progress` usa `Math.floor` — **nunca puede decir 100% si aún falta XP**.
+5. **Niveles**: 12, de Aprendiz (0 XP) a **Maestro (4.000 XP = las 80 lecciones)**. La curva está anclada al techo real del juego (terminar el temario te hace Maestro) y desde la iteración 10 es **exigente a propósito**: Practicante 100 (tus primeras 2 lecciones), **Junior 400** (≈ tu primer curso), Desarrollador 800, Semi-senior 1.250, **Senior 1.800**, Especialista 2.300, Tech lead 2.750, Referente 3.100, Principal 3.350, Arquitecto 3.500, **Maestro 4.000**. **Deuda consciente** (decisión del usuario en la 11ª): al crecer el catálogo solo se movió el techo — Arquitecto ya no es "todo menos una lección"; el tramo final es el último curso entero. Se re-anclará si el catálogo sigue creciendo. `progress` usa `Math.floor` — **nunca puede decir 100% si aún falta XP**.
 6. **Logros**: 17 (13 visibles + **4 secretos**). Se derivan de contadores **monótonos** (solo crecen) — por eso es seguro derivarlos: el conjunto de desbloqueados nunca encoge. La constancia se mide contra `bestStreak` (la MEJOR racha), no la actual: perder la racha no te quita el logro.
 7. **El toast** solo puede dispararse en `POST /answer` (la única acción que muta el juego), sale de un diff antes/después, y **se ancla al montaje de la celebración**, no al momento de responder (si no, caería sobre el ejercicio y la celebración se abriría encima).
 8. **Meta diaria**: preferencia guardada (`users.daily_goal`, escala [20,50,100,150]). Es un objetivo APARTE de la racha (no la afecta): la racha sigue siendo "≥1 día con crédito". El anillo mide XP **ganado** hoy.
@@ -203,7 +204,7 @@ Errores: middleware central, `{error}` en español con tuteo, 500 genérico sin 
 ## 9. Entorno local y comandos (Windows del usuario)
 
 - **BD**: lo que corre en `localhost:3306` es **MariaDB 12.0.2** (servicio de Windows), no MySQL. Credenciales reales en `app/.env` (git-ignorado; usuario root). **Nunca adivinar contraseñas: si `.env` falta o falla, pedírselas al usuario.** BD dev `coding`; BD de tests `coding_test` (se crea/trunca sola).
-- **Comandos** (desde `app/`): `npm start` (:3000), `npm test` (**139/139**), `npm run seed` (refresca contenido sin tocar usuarios ni progreso).
+- **Comandos** (desde `app/`): `npm start` (:3000), `npm test` (**141/141**), `npm run seed` (refresca contenido sin tocar usuarios ni progreso).
 - **El dev server suele quedar corriendo entre sesiones**. Guarda el backend **en memoria**: si sus respuestas `/api` parecen viejas, **mátalo y relanza** `npm start`. Los estáticos (`web/`) sí se sirven frescos del disco.
 - Cuenta de pruebas: `juan@test.dev` / `secreto1`.
 - Frontend con CDN (React/Babel de unpkg con SRI): requiere internet la primera carga. **Vendorizarlos sigue pendiente.**
@@ -239,11 +240,13 @@ Para cualquier trabajo no trivial, el flujo **superpowers** de principio a fin:
 
 ### Lo primero: la pasada de verificación humana
 
-Es el pendiente principal y solo el usuario puede cerrarlo. Dos mitades:
+Es el pendiente principal y solo el usuario puede cerrarlo. Tres mitades:
 
-**(a) El contenido de requisitos, con ojos de estudiante de la materia** (él ES el experto en qué le evalúan): leer las 7 lecciones de `reqsw` y pedir ajustes de énfasis/copy. Punto concreto del review final: en rq3, **JAD se expandió como "Joint Application Design"** — el original de IBM era "Development" y ambas circulan; confirmar contra su material de clase. Y recordar: su cuenta **bajó de título en pantalla** con la vara nueva (esperado, no bug — el XP no se tocó).
+**(a) Los dos cursos nuevos, con ojos de estudiante de la materia** (él ES el experto en qué le evalúan): leer las 7 lecciones de `reqsw` y las 9 de `uml` y pedir ajustes de énfasis/copy. Puntos concretos de los reviews: en rq3, **JAD se expandió como "Joint Application Design"** (el original de IBM era "Development"; confirmar contra su material); y en um2, la asociación actor-caso lleva punta `▶` donde el canon usa línea sin punta (decisión del ORO del spec — cambiarla es tocar el ejemplo normativo). Y recordar: su cuenta **bajó de título** con la vara nueva (esperado, no bug).
 
-**(b) El *feel* visual** (el tooling congela `rAF`/transiciones/`IntersectionObserver`; se necesita un navegador en **primer plano**). Los ítems acumulados, cada uno con su ajuste preparado:
+**(b) La legibilidad de los 9 diagramas dibujados de `uml`** — la apuesta estética del curso. Contexto: hay un **drift cosmético de ~6px** entre los glifos de caja (~7,42px de avance) y el texto (~8,10px) en la fuente mono — la alineación por caracteres es perfecta; la visual no. Sospecha: la fuente mono no trae los glifos de caja y el navegador cae a un fallback. **Fast-follow propuesto (DS intocado)**: endurecer el `fontFamily` del `CodeBlock` (que es de la app) con una fuente de cobertura caja+geométricos, y de paso verificar si "JetBrains Mono" realmente se sirve por `@font-face`.
+
+**(c) El *feel* visual** (el tooling congela `rAF`/transiciones/`IntersectionObserver`; se necesita un navegador en **primer plano**). Los ítems acumulados, cada uno con su ajuste preparado:
 
 - **El tilt/brillo del cursor-luz** en Inicio y Materias — incluido el **doble-lift** de las tarjetas de curso (−4px del DS Card + −6px del wrapper = −10px al hover; si molesta, `--lift: -3px` en `liquid.css` es fix de 1 línea).
 - **La refracción** del `backdrop-filter` bajo el `TiltCard` (por spec un transform ancestro no la rompe, pero solo los ojos lo confirman).
@@ -251,8 +254,8 @@ Es el pendiente principal y solo el usuario puede cerrarlo. Dos mitades:
 - **El viaje de la píldora** de NavTabs (estiramiento de gota, 420ms) — y el salto en clicks encadenados (fix futuro: capturar el `transform` vivo como origen del FLIP).
 - **La lente del fondo vivo** (persecución amortiguada, condensación donde aparece el cursor, desvanecimiento ~400ms) y el juicio estético del aclarado de la aurora.
 
-### Candidatos a lo siguiente
-El acordado es **el curso de UML** (ver §2). Tras él o en paralelo: cerrar deuda técnica (lista de abajo). No arrancar nada grande sin brainstorm con el usuario.
+### Candidatos a lo siguiente (nada acordado)
+(a) El material de la carrera restante — **IA** (17 PDFs en secuencia, el más armado), Java/POO, Python; (b) el fast-follow del font stack; (c) cerrar deuda técnica. No arrancar nada grande sin brainstorm con el usuario.
 
 ### Deuda técnica, ordenada por importancia
 
@@ -278,4 +281,4 @@ Ejecución de código libre, drag & drop, vidas/corazones, leaderboard, recupera
 
 ## 12. Resumen en una frase
 
-Coding es un Duolingo de Ingeniería de Software, local y en español, con estética Liquid Glass: Express + MariaDB con **toda la lógica derivada** (progreso, racha, repaso, niveles, logros, saldo, hueco reparable — cero columnas de estado salvo la meta diaria) y validación server-side; frontend React sin build donde el vidrio se comporta como materia (se parte por tensión superficial, responde al tacto, se condensa, **siente el cursor** — tilt + brillo especular — su navbar persiste con una píldora que viaja midiendo el texto, y **el fondo es papel de cuaderno que se curva bajo una gota-lente**); **7 materias** (la última, Ingeniería de requisitos, nacida del material de la carrera del usuario y escrita desde el canon), 142 ejercicios, celebraciones, rachas, repaso, **12 niveles con una curva que se gana** (Junior = tu primer curso; Maestro = el temario entero, 3.550 XP), 17 logros, meta diaria y protector de racha — construido y revisado tarea a tarea con el flujo superpowers, con **el curso de UML como siguiente iteración acordada** y la pasada de verificación humana (contenido + *feel*) como pendiente principal.
+Coding es un Duolingo de Ingeniería de Software, local y en español, con estética Liquid Glass: Express + MariaDB con **toda la lógica derivada** (progreso, racha, repaso, niveles, logros, saldo, hueco reparable — cero columnas de estado salvo la meta diaria) y validación server-side; frontend React sin build donde el vidrio se comporta como materia (se parte por tensión superficial, responde al tacto, se condensa, **siente el cursor**, su navbar persiste con una píldora que viaja midiendo el texto, y **el fondo es papel de cuaderno que se curva bajo una gota-lente**); **8 cursos y 160 ejercicios** — los dos últimos nacidos del material de la carrera del usuario y escritos desde el canon: requisitos y **UML con los diagramas dibujados de verdad en caracteres de caja** — con 12 niveles que se ganan (Maestro = el temario entero, 4.000 XP), 17 logros, meta diaria y protector de racha; construido y revisado tarea a tarea con el flujo superpowers, **sin próxima iteración acordada** y con la pasada de verificación humana (los dos cursos como estudiante + la legibilidad de los diagramas + el *feel*) como pendiente principal.

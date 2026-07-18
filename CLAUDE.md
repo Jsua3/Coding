@@ -12,5 +12,5 @@ Reglas mínimas que aplican siempre:
 - `backdrop-filter` jamás sobre un elemento con texto (va en un `<span aria-hidden>` con `zIndex: -1`). En animaciones, solo `transform`/`opacity`/`filter`. Reduced motion con doble cinturón (gate JS + `@media`).
 - Copy en español con tuteo, sentence case, sin emoji. Dependencias nuevas: preguntar primero.
 - BD local = MariaDB 12.0.2; credenciales en `app/.env` (git-ignorado) — si falta, pedirlas al usuario, no adivinar.
-- Comandos (desde `app/`): `npm start` (:3000), `npm test` (**139/139** deben pasar), `npm run seed`. El dev server guarda el backend en memoria: si sus respuestas parecen viejas, mátalo y relánzalo.
+- Comandos (desde `app/`): `npm start` (:3000), `npm test` (**141/141** deben pasar), `npm run seed`. El dev server guarda el backend en memoria: si sus respuestas parecen viejas, mátalo y relánzalo.
 - Trabajo no trivial: flujo superpowers (brainstorm → spec en `docs/superpowers/specs/` → plan → ejecución por subagentes → review final → merge). **Ledger histórico y follow-ups abiertos en `.superpowers/sdd/progress.md` — léelo antes de "redescubrir" issues.**
