@@ -53,7 +53,8 @@ El modo del login viaja en la ruta: `setRoute({ screen: "login", mode: "register
 // el diseño no depende del video para funcionar.
 function GateBackdrop({ mode }) {                    // mode: "landing" | "login"
   const [failed, setFailed] = React.useState(false);
-  const videoRef = React.useRef(null);
+  const frameRef = React.useRef(null);               // la lámina póster+video (NO el video: la
+  const videoRef = React.useRef(null);               // disolución debe funcionar también sin él)
   const noVideo = failed || (window.FX && FX.reducedMotion);
 
   // La disolución del hero: en landing, la opacidad cae de 1 a 0 durante el primer ~90vh
@@ -61,12 +62,10 @@ function GateBackdrop({ mode }) {                    // mode: "landing" | "login
   // El cálculo va directo en el evento (pasivo): es una resta y un clamp — y así queda
   // verificable en el panel del tooling, donde rAF jamás corre.
   React.useEffect(() => {
-    const el = videoRef.current;
-    const layer = el ? el.parentElement : null;
-    if (!layer) return;
     const apply = () => {
       const op = mode === "login" ? 1 : Math.max(0, 1 - window.scrollY / (window.innerHeight * 0.9));
-      layer.style.opacity = String(op);
+      frameRef.current.style.opacity = String(op);
+      const el = videoRef.current;
       if (el) { if (op === 0 && !el.paused) el.pause(); else if (op > 0 && el.paused) el.play().catch(() => {}); }
     };
     apply();
@@ -76,7 +75,7 @@ function GateBackdrop({ mode }) {                    // mode: "landing" | "login
 
   return (
     <div aria-hidden className="lg-gate">
-      <div className="lg-gate__frame">
+      <div ref={frameRef} className="lg-gate__frame">
         <div className="lg-gate__poster"></div>
         {!noVideo ? (
           <video ref={videoRef} className="lg-gate__video" autoPlay muted loop playsInline
@@ -111,7 +110,7 @@ El video llena la pantalla. Centrado, sobre la zona tranquila:
 - El logotipo **"Coding"** con su barra cian luminosa (la del login actual, más grande: ~64px).
 - Titular (una línea): **"Aprende Ingeniería de Software como si fuera un juego"**.
 - Subtítulo: **"Lecciones cortas, ejercicios interactivos y una racha que no vas a querer romper."**
-- CTAs: **"Empieza a programar"** (Button primario `size="lg"`, con `Liquid.ripple`) y **"Ya tengo cuenta"** (secundario/ghost). Ambos navegan la puerta (§1).
+- CTAs: **"Empieza a programar"** (`Button size="lg"` primario, con `Liquid.ripple`) y **"Ya tengo cuenta"** (`Button variant="secondary" size="lg"` — vidrio; verificado: el DS declara `primary|secondary|ghost|danger`). Ambos navegan la puerta (§1).
 - Abajo, un **chevron de scroll** que respira (solo `transform`; bajo reduced motion se oculta con `display: none` — es una pista de movimiento, sin movimiento no informa).
 
 Al scrollear, `GateBackdrop` disuelve el video (§3) y las secciones siguientes viven sobre la aurora + papel de cuaderno.
@@ -140,7 +139,7 @@ Un track de **350vh** con la escena fijada por `position: sticky` (sin secuestra
 **Mecánica** — hook `useScrollStage(trackRef, n)` en `LandingScreen.jsx`:
 
 - Listener de `scroll` **pasivo y directo** (sin rAF-throttle, a propósito: el cálculo es `clamp((scrollY - top) / (alto - vh))` + un `floor` — barato por evento, y **verificable en el panel del tooling**, donde rAF jamás procesa).
-- `top`/`alto` se leen con `getBoundingClientRect` al montar y en `resize` (listener con limpieza), no por evento.
+- `top`/`alto` se leen al montar y en `resize` (listener con limpieza), no por evento. Ojo: `getBoundingClientRect().top` es relativo al viewport — el top de documento es `rect.top + window.scrollY`.
 - Devuelve `stage` (0–3, discreto). Cambiar de etapa dispara las transiciones — **melt** entre teoría⇄ejercicio (el idioma del stepper real), **drop-in** de la banda en la etapa 3, **bloom + count-up** en la 4 — reutilizando las clases de `motion.css`/`fx.js` existentes donde encajen. Solo `transform`/`opacity`/`filter`.
 - Las etapas son **reversibles**: scrollear hacia arriba vuelve a la etapa anterior (el estado es función del scroll, no una animación de una vía).
 
