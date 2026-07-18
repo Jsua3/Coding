@@ -464,12 +464,18 @@ body {
   text-align: center;
   padding: 32px;
 }
-/* La pista de scroll: respira con transform, nada de layout. */
+/* La pista de scroll: texto + chevron respirando juntos (solo transform/opacity). El texto
+   informa por sí mismo — por eso bajo reduced motion el hint queda visible y estático. */
 .lg-hero__hint {
   position: absolute;
   bottom: 26px;
-  left: 50%;
-  margin-left: -11px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
   color: var(--text-tertiary);
   animation: lg-hint 2.2s var(--ease-glass) infinite;
 }
@@ -489,6 +495,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ---------- El cursor del logo: un caret de editor que titila ---------- */
+/* Parpadeo abrupto, solo opacity (el glow viaja con la barra). La rampa de 1% entre
+   keyframes (~11ms) es imperceptible: se lee como corte seco, como un caret real. */
+.lg-caret { animation: lg-caret-blink 1.1s linear infinite; }
+@keyframes lg-caret-blink {
+  0%, 54% { opacity: 1; }
+  55%, 100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -519,6 +534,9 @@ body {
      existiera, se apaga y queda el póster estático (estado base visible ⇒ display: none). */
   .lg-gate__video { display: none !important; }
   .lg-back { transition: none !important; }
-  /* Una pista de movimiento sin movimiento no informa: fuera entera. */
-  .lg-hero__hint { display: none !important; }
+  /* El hint ahora lleva texto: informa por sí mismo. Queda visible y estático (estado base
+     visible y correcto ⇒ animation: none es el patrón válido, como el menú del avatar). */
+  .lg-hero__hint { animation: none !important; }
+  /* La barra del logo queda sólida: estado base visible y correcto. */
+  .lg-caret { animation: none !important; }
 }

@@ -186,7 +186,7 @@ function HeroAct({ onStart, onLogin }) {
     <section className="lg-hero">
       <div className="anim-condense">
         <div style={{ fontFamily: "var(--font-display)", fontSize: 64, fontWeight: "var(--weight-heavy)", letterSpacing: "var(--tracking-display)", color: "var(--text-primary)", lineHeight: 1 }}>
-          Coding<span style={{ display: "inline-block", width: 7, height: 48, marginLeft: 12, borderRadius: 3, background: "var(--accent-cyan)", boxShadow: "0 0 18px var(--accent-cyan)" }}></span>
+          Coding<span className="lg-caret" style={{ display: "inline-block", width: 7, height: 48, marginLeft: 12, borderRadius: 3, background: "var(--accent-cyan)", boxShadow: "0 0 18px var(--accent-cyan)" }}></span>
         </div>
       </div>
       <div className="anim-condense anim-condense--delayed" style={{ maxWidth: 640 }}>
@@ -201,7 +201,10 @@ function HeroAct({ onStart, onLogin }) {
         <Button size="lg" onClick={onStart}>Empieza a programar</Button>
         <Button size="lg" variant="secondary" onClick={onLogin}>Ya tengo cuenta</Button>
       </div>
-      <span aria-hidden className="lg-hero__hint"><KIcon d="M4 6l4 4 4-4" size={22} /></span>
+      <div aria-hidden className="lg-hero__hint">
+        <span>Desliza para ver más</span>
+        <KIcon d="M4 6l4 4 4-4" size={22} />
+      </div>
     </section>
   );
 }
