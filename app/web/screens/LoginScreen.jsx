@@ -18,7 +18,9 @@ function LoginScreen({ onLoggedIn, initialMode, onBack }) {
   const isLogin = shownMode === "login";
   const modeCls = phase === "out" ? "anim-melt-out" : "anim-melt-in";
 
-  const switchMode = (e, m) => { e.preventDefault(); setMode(m); setError(null); };
+  // Con un submit en vuelo no se alterna: un fallo tardío pintaría el error de un modo
+  // bajo la interfaz del otro.
+  const switchMode = (e, m) => { e.preventDefault(); if (loading) return; setMode(m); setError(null); };
 
   const submit = async () => {
     if (loading) return;

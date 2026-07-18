@@ -477,6 +477,7 @@ body {
   gap: 6px;
   font-size: var(--text-xs);
   color: var(--text-tertiary);
+  pointer-events: none; /* decorativo: la franja a todo lo ancho jamás roba un click */
   animation: lg-hint 2.2s var(--ease-glass) infinite;
 }
 @keyframes lg-hint {
