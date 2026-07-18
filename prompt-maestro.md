@@ -1,10 +1,10 @@
 # PROMPT MAESTRO — Coding
 
 > Documento de contexto total del proyecto. **Léelo completo antes de trabajar en él desde una conversación nueva.**
-> Última actualización: **2026-07-17**, tras fusionar la 11ª iteración ("Modelado con UML") a `master` (código en `cb186e1`).
+> Última actualización: **2026-07-18**, tras fusionar la 12ª iteración ("La puerta de entrada") a `master`.
 >
-> **Qué cambió en la última tanda:** las iteraciones 10-11 hicieron crecer el catálogo con el material de la carrera del usuario — **Ingeniería de requisitos** (7 lecciones) y **Modelado con UML** (9 lecciones donde los diagramas se DIBUJAN con caracteres de caja; candado tras requisitos) — más la curva exigente (Junior 400) y el techo en 4.000. Detalle en §2.
-> **Qué está pendiente:** la **pasada de verificación humana** (leer los dos cursos nuevos como estudiante + legibilidad de los diagramas + *feel* visual), el **fast-follow del font stack del CodeBlock** (drift de píxel en glifos de caja) y la deuda técnica menor — todo en §11.
+> **Qué cambió en la última tanda:** la 12ª iteración construyó **la puerta de entrada** — un landing pre-login de cuatro actos (hero sobre video, scrollytelling pinned, catálogo, cierre) y el login rediseñado sobre el mismo video, montado una sola vez en `App`. **Regla de proceso nueva pedida por el usuario: todo cambio significativo queda reflejado en este documento en la misma sesión.** Detalle en §2.
+> **Qué está pendiente:** el usuario debe **crear el video en Claude Design** y soltarlo en `app/web/assets/` (la puerta funciona sin él, sobre la aurora); la **pasada de verificación humana** acumulada (§11) suma ahora el *feel* de la puerta (pinned, disolución, condensación del panel) y la legibilidad sobre el video real.
 
 ---
 
@@ -35,6 +35,7 @@
 | 9 | **El fondo vivo** (`2026-07-16-fondo-vivo`) | El fondo deja de ser un telón: **aurora un paso más luminosa** (override en cascada del `body`; DS intocado) + **papel de cuaderno** — `Liquid.grid`, un canvas 2D cuya cuadrícula (48px) se curva hacia el cursor como bajo una **gota-lente** (radio 180, smoothstep), perseguido con amortiguación, refractado por el vidrio, y que **duerme a cero CPU** en reposo. Primera iteración con CERO fixes de review. |
 | 10 | **Ingeniería de requisitos + la vara nueva** (`2026-07-17-curso-requisitos`) | La **primera materia nueva desde la iteración 2**: `reqsw` (violet, order 7, sin prereq) — 7 lecciones en 2 unidades y 14 ejercicios sobre elicitar, analizar, especificar, validar y gestionar requisitos. Contenido **100% original desde el canon** (Pressman/SWEBOK/IEEE 29148), con el temario del curso real del usuario marcando orden y énfasis; verificado "como profesor" en tres capas de review. Y la **curva de niveles recalibrada** (pedido del usuario: los títulos se ganan) + logros de catálogo a 71/7. |
 | 11 | **Modelado con UML** (`2026-07-17-curso-uml`) | El segundo curso de Ingeniería de software (`uml`, violet, order 8, **prereq reqsw** — el candado es puro dato): 9 lecciones en 2 unidades donde **los diagramas se DIBUJAN con caracteres de caja** dentro de bloques `code` (contrato de dibujo en el spec §3: ≤60 col, ≤12 líneas, notación canónica, color selectivo). Techo a **4.000** (solo Maestro — deuda del ancla de Arquitecto anotada), logros 80/8, y el `CodeBlock` con `white-space: pre` (único frontend; de regalo, la indentación del SQL viejo por fin se ve). |
+| 12 | **La puerta de entrada** (`2026-07-18-puerta-de-entrada`) | El pre-login completo: **landing** de cuatro actos — hero sobre **video** aurora+código (asset del usuario, contrato en el spec §2), **scrollytelling pinned** donde una lección de mentira avanza 4 etapas con el scroll (sticky + listener directo sin rAF, reversible), catálogo estático de los 8 cursos con tilt, cierre con CTA — y el **login rediseñado** sobre el mismo video (`GateBackdrop` montado UNA vez en `App`, fuera del div keyado: landing⇄login no lo reinicia), que **se defiende solo** si el video falta (aurora; `onError` silencioso; reduced motion a doble cinturón). Llegada fresca → landing; logout/expiración → login directo. Cero backend. |
 | — | **Fix del `context`** (`fix/context-guard`) | Cerró un agujero de integridad preexistente: `POST /answer` confiaba en el `context` del cliente. Ahora el servidor lo degrada a `'lesson'` salvo que el ejercicio esté genuinamente pendiente de repaso. |
 | — | **Fixes visuales** (directos a master, con systematic-debugging) | (a) Las tarjetas de logros desbordaban su celda 42px (`GlassPanel` es **content-box** y `height:100%` + padding se salía; fix: `boxSizing: border-box` vía el `style` prop). (b) La banda de feedback pisaba el botón Comprobar en pantallas bajas (fix: reservar 120px al fondo de lección y repaso). |
 
@@ -115,9 +116,11 @@ coding/                                  (repo git, rama master; remoto: github.
     │   │                                  vivo (incl. el override del body: aurora aclarada, en cascada sobre el DS)
     │   ├── app.jsx                      ← router (lee `tab`), DUEÑO DEL MARCO (PageFrame + NavBar persistente
     │   │                                  fuera del div keyado), toast global, COLA DE LOGROS
-    │   └── screens/                     ← Orb, AppShell (NavBar, NavTabs, TiltCard, PageFrame, hooks), Login,
-    │                                      Inicio, Materias, Course, exercises, Lesson (+Celebration
-    │                                      +FeedbackBand), Review, Progress, Profile — content-only (sin marco propio)
+    │   ├── assets/                      ← gate.mp4 + gate-poster.jpg (los entrega el usuario; README con el contrato)
+    │   └── screens/                     ← Orb, AppShell (NavBar, NavTabs, TiltCard, PageFrame, hooks), Gate
+    │                                      (GateBackdrop), Landing, Login, Inicio, Materias, Course, exercises,
+    │                                      Lesson (+Celebration +FeedbackBand), Review, Progress, Profile —
+    │                                      content-only (sin marco propio)
     ├── test/                            ← 141 tests: node:test + supertest contra MariaDB real (BD coding_test)
     └── README.md
 ```
@@ -201,6 +204,7 @@ Errores: middleware central, `{error}` en español con tuteo, 500 genérico sin 
 - **Higiene**: todo timer/rAF/observer en ref, limpiado en el `useEffect` de desmontaje. Los nodos inyectados se autodestruyen por `animationend` + `setTimeout` de seguridad.
 - **El `CodeBlock` de las lecciones preserva espacios** (`whiteSpace: "pre"` + `overflowX: "auto"`, en `LessonScreen.jsx`): los diagramas de caja de `uml` y la indentación del SQL/Java dependen de ello — no lo quites jamás. Ojo JSX en este proyecto: los comentarios `{/* */}` SOLO en posición de children — jamás directamente tras `return (` ni dentro de un ternario (rompe Babel; nos pasó).
 - **Globales disponibles**: `window.FX` (`sound.play`, `burst`, `bloom`, `countUp`, `reducedMotion`), `window.Liquid` (`ripple`, `reveal`, `pointer`, `grid` — este último es el papel de cuaderno del fondo: canvas único montado en `App`, no lo montes en ningún otro sitio), y de `AppShell.jsx`: `usePhase(value, outMs)`, `useScrolled(px)`, `TiltCard` (envuelve una tarjeta para que sienta el cursor: brillo + tilt; va DENTRO del `.lg-reveal`, nunca en el mismo div — ambos escriben `transform`) y `NavTabs`.
+- **La puerta de entrada** (pre-login): estados sin token `landing` (por defecto) y `login` (con `mode` en la ruta); `GateBackdrop` (video + póster + scrim) vive en `App` fuera del div keyado y solo sin sesión — no lo montes en ninguna pantalla. El video es **mejora progresiva**: la puerta funciona sin `assets/gate.mp4`. El catálogo del landing es **copy estático espejo del seed** (se actualiza a mano en cada iteración de contenido, como los logros de catálogo). Logout/expiración → `login` directo, jamás al landing.
 
 ---
 
@@ -264,6 +268,7 @@ Es el pendiente principal y solo el usuario puede cerrarlo. Tres mitades:
 - **La legibilidad** del botón Continuar/Empezar de la CourseCard en el pico de brillo.
 - **El viaje de la píldora** de NavTabs (estiramiento de gota, 420ms) — y el salto en clicks encadenados (fix futuro: capturar el `transform` vivo como origen del FLIP).
 - **La lente del fondo vivo** (persecución amortiguada, condensación donde aparece el cursor, desvanecimiento ~400ms) y el juicio estético del aclarado de la aurora.
+- **La puerta de entrada** (12ª): crear el video en Claude Design y soltarlo en `assets/`; juzgar la legibilidad del hero y el formulario **sobre el video real**; el *feel* del scrollytelling pinned (ritmo de 4 etapas en 350vh), la disolución del hero al scrollear y la condensación del panel del login.
 
 ### Candidatos a lo siguiente (nada acordado)
 (a) El material de la carrera restante — **IA** (17 PDFs en secuencia, el más armado), Java/POO, Python; (b) el fast-follow del font stack; (c) cerrar deuda técnica. No arrancar nada grande sin brainstorm con el usuario.
