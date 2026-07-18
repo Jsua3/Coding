@@ -431,6 +431,28 @@ body {
     linear-gradient(180deg, rgba(5, 8, 18, 0.20) 0%, rgba(5, 8, 18, 0.55) 100%);
 }
 
+/* ---------- La puerta: el enlace Volver del login ---------- */
+.lg-back {
+  position: fixed;
+  top: 24px;
+  left: 28px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+  transition: color var(--duration-fast) var(--ease-glass);
+}
+.lg-back:hover { color: var(--text-primary); }
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */
@@ -458,4 +480,5 @@ body {
   /* Cinturón 2 de la puerta: el gate JS ni monta el video bajo reduced motion; si aun así
      existiera, se apaga y queda el póster estático (estado base visible ⇒ display: none). */
   .lg-gate__video { display: none !important; }
+  .lg-back { transition: none !important; }
 }
