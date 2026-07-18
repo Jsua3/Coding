@@ -110,7 +110,7 @@ El video llena la pantalla. Centrado, sobre la zona tranquila:
 - El logotipo **"Coding"** con su barra cian luminosa (la del login actual, más grande: ~64px).
 - Titular (una línea): **"Aprende Ingeniería de Software como si fuera un juego"**.
 - Subtítulo: **"Lecciones cortas, ejercicios interactivos y una racha que no vas a querer romper."**
-- CTAs: **"Empieza a programar"** (`Button size="lg"` primario, con `Liquid.ripple`) y **"Ya tengo cuenta"** (`Button variant="secondary" size="lg"` — vidrio; verificado: el DS declara `primary|secondary|ghost|danger`). Ambos navegan la puerta (§1).
+- CTAs: **"Empieza a programar"** (`Button size="lg"` primario) y **"Ya tengo cuenta"** (`Button variant="secondary" size="lg"` — vidrio; verificado: el DS declara `primary|secondary|ghost|danger`). Ambos navegan la puerta (§1). Sin `Liquid.ripple`: su contrato de host exige `overflow: hidden`, que recortaría el halo del botón primario — en la app el ripple vive en superficies propias (RippleBox de ejercicios), nunca en Buttons del DS.
 - Abajo, un **chevron de scroll** que respira (solo `transform`; bajo reduced motion se oculta con `display: none` — es una pista de movimiento, sin movimiento no informa).
 
 Al scrollear, `GateBackdrop` disuelve el video (§3) y las secciones siguientes viven sobre la aurora + papel de cuaderno.
@@ -171,7 +171,7 @@ El mismo `GateBackdrop` a plena opacidad (modo `login`). Encima:
 - **El logotipo con más protagonismo**: "Coding" + barra cian arriba del panel (~56px, hoy 44) con el subtítulo actual ("Aprende Ingeniería de Software, una lección a la vez").
 - **El panel de vidrio** (`GlassPanel strength="strong"`, como hoy) mantiene la estructura del formulario — campos, Recordarme, error, cambio login/registro — pero **entra condensándose** sobre el video (la coreografía de condensación existente, vía clase en un `<div>` wrapper propio — los componentes del DS no reenvían `className`). El blur del panel refracta el video en movimiento: **ese es el momento visual de la pantalla**.
 - `initialMode` respeta el CTA de origen: "Empieza a programar" abre **registro**; "Ya tengo cuenta", entrar. El toggle interno sigue funcionando igual.
-- Botón de enviar con `Liquid.ripple`, como el resto de la app.
+- El botón de enviar queda como `Button` del DS con sus estados propios (sin `Liquid.ripple` — mismo motivo que los CTAs del hero: el contrato del host recortaría el halo).
 - El "¿Olvidaste tu contraseña?" actual (enlace muerto) **se elimina** — recuperación de contraseña está fuera de alcance decidido desde la iteración 1, y un enlace que no hace nada es deuda de copy.
 
 ## 6. Gates, accesibilidad y restricciones
