@@ -391,6 +391,46 @@ body {
   pointer-events: none;
 }
 
+/* ---------- La puerta de entrada: el video compartido del landing y el login ---------- */
+/* Después de .lg-noise en el DOM (a igual z-index, el orden de fuente decide): el video pinta
+   ENCIMA de cuadrícula y ruido; cuando su lámina se disuelve al scrollear, el fondo vivo
+   reaparece debajo. pointer-events: none — es fondo, jamás roba un click. */
+.lg-gate {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+/* La lámina póster+video. Su opacidad la escribe GateBackdrop directo en el evento de scroll
+   (una resta y un clamp por evento — sin rAF, y así verificable en el panel del tooling).
+   Solo opacity: jamás layout. */
+.lg-gate__frame { position: absolute; inset: 0; }
+/* El póster va DEBAJO del video como background CSS: si el archivo no existe todavía, un
+   background 404 no pinta nada ni rompe nada — queda la aurora. */
+.lg-gate__poster {
+  position: absolute;
+  inset: 0;
+  background-image: url("assets/gate-poster.jpg");
+  background-size: cover;
+  background-position: center;
+}
+.lg-gate__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* El scrim: contraste garantizado para el vidrio y el texto encima del video. Es un gradiente
+   (sin blur y sin texto dentro), más denso hacia el centro-abajo, donde vive el formulario. */
+.lg-gate__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(90% 70% at 50% 62%, rgba(5, 8, 18, 0.42), transparent 75%),
+    linear-gradient(180deg, rgba(5, 8, 18, 0.20) 0%, rgba(5, 8, 18, 0.55) 100%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */
@@ -415,4 +455,7 @@ body {
   .lg-bars__bar { transition: none !important; }
   .lg-tilt { transform: none !important; transition: none !important; }
   .lg-tilt::after { display: none !important; }
+  /* Cinturón 2 de la puerta: el gate JS ni monta el video bajo reduced motion; si aun así
+     existiera, se apaga y queda el póster estático (estado base visible ⇒ display: none). */
+  .lg-gate__video { display: none !important; }
 }
