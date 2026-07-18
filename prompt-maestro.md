@@ -268,7 +268,7 @@ Es el pendiente principal y solo el usuario puede cerrarlo. Tres mitades:
 - **La legibilidad** del botón Continuar/Empezar de la CourseCard en el pico de brillo.
 - **El viaje de la píldora** de NavTabs (estiramiento de gota, 420ms) — y el salto en clicks encadenados (fix futuro: capturar el `transform` vivo como origen del FLIP).
 - **La lente del fondo vivo** (persecución amortiguada, condensación donde aparece el cursor, desvanecimiento ~400ms) y el juicio estético del aclarado de la aurora.
-- **La puerta de entrada** (12ª): crear el video en Claude Design y soltarlo en `assets/`; juzgar la legibilidad del hero y el formulario **sobre el video real**; el *feel* del scrollytelling pinned (ritmo de 4 etapas en 350vh), la disolución del hero al scrollear y la condensación del panel del login.
+- **La puerta de entrada** (12ª): crear el video en Claude Design y soltarlo en `assets/`; juzgar la legibilidad del hero y el formulario **sobre el video real**; el *feel* del scrollytelling pinned (ritmo de 4 etapas en 350vh), la disolución del hero al scrollear y la condensación del panel del login. Y un ítem del review final: **el scrim de la puerta no se disuelve con el scroll** (es contraste permanente por spec) — si las secciones bajas del landing se ven demasiado oscuras, el fix de 1 línea es mover `.lg-gate__scrim` dentro de `.lg-gate__frame` para que se disuelva con el video.
 
 ### Candidatos a lo siguiente (nada acordado)
 (a) El material de la carrera restante — **IA** (17 PDFs en secuencia, el más armado), Java/POO, Python; (b) el fast-follow del font stack; (c) cerrar deuda técnica. No arrancar nada grande sin brainstorm con el usuario.
