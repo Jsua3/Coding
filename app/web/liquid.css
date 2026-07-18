@@ -478,6 +478,19 @@ body {
   50% { transform: translateY(7px); opacity: 1; }
 }
 
+/* ---------- El landing: scrollytelling pinned ---------- */
+/* El track alto da el recorrido; la escena queda fijada con sticky (sin secuestrar el scroll:
+   si scrolleas rápido, las etapas pasan rápido). La etapa la decide useScrollStage por umbral. */
+.lg-scrolly { position: relative; height: 350vh; }
+.lg-scrolly__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */
