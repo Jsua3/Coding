@@ -20,7 +20,7 @@
 
 ---
 
-## 2. Estado actual: once iteraciones + los fixes, todo fusionado a `master`
+## 2. Estado actual: doce iteraciones + los fixes, todo fusionado a `master`
 
 | # | Iteración | Qué añadió |
 |---|---|---|
