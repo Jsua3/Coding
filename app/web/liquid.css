@@ -453,6 +453,31 @@ body {
 }
 .lg-back:hover { color: var(--text-primary); }
 
+/* ---------- El landing: hero sobre el video ---------- */
+.lg-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px;
+}
+/* La pista de scroll: respira con transform, nada de layout. */
+.lg-hero__hint {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  margin-left: -11px;
+  color: var(--text-tertiary);
+  animation: lg-hint 2.2s var(--ease-glass) infinite;
+}
+@keyframes lg-hint {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(7px); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* El ruido es textura estática, no movimiento: se conserva. */
   /* display:none y NO animation:none — el estado base del ripple es visible y quedaría un círculo fijo. */
@@ -481,4 +506,6 @@ body {
      existiera, se apaga y queda el póster estático (estado base visible ⇒ display: none). */
   .lg-gate__video { display: none !important; }
   .lg-back { transition: none !important; }
+  /* Una pista de movimiento sin movimiento no informa: fuera entera. */
+  .lg-hero__hint { display: none !important; }
 }

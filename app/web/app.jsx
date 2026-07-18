@@ -2,7 +2,9 @@ const KITA = window.CodingDesignSystem_2ecb3a;
 
 function App() {
   const { Toast } = KITA;
-  const [route, setRoute] = React.useState({ screen: API.token ? "loading" : "login" });
+  // Sin token, la llegada fresca cae en el landing. Cerrar sesión y la expiración caen en
+  // "login" directo (ya conoces el producto) — esos caminos no cambian.
+  const [route, setRoute] = React.useState({ screen: API.token ? "loading" : "landing" });
   const [me, setMe] = React.useState(null);
   const [tab, setTab] = React.useState("inicio");
   const [toast, setToast] = React.useState(null);
@@ -82,6 +84,11 @@ function App() {
     if (API.token) loadMe();
   }, []);
 
+  // La puerta abre siempre arriba: el landing puede estar scrolleado al pulsar un CTA.
+  React.useEffect(() => {
+    if (route.screen === "landing" || route.screen === "login") window.scrollTo(0, 0);
+  }, [route.screen]);
+
   const go = {
     dashboard: () => { setRoute({ screen: "dashboard" }); loadMe(); },
     course: (courseId) => setRoute({ screen: "course", courseId }),
@@ -93,8 +100,13 @@ function App() {
   const goTab = (id) => { setTab(id); setRoute({ screen: "dashboard" }); };
 
   let screen;
-  if (route.screen === "login") {
-    screen = <LoginScreen onLoggedIn={() => { setRoute({ screen: "loading" }); loadMe(); }} />;
+  if (route.screen === "landing") {
+    screen = <LandingScreen
+      onStart={() => setRoute({ screen: "login", mode: "register" })}
+      onLogin={() => setRoute({ screen: "login", mode: "login" })} />;
+  } else if (route.screen === "login") {
+    screen = <LoginScreen initialMode={route.mode} onBack={() => setRoute({ screen: "landing" })}
+      onLoggedIn={() => { setRoute({ screen: "loading" }); loadMe(); }} />;
   } else if (route.screen === "loading" || !me) {
     screen = <LoadingPanel />;
   } else if (route.screen === "course") {
@@ -122,7 +134,8 @@ function App() {
   // La NavBar vive AQUÍ, fuera del div keyado que remonta el contenido en cada navegación: es la
   // única forma de que el indicador de pestañas pueda viajar (un componente que muere no desliza).
   // El sticky sigue funcionando porque su contenedor es la página entera, no un wrapper corto.
-  const conSesion = route.screen !== "login" && route.screen !== "loading" && me;
+  const conSesion = route.screen !== "landing" && route.screen !== "login" && route.screen !== "loading" && me;
+  const enPuerta = route.screen === "landing" || route.screen === "login";
   const contenido = (
     <div key={route.screen + ":" + tab + ":" + (route.lessonId || route.courseId || "")} className="anim-screen-in">
       {screen}
@@ -133,6 +146,7 @@ function App() {
     <React.Fragment>
       <canvas ref={gridRef} aria-hidden className="lg-grid"></canvas>
       <span aria-hidden className="lg-noise"></span>
+      {enPuerta ? <GateBackdrop mode={route.screen} /> : null}
       {conSesion ? (
         <PageFrame>
           <NavBar user={{ ...me.user, streak: me.stats.streak }} tab={tab} setTab={goTab} onHome={() => goTab("inicio")} />
